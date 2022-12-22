@@ -19,7 +19,13 @@ for target in ["x86_64-linux-gnu"]
         "general" => general,
         "codegen" => codegen,
         )
-    general["library_name"] = "Symbol(\"libwayland-client\")"
+    general["library_name"] = "libwayland_client"
+    general["library_names"] = Dict(
+        "wayland-client.*.h" => "libwayland_client",
+        "wayland-cursor.h" => "libwayland_cursor",
+        "wayland-egl.*.h" => "libwayland_egl",
+        "wayland-server.*.h" => "libwayland_server",
+    )
     general["output_file_path"] = joinpath(dirname(@__DIR__), "lib", "$target.jl")
     general["use_deterministic_symbol"] = true
     general["print_using_CEnum"] = false

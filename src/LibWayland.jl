@@ -1,5 +1,6 @@
 module LibWayland
 
+using Wayland_jll: libwayland_client, libwayland_cursor, libwayland_egl, libwayland_server
 using CEnum
 
 const IS_LIBC_MUSL = occursin("musl", Base.BUILD_TRIPLET)

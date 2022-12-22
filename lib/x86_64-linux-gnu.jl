@@ -171,7 +171,7 @@ Initializes the list.
 * `list`: List to initialize
 """
 function wl_list_init(list)
-    ccall((:wl_list_init, Symbol("libwayland-client")), Cvoid, (Ptr{wl_list},), list)
+    ccall((:wl_list_init, libwayland_client), Cvoid, (Ptr{wl_list},), list)
 end
 
 """
@@ -190,7 +190,7 @@ Inserts an element into the list, after the element represented by `list`. When 
 * `elm`: Link of the containing struct to insert into the list
 """
 function wl_list_insert(list, elm)
-    ccall((:wl_list_insert, Symbol("libwayland-client")), Cvoid, (Ptr{wl_list}, Ptr{wl_list}), list, elm)
+    ccall((:wl_list_insert, libwayland_client), Cvoid, (Ptr{wl_list}, Ptr{wl_list}), list, elm)
 end
 
 """
@@ -208,7 +208,7 @@ Removes an element from the list.
 * `elm`: Link of the containing struct to remove from the list
 """
 function wl_list_remove(elm)
-    ccall((:wl_list_remove, Symbol("libwayland-client")), Cvoid, (Ptr{wl_list},), elm)
+    ccall((:wl_list_remove, libwayland_client), Cvoid, (Ptr{wl_list},), elm)
 end
 
 """
@@ -228,7 +228,7 @@ Determines the length of the list.
 Number of elements in the list
 """
 function wl_list_length(list)
-    ccall((:wl_list_length, Symbol("libwayland-client")), Cint, (Ptr{wl_list},), list)
+    ccall((:wl_list_length, libwayland_client), Cint, (Ptr{wl_list},), list)
 end
 
 """
@@ -244,7 +244,7 @@ Determines if the list is empty.
 1 if empty, or 0 if not empty
 """
 function wl_list_empty(list)
-    ccall((:wl_list_empty, Symbol("libwayland-client")), Cint, (Ptr{wl_list},), list)
+    ccall((:wl_list_empty, libwayland_client), Cint, (Ptr{wl_list},), list)
 end
 
 """
@@ -263,7 +263,7 @@ Inserts all of the elements of one list into another, after the element represen
 * `other`: List of elements to insert
 """
 function wl_list_insert_list(list, other)
-    ccall((:wl_list_insert_list, Symbol("libwayland-client")), Cvoid, (Ptr{wl_list}, Ptr{wl_list}), list, other)
+    ccall((:wl_list_insert_list, libwayland_client), Cvoid, (Ptr{wl_list}, Ptr{wl_list}), list, other)
 end
 
 """
@@ -298,7 +298,7 @@ Initializes the array.
 * `array`: Array to initialize
 """
 function wl_array_init(array)
-    ccall((:wl_array_init, Symbol("libwayland-client")), Cvoid, (Ptr{wl_array},), array)
+    ccall((:wl_array_init, libwayland_client), Cvoid, (Ptr{wl_array},), array)
 end
 
 """
@@ -316,7 +316,7 @@ Releases the array data.
 * `array`: Array whose data is to be released
 """
 function wl_array_release(array)
-    ccall((:wl_array_release, Symbol("libwayland-client")), Cvoid, (Ptr{wl_array},), array)
+    ccall((:wl_array_release, libwayland_client), Cvoid, (Ptr{wl_array},), array)
 end
 
 """
@@ -333,7 +333,7 @@ Increases the size of the array by `size` bytes.
 A pointer to the beginning of the newly appended space, or NULL when resizing fails.
 """
 function wl_array_add(array, size)
-    ccall((:wl_array_add, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_array}, Csize_t), array, size)
+    ccall((:wl_array_add, libwayland_client), Ptr{Cvoid}, (Ptr{wl_array}, Csize_t), array, size)
 end
 
 """
@@ -350,7 +350,7 @@ Copies the contents of `source` to `array`.
 0 on success, or -1 on failure
 """
 function wl_array_copy(array, source)
-    ccall((:wl_array_copy, Symbol("libwayland-client")), Cint, (Ptr{wl_array}, Ptr{wl_array}), array, source)
+    ccall((:wl_array_copy, libwayland_client), Cint, (Ptr{wl_array}, Ptr{wl_array}), array, source)
 end
 
 """
@@ -371,7 +371,7 @@ Converts a fixed-point number to a floating-point number.
 Floating-point representation of the fixed-point argument
 """
 function wl_fixed_to_double(f)
-    ccall((:wl_fixed_to_double, Symbol("libwayland-client")), Cdouble, (wl_fixed_t,), f)
+    ccall((:wl_fixed_to_double, libwayland_client), Cdouble, (wl_fixed_t,), f)
 end
 
 """
@@ -385,7 +385,7 @@ Converts a floating-point number to a fixed-point number.
 Fixed-point representation of the floating-point argument
 """
 function wl_fixed_from_double(d)
-    ccall((:wl_fixed_from_double, Symbol("libwayland-client")), wl_fixed_t, (Cdouble,), d)
+    ccall((:wl_fixed_from_double, libwayland_client), wl_fixed_t, (Cdouble,), d)
 end
 
 """
@@ -399,7 +399,7 @@ Converts a fixed-point number to an integer.
 Integer component of the fixed-point argument
 """
 function wl_fixed_to_int(f)
-    ccall((:wl_fixed_to_int, Symbol("libwayland-client")), Cint, (wl_fixed_t,), f)
+    ccall((:wl_fixed_to_int, libwayland_client), Cint, (wl_fixed_t,), f)
 end
 
 """
@@ -413,7 +413,7 @@ Converts an integer to a fixed-point number.
 Fixed-point representation of the integer argument
 """
 function wl_fixed_from_int(i)
-    ccall((:wl_fixed_from_int, Symbol("libwayland-client")), wl_fixed_t, (Cint,), i)
+    ccall((:wl_fixed_from_int, libwayland_client), wl_fixed_t, (Cint,), i)
 end
 
 """
@@ -582,155 +582,155 @@ Event queues allows the events on a display to be handled in a thread-safe manne
 const wl_event_queue = Cvoid
 
 function wl_event_queue_destroy(queue)
-    ccall((:wl_event_queue_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_event_queue},), queue)
+    ccall((:wl_event_queue_destroy, libwayland_client), Cvoid, (Ptr{wl_event_queue},), queue)
 end
 
 function wl_proxy_marshal_array(p, opcode, args)
-    ccall((:wl_proxy_marshal_array, Symbol("libwayland-client")), Cvoid, (Ptr{wl_proxy}, UInt32, Ptr{wl_argument}), p, opcode, args)
+    ccall((:wl_proxy_marshal_array, libwayland_client), Cvoid, (Ptr{wl_proxy}, UInt32, Ptr{wl_argument}), p, opcode, args)
 end
 
 function wl_proxy_create(factory, interface)
-    ccall((:wl_proxy_create, Symbol("libwayland-client")), Ptr{wl_proxy}, (Ptr{wl_proxy}, Ptr{wl_interface}), factory, interface)
+    ccall((:wl_proxy_create, libwayland_client), Ptr{wl_proxy}, (Ptr{wl_proxy}, Ptr{wl_interface}), factory, interface)
 end
 
 function wl_proxy_create_wrapper(proxy)
-    ccall((:wl_proxy_create_wrapper, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{Cvoid},), proxy)
+    ccall((:wl_proxy_create_wrapper, libwayland_client), Ptr{Cvoid}, (Ptr{Cvoid},), proxy)
 end
 
 function wl_proxy_wrapper_destroy(proxy_wrapper)
-    ccall((:wl_proxy_wrapper_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{Cvoid},), proxy_wrapper)
+    ccall((:wl_proxy_wrapper_destroy, libwayland_client), Cvoid, (Ptr{Cvoid},), proxy_wrapper)
 end
 
 function wl_proxy_marshal_array_constructor(proxy, opcode, args, interface)
-    ccall((:wl_proxy_marshal_array_constructor, Symbol("libwayland-client")), Ptr{wl_proxy}, (Ptr{wl_proxy}, UInt32, Ptr{wl_argument}, Ptr{wl_interface}), proxy, opcode, args, interface)
+    ccall((:wl_proxy_marshal_array_constructor, libwayland_client), Ptr{wl_proxy}, (Ptr{wl_proxy}, UInt32, Ptr{wl_argument}, Ptr{wl_interface}), proxy, opcode, args, interface)
 end
 
 function wl_proxy_marshal_array_constructor_versioned(proxy, opcode, args, interface, version)
-    ccall((:wl_proxy_marshal_array_constructor_versioned, Symbol("libwayland-client")), Ptr{wl_proxy}, (Ptr{wl_proxy}, UInt32, Ptr{wl_argument}, Ptr{wl_interface}, UInt32), proxy, opcode, args, interface, version)
+    ccall((:wl_proxy_marshal_array_constructor_versioned, libwayland_client), Ptr{wl_proxy}, (Ptr{wl_proxy}, UInt32, Ptr{wl_argument}, Ptr{wl_interface}, UInt32), proxy, opcode, args, interface, version)
 end
 
 function wl_proxy_destroy(proxy)
-    ccall((:wl_proxy_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_proxy},), proxy)
+    ccall((:wl_proxy_destroy, libwayland_client), Cvoid, (Ptr{wl_proxy},), proxy)
 end
 
 function wl_proxy_add_listener(proxy, implementation, data)
-    ccall((:wl_proxy_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_proxy}, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}), proxy, implementation, data)
+    ccall((:wl_proxy_add_listener, libwayland_client), Cint, (Ptr{wl_proxy}, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}), proxy, implementation, data)
 end
 
 function wl_proxy_get_listener(proxy)
-    ccall((:wl_proxy_get_listener, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_proxy},), proxy)
+    ccall((:wl_proxy_get_listener, libwayland_client), Ptr{Cvoid}, (Ptr{wl_proxy},), proxy)
 end
 
 function wl_proxy_add_dispatcher(proxy, dispatcher_func, dispatcher_data, data)
-    ccall((:wl_proxy_add_dispatcher, Symbol("libwayland-client")), Cint, (Ptr{wl_proxy}, wl_dispatcher_func_t, Ptr{Cvoid}, Ptr{Cvoid}), proxy, dispatcher_func, dispatcher_data, data)
+    ccall((:wl_proxy_add_dispatcher, libwayland_client), Cint, (Ptr{wl_proxy}, wl_dispatcher_func_t, Ptr{Cvoid}, Ptr{Cvoid}), proxy, dispatcher_func, dispatcher_data, data)
 end
 
 function wl_proxy_set_user_data(proxy, user_data)
-    ccall((:wl_proxy_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_proxy}, Ptr{Cvoid}), proxy, user_data)
+    ccall((:wl_proxy_set_user_data, libwayland_client), Cvoid, (Ptr{wl_proxy}, Ptr{Cvoid}), proxy, user_data)
 end
 
 function wl_proxy_get_user_data(proxy)
-    ccall((:wl_proxy_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_proxy},), proxy)
+    ccall((:wl_proxy_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_proxy},), proxy)
 end
 
 function wl_proxy_get_version(proxy)
-    ccall((:wl_proxy_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_proxy},), proxy)
+    ccall((:wl_proxy_get_version, libwayland_client), UInt32, (Ptr{wl_proxy},), proxy)
 end
 
 function wl_proxy_get_id(proxy)
-    ccall((:wl_proxy_get_id, Symbol("libwayland-client")), UInt32, (Ptr{wl_proxy},), proxy)
+    ccall((:wl_proxy_get_id, libwayland_client), UInt32, (Ptr{wl_proxy},), proxy)
 end
 
 function wl_proxy_set_tag(proxy, tag)
-    ccall((:wl_proxy_set_tag, Symbol("libwayland-client")), Cvoid, (Ptr{wl_proxy}, Ptr{Ptr{Cchar}}), proxy, tag)
+    ccall((:wl_proxy_set_tag, libwayland_client), Cvoid, (Ptr{wl_proxy}, Ptr{Ptr{Cchar}}), proxy, tag)
 end
 
 function wl_proxy_get_tag(proxy)
-    ccall((:wl_proxy_get_tag, Symbol("libwayland-client")), Ptr{Ptr{Cchar}}, (Ptr{wl_proxy},), proxy)
+    ccall((:wl_proxy_get_tag, libwayland_client), Ptr{Ptr{Cchar}}, (Ptr{wl_proxy},), proxy)
 end
 
 function wl_proxy_get_class(proxy)
-    ccall((:wl_proxy_get_class, Symbol("libwayland-client")), Ptr{Cchar}, (Ptr{wl_proxy},), proxy)
+    ccall((:wl_proxy_get_class, libwayland_client), Ptr{Cchar}, (Ptr{wl_proxy},), proxy)
 end
 
 function wl_proxy_set_queue(proxy, queue)
-    ccall((:wl_proxy_set_queue, Symbol("libwayland-client")), Cvoid, (Ptr{wl_proxy}, Ptr{wl_event_queue}), proxy, queue)
+    ccall((:wl_proxy_set_queue, libwayland_client), Cvoid, (Ptr{wl_proxy}, Ptr{wl_event_queue}), proxy, queue)
 end
 
 function wl_display_connect(name)
-    ccall((:wl_display_connect, Symbol("libwayland-client")), Ptr{wl_display}, (Ptr{Cchar},), name)
+    ccall((:wl_display_connect, libwayland_client), Ptr{wl_display}, (Ptr{Cchar},), name)
 end
 
 function wl_display_connect_to_fd(fd)
-    ccall((:wl_display_connect_to_fd, Symbol("libwayland-client")), Ptr{wl_display}, (Cint,), fd)
+    ccall((:wl_display_connect_to_fd, libwayland_client), Ptr{wl_display}, (Cint,), fd)
 end
 
 function wl_display_disconnect(display)
-    ccall((:wl_display_disconnect, Symbol("libwayland-client")), Cvoid, (Ptr{wl_display},), display)
+    ccall((:wl_display_disconnect, libwayland_client), Cvoid, (Ptr{wl_display},), display)
 end
 
 function wl_display_get_fd(display)
-    ccall((:wl_display_get_fd, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_get_fd, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_display_dispatch(display)
-    ccall((:wl_display_dispatch, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_dispatch, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_display_dispatch_queue(display, queue)
-    ccall((:wl_display_dispatch_queue, Symbol("libwayland-client")), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
+    ccall((:wl_display_dispatch_queue, libwayland_client), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
 end
 
 function wl_display_dispatch_queue_pending(display, queue)
-    ccall((:wl_display_dispatch_queue_pending, Symbol("libwayland-client")), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
+    ccall((:wl_display_dispatch_queue_pending, libwayland_client), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
 end
 
 function wl_display_dispatch_pending(display)
-    ccall((:wl_display_dispatch_pending, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_dispatch_pending, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_display_get_error(display)
-    ccall((:wl_display_get_error, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_get_error, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_display_get_protocol_error(display, interface, id)
-    ccall((:wl_display_get_protocol_error, Symbol("libwayland-client")), UInt32, (Ptr{wl_display}, Ptr{Ptr{wl_interface}}, Ptr{UInt32}), display, interface, id)
+    ccall((:wl_display_get_protocol_error, libwayland_client), UInt32, (Ptr{wl_display}, Ptr{Ptr{wl_interface}}, Ptr{UInt32}), display, interface, id)
 end
 
 function wl_display_flush(display)
-    ccall((:wl_display_flush, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_flush, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_display_roundtrip_queue(display, queue)
-    ccall((:wl_display_roundtrip_queue, Symbol("libwayland-client")), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
+    ccall((:wl_display_roundtrip_queue, libwayland_client), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
 end
 
 function wl_display_roundtrip(display)
-    ccall((:wl_display_roundtrip, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_roundtrip, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_display_create_queue(display)
-    ccall((:wl_display_create_queue, Symbol("libwayland-client")), Ptr{wl_event_queue}, (Ptr{wl_display},), display)
+    ccall((:wl_display_create_queue, libwayland_client), Ptr{wl_event_queue}, (Ptr{wl_display},), display)
 end
 
 function wl_display_prepare_read_queue(display, queue)
-    ccall((:wl_display_prepare_read_queue, Symbol("libwayland-client")), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
+    ccall((:wl_display_prepare_read_queue, libwayland_client), Cint, (Ptr{wl_display}, Ptr{wl_event_queue}), display, queue)
 end
 
 function wl_display_prepare_read(display)
-    ccall((:wl_display_prepare_read, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_prepare_read, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_display_cancel_read(display)
-    ccall((:wl_display_cancel_read, Symbol("libwayland-client")), Cvoid, (Ptr{wl_display},), display)
+    ccall((:wl_display_cancel_read, libwayland_client), Cvoid, (Ptr{wl_display},), display)
 end
 
 function wl_display_read_events(display)
-    ccall((:wl_display_read_events, Symbol("libwayland-client")), Cint, (Ptr{wl_display},), display)
+    ccall((:wl_display_read_events, libwayland_client), Cint, (Ptr{wl_display},), display)
 end
 
 function wl_log_set_handler_client(handler)
-    ccall((:wl_log_set_handler_client, Symbol("libwayland-client")), Cvoid, (wl_log_func_t,), handler)
+    ccall((:wl_log_set_handler_client, libwayland_client), Cvoid, (wl_log_func_t,), handler)
 end
 
 """
@@ -926,7 +926,7 @@ end
 ` iface_wl_display`
 """
 function wl_display_add_listener(wl_display_, listener, data)
-    ccall((:wl_display_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_display}, Ptr{wl_display_listener}, Ptr{Cvoid}), wl_display_, listener, data)
+    ccall((:wl_display_add_listener, libwayland_client), Cint, (Ptr{wl_display}, Ptr{wl_display_listener}, Ptr{Cvoid}), wl_display_, listener, data)
 end
 
 """
@@ -935,7 +935,7 @@ end
 ` iface_wl_display `
 """
 function wl_display_set_user_data(wl_display_, user_data)
-    ccall((:wl_display_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_display}, Ptr{Cvoid}), wl_display_, user_data)
+    ccall((:wl_display_set_user_data, libwayland_client), Cvoid, (Ptr{wl_display}, Ptr{Cvoid}), wl_display_, user_data)
 end
 
 """
@@ -944,11 +944,11 @@ end
 ` iface_wl_display `
 """
 function wl_display_get_user_data(wl_display_)
-    ccall((:wl_display_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_display},), wl_display_)
+    ccall((:wl_display_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_display},), wl_display_)
 end
 
 function wl_display_get_version(wl_display_)
-    ccall((:wl_display_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_display},), wl_display_)
+    ccall((:wl_display_get_version, libwayland_client), UInt32, (Ptr{wl_display},), wl_display_)
 end
 
 """
@@ -963,7 +963,7 @@ The object returned by this request will be destroyed by the compositor after th
 The callback\\_data passed in the callback is the event serial.
 """
 function wl_display_sync(wl_display_)
-    ccall((:wl_display_sync, Symbol("libwayland-client")), Ptr{wl_callback}, (Ptr{wl_display},), wl_display_)
+    ccall((:wl_display_sync, libwayland_client), Ptr{wl_callback}, (Ptr{wl_display},), wl_display_)
 end
 
 """
@@ -976,7 +976,7 @@ This request creates a registry object that allows the client to list and bind t
 It should be noted that the server side resources consumed in response to a get\\_registry request can only be released when the client disconnects, not when the client side proxy is destroyed. Therefore, clients should invoke get\\_registry as infrequently as possible to avoid wasting memory.
 """
 function wl_display_get_registry(wl_display_)
-    ccall((:wl_display_get_registry, Symbol("libwayland-client")), Ptr{wl_registry}, (Ptr{wl_display},), wl_display_)
+    ccall((:wl_display_get_registry, libwayland_client), Ptr{wl_registry}, (Ptr{wl_display},), wl_display_)
 end
 
 """
@@ -1002,7 +1002,7 @@ end
 ` iface_wl_registry`
 """
 function wl_registry_add_listener(wl_registry_, listener, data)
-    ccall((:wl_registry_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_registry}, Ptr{wl_registry_listener}, Ptr{Cvoid}), wl_registry_, listener, data)
+    ccall((:wl_registry_add_listener, libwayland_client), Cint, (Ptr{wl_registry}, Ptr{wl_registry_listener}, Ptr{Cvoid}), wl_registry_, listener, data)
 end
 
 """
@@ -1011,7 +1011,7 @@ end
 ` iface_wl_registry `
 """
 function wl_registry_set_user_data(wl_registry_, user_data)
-    ccall((:wl_registry_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_registry}, Ptr{Cvoid}), wl_registry_, user_data)
+    ccall((:wl_registry_set_user_data, libwayland_client), Cvoid, (Ptr{wl_registry}, Ptr{Cvoid}), wl_registry_, user_data)
 end
 
 """
@@ -1020,11 +1020,11 @@ end
 ` iface_wl_registry `
 """
 function wl_registry_get_user_data(wl_registry_)
-    ccall((:wl_registry_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_registry},), wl_registry_)
+    ccall((:wl_registry_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_registry},), wl_registry_)
 end
 
 function wl_registry_get_version(wl_registry_)
-    ccall((:wl_registry_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_registry},), wl_registry_)
+    ccall((:wl_registry_get_version, libwayland_client), UInt32, (Ptr{wl_registry},), wl_registry_)
 end
 
 """
@@ -1033,7 +1033,7 @@ end
 ` iface_wl_registry `
 """
 function wl_registry_destroy(wl_registry_)
-    ccall((:wl_registry_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_registry},), wl_registry_)
+    ccall((:wl_registry_destroy, libwayland_client), Cvoid, (Ptr{wl_registry},), wl_registry_)
 end
 
 """
@@ -1044,7 +1044,7 @@ end
 Binds a new, client-created object to the server using the specified name as the identifier.
 """
 function wl_registry_bind(wl_registry_, name, interface, version)
-    ccall((:wl_registry_bind, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_registry}, UInt32, Ptr{wl_interface}, UInt32), wl_registry_, name, interface, version)
+    ccall((:wl_registry_bind, libwayland_client), Ptr{Cvoid}, (Ptr{wl_registry}, UInt32, Ptr{wl_interface}, UInt32), wl_registry_, name, interface, version)
 end
 
 """
@@ -1068,7 +1068,7 @@ end
 ` iface_wl_callback`
 """
 function wl_callback_add_listener(wl_callback_, listener, data)
-    ccall((:wl_callback_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_callback}, Ptr{wl_callback_listener}, Ptr{Cvoid}), wl_callback_, listener, data)
+    ccall((:wl_callback_add_listener, libwayland_client), Cint, (Ptr{wl_callback}, Ptr{wl_callback_listener}, Ptr{Cvoid}), wl_callback_, listener, data)
 end
 
 """
@@ -1077,7 +1077,7 @@ end
 ` iface_wl_callback `
 """
 function wl_callback_set_user_data(wl_callback_, user_data)
-    ccall((:wl_callback_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_callback}, Ptr{Cvoid}), wl_callback_, user_data)
+    ccall((:wl_callback_set_user_data, libwayland_client), Cvoid, (Ptr{wl_callback}, Ptr{Cvoid}), wl_callback_, user_data)
 end
 
 """
@@ -1086,11 +1086,11 @@ end
 ` iface_wl_callback `
 """
 function wl_callback_get_user_data(wl_callback_)
-    ccall((:wl_callback_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_callback},), wl_callback_)
+    ccall((:wl_callback_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_callback},), wl_callback_)
 end
 
 function wl_callback_get_version(wl_callback_)
-    ccall((:wl_callback_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_callback},), wl_callback_)
+    ccall((:wl_callback_get_version, libwayland_client), UInt32, (Ptr{wl_callback},), wl_callback_)
 end
 
 """
@@ -1099,7 +1099,7 @@ end
 ` iface_wl_callback `
 """
 function wl_callback_destroy(wl_callback_)
-    ccall((:wl_callback_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_callback},), wl_callback_)
+    ccall((:wl_callback_destroy, libwayland_client), Cvoid, (Ptr{wl_callback},), wl_callback_)
 end
 
 """
@@ -1108,7 +1108,7 @@ end
 ` iface_wl_compositor `
 """
 function wl_compositor_set_user_data(wl_compositor_, user_data)
-    ccall((:wl_compositor_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_compositor}, Ptr{Cvoid}), wl_compositor_, user_data)
+    ccall((:wl_compositor_set_user_data, libwayland_client), Cvoid, (Ptr{wl_compositor}, Ptr{Cvoid}), wl_compositor_, user_data)
 end
 
 """
@@ -1117,11 +1117,11 @@ end
 ` iface_wl_compositor `
 """
 function wl_compositor_get_user_data(wl_compositor_)
-    ccall((:wl_compositor_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_compositor},), wl_compositor_)
+    ccall((:wl_compositor_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_compositor},), wl_compositor_)
 end
 
 function wl_compositor_get_version(wl_compositor_)
-    ccall((:wl_compositor_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_compositor},), wl_compositor_)
+    ccall((:wl_compositor_get_version, libwayland_client), UInt32, (Ptr{wl_compositor},), wl_compositor_)
 end
 
 """
@@ -1130,7 +1130,7 @@ end
 ` iface_wl_compositor `
 """
 function wl_compositor_destroy(wl_compositor_)
-    ccall((:wl_compositor_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_compositor},), wl_compositor_)
+    ccall((:wl_compositor_destroy, libwayland_client), Cvoid, (Ptr{wl_compositor},), wl_compositor_)
 end
 
 """
@@ -1141,7 +1141,7 @@ end
 Ask the compositor to create a new surface.
 """
 function wl_compositor_create_surface(wl_compositor_)
-    ccall((:wl_compositor_create_surface, Symbol("libwayland-client")), Ptr{wl_surface}, (Ptr{wl_compositor},), wl_compositor_)
+    ccall((:wl_compositor_create_surface, libwayland_client), Ptr{wl_surface}, (Ptr{wl_compositor},), wl_compositor_)
 end
 
 """
@@ -1152,7 +1152,7 @@ end
 Ask the compositor to create a new region.
 """
 function wl_compositor_create_region(wl_compositor_)
-    ccall((:wl_compositor_create_region, Symbol("libwayland-client")), Ptr{wl_region}, (Ptr{wl_compositor},), wl_compositor_)
+    ccall((:wl_compositor_create_region, libwayland_client), Ptr{wl_region}, (Ptr{wl_compositor},), wl_compositor_)
 end
 
 """
@@ -1161,7 +1161,7 @@ end
 ` iface_wl_shm_pool `
 """
 function wl_shm_pool_set_user_data(wl_shm_pool_, user_data)
-    ccall((:wl_shm_pool_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shm_pool}, Ptr{Cvoid}), wl_shm_pool_, user_data)
+    ccall((:wl_shm_pool_set_user_data, libwayland_client), Cvoid, (Ptr{wl_shm_pool}, Ptr{Cvoid}), wl_shm_pool_, user_data)
 end
 
 """
@@ -1170,11 +1170,11 @@ end
 ` iface_wl_shm_pool `
 """
 function wl_shm_pool_get_user_data(wl_shm_pool_)
-    ccall((:wl_shm_pool_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_shm_pool},), wl_shm_pool_)
+    ccall((:wl_shm_pool_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_shm_pool},), wl_shm_pool_)
 end
 
 function wl_shm_pool_get_version(wl_shm_pool_)
-    ccall((:wl_shm_pool_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_shm_pool},), wl_shm_pool_)
+    ccall((:wl_shm_pool_get_version, libwayland_client), UInt32, (Ptr{wl_shm_pool},), wl_shm_pool_)
 end
 
 """
@@ -1189,7 +1189,7 @@ The buffer is created offset bytes into the pool and has width and height as spe
 A buffer will keep a reference to the pool it was created from so it is valid to destroy the pool immediately after creating a buffer from it.
 """
 function wl_shm_pool_create_buffer(wl_shm_pool_, offset, width, height, stride, format)
-    ccall((:wl_shm_pool_create_buffer, Symbol("libwayland-client")), Ptr{wl_buffer}, (Ptr{wl_shm_pool}, Int32, Int32, Int32, Int32, UInt32), wl_shm_pool_, offset, width, height, stride, format)
+    ccall((:wl_shm_pool_create_buffer, libwayland_client), Ptr{wl_buffer}, (Ptr{wl_shm_pool}, Int32, Int32, Int32, Int32, UInt32), wl_shm_pool_, offset, width, height, stride, format)
 end
 
 """
@@ -1202,7 +1202,7 @@ Destroy the shared memory pool.
 The mmapped memory will be released when all buffers that have been created from this pool are gone.
 """
 function wl_shm_pool_destroy(wl_shm_pool_)
-    ccall((:wl_shm_pool_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shm_pool},), wl_shm_pool_)
+    ccall((:wl_shm_pool_destroy, libwayland_client), Cvoid, (Ptr{wl_shm_pool},), wl_shm_pool_)
 end
 
 """
@@ -1213,7 +1213,7 @@ end
 This request will cause the server to remap the backing memory for the pool from the file descriptor passed when the pool was created, but using the new size. This request can only be used to make the pool bigger.
 """
 function wl_shm_pool_resize(wl_shm_pool_, size)
-    ccall((:wl_shm_pool_resize, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shm_pool}, Int32), wl_shm_pool_, size)
+    ccall((:wl_shm_pool_resize, libwayland_client), Cvoid, (Ptr{wl_shm_pool}, Int32), wl_shm_pool_, size)
 end
 
 """
@@ -1485,7 +1485,7 @@ end
 ` iface_wl_shm`
 """
 function wl_shm_add_listener(wl_shm_, listener, data)
-    ccall((:wl_shm_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_shm}, Ptr{wl_shm_listener}, Ptr{Cvoid}), wl_shm_, listener, data)
+    ccall((:wl_shm_add_listener, libwayland_client), Cint, (Ptr{wl_shm}, Ptr{wl_shm_listener}, Ptr{Cvoid}), wl_shm_, listener, data)
 end
 
 """
@@ -1494,7 +1494,7 @@ end
 ` iface_wl_shm `
 """
 function wl_shm_set_user_data(wl_shm_, user_data)
-    ccall((:wl_shm_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shm}, Ptr{Cvoid}), wl_shm_, user_data)
+    ccall((:wl_shm_set_user_data, libwayland_client), Cvoid, (Ptr{wl_shm}, Ptr{Cvoid}), wl_shm_, user_data)
 end
 
 """
@@ -1503,11 +1503,11 @@ end
 ` iface_wl_shm `
 """
 function wl_shm_get_user_data(wl_shm_)
-    ccall((:wl_shm_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_shm},), wl_shm_)
+    ccall((:wl_shm_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_shm},), wl_shm_)
 end
 
 function wl_shm_get_version(wl_shm_)
-    ccall((:wl_shm_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_shm},), wl_shm_)
+    ccall((:wl_shm_get_version, libwayland_client), UInt32, (Ptr{wl_shm},), wl_shm_)
 end
 
 """
@@ -1516,7 +1516,7 @@ end
 ` iface_wl_shm `
 """
 function wl_shm_destroy(wl_shm_)
-    ccall((:wl_shm_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shm},), wl_shm_)
+    ccall((:wl_shm_destroy, libwayland_client), Cvoid, (Ptr{wl_shm},), wl_shm_)
 end
 
 """
@@ -1529,7 +1529,7 @@ Create a new [`wl_shm_pool`](@ref) object.
 The pool can be used to create shared memory based buffer objects. The server will mmap size bytes of the passed file descriptor, to use as backing memory for the pool.
 """
 function wl_shm_create_pool(wl_shm_, fd, size)
-    ccall((:wl_shm_create_pool, Symbol("libwayland-client")), Ptr{wl_shm_pool}, (Ptr{wl_shm}, Int32, Int32), wl_shm_, fd, size)
+    ccall((:wl_shm_create_pool, libwayland_client), Ptr{wl_shm_pool}, (Ptr{wl_shm}, Int32, Int32), wl_shm_, fd, size)
 end
 
 """
@@ -1553,7 +1553,7 @@ end
 ` iface_wl_buffer`
 """
 function wl_buffer_add_listener(wl_buffer_, listener, data)
-    ccall((:wl_buffer_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_buffer}, Ptr{wl_buffer_listener}, Ptr{Cvoid}), wl_buffer_, listener, data)
+    ccall((:wl_buffer_add_listener, libwayland_client), Cint, (Ptr{wl_buffer}, Ptr{wl_buffer_listener}, Ptr{Cvoid}), wl_buffer_, listener, data)
 end
 
 """
@@ -1562,7 +1562,7 @@ end
 ` iface_wl_buffer `
 """
 function wl_buffer_set_user_data(wl_buffer_, user_data)
-    ccall((:wl_buffer_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_buffer}, Ptr{Cvoid}), wl_buffer_, user_data)
+    ccall((:wl_buffer_set_user_data, libwayland_client), Cvoid, (Ptr{wl_buffer}, Ptr{Cvoid}), wl_buffer_, user_data)
 end
 
 """
@@ -1571,11 +1571,11 @@ end
 ` iface_wl_buffer `
 """
 function wl_buffer_get_user_data(wl_buffer_)
-    ccall((:wl_buffer_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_buffer},), wl_buffer_)
+    ccall((:wl_buffer_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_buffer},), wl_buffer_)
 end
 
 function wl_buffer_get_version(wl_buffer_)
-    ccall((:wl_buffer_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_buffer},), wl_buffer_)
+    ccall((:wl_buffer_get_version, libwayland_client), UInt32, (Ptr{wl_buffer},), wl_buffer_)
 end
 
 """
@@ -1588,7 +1588,7 @@ Destroy a buffer. If and how you need to release the backing storage is defined 
 For possible side-effects to a surface, see [`wl_surface`](@ref).attach.
 """
 function wl_buffer_destroy(wl_buffer_)
-    ccall((:wl_buffer_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_buffer},), wl_buffer_)
+    ccall((:wl_buffer_destroy, libwayland_client), Cvoid, (Ptr{wl_buffer},), wl_buffer_)
 end
 
 """
@@ -1633,7 +1633,7 @@ end
 ` iface_wl_data_offer`
 """
 function wl_data_offer_add_listener(wl_data_offer_, listener, data)
-    ccall((:wl_data_offer_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_data_offer}, Ptr{wl_data_offer_listener}, Ptr{Cvoid}), wl_data_offer_, listener, data)
+    ccall((:wl_data_offer_add_listener, libwayland_client), Cint, (Ptr{wl_data_offer}, Ptr{wl_data_offer_listener}, Ptr{Cvoid}), wl_data_offer_, listener, data)
 end
 
 """
@@ -1642,7 +1642,7 @@ end
 ` iface_wl_data_offer `
 """
 function wl_data_offer_set_user_data(wl_data_offer_, user_data)
-    ccall((:wl_data_offer_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_offer}, Ptr{Cvoid}), wl_data_offer_, user_data)
+    ccall((:wl_data_offer_set_user_data, libwayland_client), Cvoid, (Ptr{wl_data_offer}, Ptr{Cvoid}), wl_data_offer_, user_data)
 end
 
 """
@@ -1651,11 +1651,11 @@ end
 ` iface_wl_data_offer `
 """
 function wl_data_offer_get_user_data(wl_data_offer_)
-    ccall((:wl_data_offer_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_data_offer},), wl_data_offer_)
+    ccall((:wl_data_offer_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_data_offer},), wl_data_offer_)
 end
 
 function wl_data_offer_get_version(wl_data_offer_)
-    ccall((:wl_data_offer_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_data_offer},), wl_data_offer_)
+    ccall((:wl_data_offer_get_version, libwayland_client), UInt32, (Ptr{wl_data_offer},), wl_data_offer_)
 end
 
 """
@@ -1670,7 +1670,7 @@ For objects of version 2 or older, this request is used by the client to give fe
 For objects of version 3 or newer, this request determines the final result of the drag-and-drop operation. If the end result is that no mime types were accepted, the drag-and-drop operation will be cancelled and the corresponding drag source will receive [`wl_data_source`](@ref).cancelled. Clients may still use this event in conjunction with [`wl_data_source`](@ref).action for feedback.
 """
 function wl_data_offer_accept(wl_data_offer_, serial, mime_type)
-    ccall((:wl_data_offer_accept, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_offer}, UInt32, Ptr{Cchar}), wl_data_offer_, serial, mime_type)
+    ccall((:wl_data_offer_accept, libwayland_client), Cvoid, (Ptr{wl_data_offer}, UInt32, Ptr{Cchar}), wl_data_offer_, serial, mime_type)
 end
 
 """
@@ -1685,7 +1685,7 @@ The receiving client reads from the read end of the pipe until EOF and then clos
 This request may happen multiple times for different mime types, both before and after [`wl_data_device`](@ref).drop. Drag-and-drop destination clients may preemptively fetch data or examine it more closely to determine acceptance.
 """
 function wl_data_offer_receive(wl_data_offer_, mime_type, fd)
-    ccall((:wl_data_offer_receive, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_offer}, Ptr{Cchar}, Int32), wl_data_offer_, mime_type, fd)
+    ccall((:wl_data_offer_receive, libwayland_client), Cvoid, (Ptr{wl_data_offer}, Ptr{Cchar}, Int32), wl_data_offer_, mime_type, fd)
 end
 
 """
@@ -1696,7 +1696,7 @@ end
 Destroy the data offer.
 """
 function wl_data_offer_destroy(wl_data_offer_)
-    ccall((:wl_data_offer_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_offer},), wl_data_offer_)
+    ccall((:wl_data_offer_destroy, libwayland_client), Cvoid, (Ptr{wl_data_offer},), wl_data_offer_)
 end
 
 """
@@ -1713,7 +1713,7 @@ It is a client error to perform other requests than [`wl_data_offer`](@ref).dest
 If [`wl_data_offer`](@ref).finish request is received for a non drag and drop operation, the invalid\\_finish protocol error is raised.
 """
 function wl_data_offer_finish(wl_data_offer_)
-    ccall((:wl_data_offer_finish, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_offer},), wl_data_offer_)
+    ccall((:wl_data_offer_finish, libwayland_client), Cvoid, (Ptr{wl_data_offer},), wl_data_offer_)
 end
 
 """
@@ -1736,7 +1736,7 @@ If the "ask" action is dismissed (e.g. user cancellation), the client is expecte
 This request can only be made on drag-and-drop offers, a protocol error will be raised otherwise.
 """
 function wl_data_offer_set_actions(wl_data_offer_, dnd_actions, preferred_action)
-    ccall((:wl_data_offer_set_actions, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_offer}, UInt32, UInt32), wl_data_offer_, dnd_actions, preferred_action)
+    ccall((:wl_data_offer_set_actions, libwayland_client), Cvoid, (Ptr{wl_data_offer}, UInt32, UInt32), wl_data_offer_, dnd_actions, preferred_action)
 end
 
 """
@@ -1783,7 +1783,7 @@ end
 ` iface_wl_data_source`
 """
 function wl_data_source_add_listener(wl_data_source_, listener, data)
-    ccall((:wl_data_source_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_data_source}, Ptr{wl_data_source_listener}, Ptr{Cvoid}), wl_data_source_, listener, data)
+    ccall((:wl_data_source_add_listener, libwayland_client), Cint, (Ptr{wl_data_source}, Ptr{wl_data_source_listener}, Ptr{Cvoid}), wl_data_source_, listener, data)
 end
 
 """
@@ -1792,7 +1792,7 @@ end
 ` iface_wl_data_source `
 """
 function wl_data_source_set_user_data(wl_data_source_, user_data)
-    ccall((:wl_data_source_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_source}, Ptr{Cvoid}), wl_data_source_, user_data)
+    ccall((:wl_data_source_set_user_data, libwayland_client), Cvoid, (Ptr{wl_data_source}, Ptr{Cvoid}), wl_data_source_, user_data)
 end
 
 """
@@ -1801,11 +1801,11 @@ end
 ` iface_wl_data_source `
 """
 function wl_data_source_get_user_data(wl_data_source_)
-    ccall((:wl_data_source_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_data_source},), wl_data_source_)
+    ccall((:wl_data_source_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_data_source},), wl_data_source_)
 end
 
 function wl_data_source_get_version(wl_data_source_)
-    ccall((:wl_data_source_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_data_source},), wl_data_source_)
+    ccall((:wl_data_source_get_version, libwayland_client), UInt32, (Ptr{wl_data_source},), wl_data_source_)
 end
 
 """
@@ -1816,7 +1816,7 @@ end
 This request adds a mime type to the set of mime types advertised to targets. Can be called several times to offer multiple types.
 """
 function wl_data_source_offer(wl_data_source_, mime_type)
-    ccall((:wl_data_source_offer, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_source}, Ptr{Cchar}), wl_data_source_, mime_type)
+    ccall((:wl_data_source_offer, libwayland_client), Cvoid, (Ptr{wl_data_source}, Ptr{Cchar}), wl_data_source_, mime_type)
 end
 
 """
@@ -1827,7 +1827,7 @@ end
 Destroy the data source.
 """
 function wl_data_source_destroy(wl_data_source_)
-    ccall((:wl_data_source_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_source},), wl_data_source_)
+    ccall((:wl_data_source_destroy, libwayland_client), Cvoid, (Ptr{wl_data_source},), wl_data_source_)
 end
 
 """
@@ -1842,7 +1842,7 @@ The dnd\\_actions argument must contain only values expressed in the [`wl_data_d
 This request must be made once only, and can only be made on sources used in drag-and-drop, so it must be performed before [`wl_data_device`](@ref).start\\_drag. Attempting to use the source other than for drag-and-drop will raise a protocol error.
 """
 function wl_data_source_set_actions(wl_data_source_, dnd_actions)
-    ccall((:wl_data_source_set_actions, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_source}, UInt32), wl_data_source_, dnd_actions)
+    ccall((:wl_data_source_set_actions, libwayland_client), Cvoid, (Ptr{wl_data_source}, UInt32), wl_data_source_, dnd_actions)
 end
 
 """
@@ -1887,7 +1887,7 @@ end
 ` iface_wl_data_device`
 """
 function wl_data_device_add_listener(wl_data_device_, listener, data)
-    ccall((:wl_data_device_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_data_device}, Ptr{wl_data_device_listener}, Ptr{Cvoid}), wl_data_device_, listener, data)
+    ccall((:wl_data_device_add_listener, libwayland_client), Cint, (Ptr{wl_data_device}, Ptr{wl_data_device_listener}, Ptr{Cvoid}), wl_data_device_, listener, data)
 end
 
 """
@@ -1896,7 +1896,7 @@ end
 ` iface_wl_data_device `
 """
 function wl_data_device_set_user_data(wl_data_device_, user_data)
-    ccall((:wl_data_device_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_device}, Ptr{Cvoid}), wl_data_device_, user_data)
+    ccall((:wl_data_device_set_user_data, libwayland_client), Cvoid, (Ptr{wl_data_device}, Ptr{Cvoid}), wl_data_device_, user_data)
 end
 
 """
@@ -1905,11 +1905,11 @@ end
 ` iface_wl_data_device `
 """
 function wl_data_device_get_user_data(wl_data_device_)
-    ccall((:wl_data_device_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_data_device},), wl_data_device_)
+    ccall((:wl_data_device_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_data_device},), wl_data_device_)
 end
 
 function wl_data_device_get_version(wl_data_device_)
-    ccall((:wl_data_device_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_data_device},), wl_data_device_)
+    ccall((:wl_data_device_get_version, libwayland_client), UInt32, (Ptr{wl_data_device},), wl_data_device_)
 end
 
 """
@@ -1918,7 +1918,7 @@ end
 ` iface_wl_data_device `
 """
 function wl_data_device_destroy(wl_data_device_)
-    ccall((:wl_data_device_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_device},), wl_data_device_)
+    ccall((:wl_data_device_destroy, libwayland_client), Cvoid, (Ptr{wl_data_device},), wl_data_device_)
 end
 
 """
@@ -1937,7 +1937,7 @@ The icon surface is an optional (can be NULL) surface that provides an icon to b
 The current and pending input regions of the icon [`wl_surface`](@ref) are cleared, and [`wl_surface`](@ref).set\\_input\\_region is ignored until the [`wl_surface`](@ref) is no longer used as the icon surface. When the use as an icon ends, the current and pending input regions become undefined, and the [`wl_surface`](@ref) is unmapped.
 """
 function wl_data_device_start_drag(wl_data_device_, source, origin, icon, serial)
-    ccall((:wl_data_device_start_drag, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_device}, Ptr{wl_data_source}, Ptr{wl_surface}, Ptr{wl_surface}, UInt32), wl_data_device_, source, origin, icon, serial)
+    ccall((:wl_data_device_start_drag, libwayland_client), Cvoid, (Ptr{wl_data_device}, Ptr{wl_data_source}, Ptr{wl_surface}, Ptr{wl_surface}, UInt32), wl_data_device_, source, origin, icon, serial)
 end
 
 """
@@ -1950,7 +1950,7 @@ This request asks the compositor to set the selection to the data from the sourc
 To unset the selection, set the source to NULL.
 """
 function wl_data_device_set_selection(wl_data_device_, source, serial)
-    ccall((:wl_data_device_set_selection, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_device}, Ptr{wl_data_source}, UInt32), wl_data_device_, source, serial)
+    ccall((:wl_data_device_set_selection, libwayland_client), Cvoid, (Ptr{wl_data_device}, Ptr{wl_data_source}, UInt32), wl_data_device_, source, serial)
 end
 
 """
@@ -1961,7 +1961,7 @@ end
 This request destroys the data device.
 """
 function wl_data_device_release(wl_data_device_)
-    ccall((:wl_data_device_release, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_device},), wl_data_device_)
+    ccall((:wl_data_device_release, libwayland_client), Cvoid, (Ptr{wl_data_device},), wl_data_device_)
 end
 
 """
@@ -2001,7 +2001,7 @@ end
 ` iface_wl_data_device_manager `
 """
 function wl_data_device_manager_set_user_data(wl_data_device_manager_, user_data)
-    ccall((:wl_data_device_manager_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_device_manager}, Ptr{Cvoid}), wl_data_device_manager_, user_data)
+    ccall((:wl_data_device_manager_set_user_data, libwayland_client), Cvoid, (Ptr{wl_data_device_manager}, Ptr{Cvoid}), wl_data_device_manager_, user_data)
 end
 
 """
@@ -2010,11 +2010,11 @@ end
 ` iface_wl_data_device_manager `
 """
 function wl_data_device_manager_get_user_data(wl_data_device_manager_)
-    ccall((:wl_data_device_manager_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
+    ccall((:wl_data_device_manager_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
 end
 
 function wl_data_device_manager_get_version(wl_data_device_manager_)
-    ccall((:wl_data_device_manager_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
+    ccall((:wl_data_device_manager_get_version, libwayland_client), UInt32, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
 end
 
 """
@@ -2023,7 +2023,7 @@ end
 ` iface_wl_data_device_manager `
 """
 function wl_data_device_manager_destroy(wl_data_device_manager_)
-    ccall((:wl_data_device_manager_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
+    ccall((:wl_data_device_manager_destroy, libwayland_client), Cvoid, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
 end
 
 """
@@ -2034,7 +2034,7 @@ end
 Create a new data source.
 """
 function wl_data_device_manager_create_data_source(wl_data_device_manager_)
-    ccall((:wl_data_device_manager_create_data_source, Symbol("libwayland-client")), Ptr{wl_data_source}, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
+    ccall((:wl_data_device_manager_create_data_source, libwayland_client), Ptr{wl_data_source}, (Ptr{wl_data_device_manager},), wl_data_device_manager_)
 end
 
 """
@@ -2045,7 +2045,7 @@ end
 Create a new data device for a given seat.
 """
 function wl_data_device_manager_get_data_device(wl_data_device_manager_, seat)
-    ccall((:wl_data_device_manager_get_data_device, Symbol("libwayland-client")), Ptr{wl_data_device}, (Ptr{wl_data_device_manager}, Ptr{wl_seat}), wl_data_device_manager_, seat)
+    ccall((:wl_data_device_manager_get_data_device, libwayland_client), Ptr{wl_data_device}, (Ptr{wl_data_device_manager}, Ptr{wl_seat}), wl_data_device_manager_, seat)
 end
 
 """
@@ -2065,7 +2065,7 @@ end
 ` iface_wl_shell `
 """
 function wl_shell_set_user_data(wl_shell_, user_data)
-    ccall((:wl_shell_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell}, Ptr{Cvoid}), wl_shell_, user_data)
+    ccall((:wl_shell_set_user_data, libwayland_client), Cvoid, (Ptr{wl_shell}, Ptr{Cvoid}), wl_shell_, user_data)
 end
 
 """
@@ -2074,11 +2074,11 @@ end
 ` iface_wl_shell `
 """
 function wl_shell_get_user_data(wl_shell_)
-    ccall((:wl_shell_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_shell},), wl_shell_)
+    ccall((:wl_shell_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_shell},), wl_shell_)
 end
 
 function wl_shell_get_version(wl_shell_)
-    ccall((:wl_shell_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_shell},), wl_shell_)
+    ccall((:wl_shell_get_version, libwayland_client), UInt32, (Ptr{wl_shell},), wl_shell_)
 end
 
 """
@@ -2087,7 +2087,7 @@ end
 ` iface_wl_shell `
 """
 function wl_shell_destroy(wl_shell_)
-    ccall((:wl_shell_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell},), wl_shell_)
+    ccall((:wl_shell_destroy, libwayland_client), Cvoid, (Ptr{wl_shell},), wl_shell_)
 end
 
 """
@@ -2100,7 +2100,7 @@ Create a shell surface for an existing surface. This gives the [`wl_surface`](@r
 Only one shell surface can be associated with a given surface.
 """
 function wl_shell_get_shell_surface(wl_shell_, surface)
-    ccall((:wl_shell_get_shell_surface, Symbol("libwayland-client")), Ptr{wl_shell_surface}, (Ptr{wl_shell}, Ptr{wl_surface}), wl_shell_, surface)
+    ccall((:wl_shell_get_shell_surface, libwayland_client), Ptr{wl_shell_surface}, (Ptr{wl_shell}, Ptr{wl_surface}), wl_shell_, surface)
 end
 
 """
@@ -2201,7 +2201,7 @@ end
 ` iface_wl_shell_surface`
 """
 function wl_shell_surface_add_listener(wl_shell_surface_, listener, data)
-    ccall((:wl_shell_surface_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_shell_surface}, Ptr{wl_shell_surface_listener}, Ptr{Cvoid}), wl_shell_surface_, listener, data)
+    ccall((:wl_shell_surface_add_listener, libwayland_client), Cint, (Ptr{wl_shell_surface}, Ptr{wl_shell_surface_listener}, Ptr{Cvoid}), wl_shell_surface_, listener, data)
 end
 
 """
@@ -2210,7 +2210,7 @@ end
 ` iface_wl_shell_surface `
 """
 function wl_shell_surface_set_user_data(wl_shell_surface_, user_data)
-    ccall((:wl_shell_surface_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{Cvoid}), wl_shell_surface_, user_data)
+    ccall((:wl_shell_surface_set_user_data, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{Cvoid}), wl_shell_surface_, user_data)
 end
 
 """
@@ -2219,11 +2219,11 @@ end
 ` iface_wl_shell_surface `
 """
 function wl_shell_surface_get_user_data(wl_shell_surface_)
-    ccall((:wl_shell_surface_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_shell_surface},), wl_shell_surface_)
+    ccall((:wl_shell_surface_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_shell_surface},), wl_shell_surface_)
 end
 
 function wl_shell_surface_get_version(wl_shell_surface_)
-    ccall((:wl_shell_surface_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_shell_surface},), wl_shell_surface_)
+    ccall((:wl_shell_surface_get_version, libwayland_client), UInt32, (Ptr{wl_shell_surface},), wl_shell_surface_)
 end
 
 """
@@ -2232,7 +2232,7 @@ end
 ` iface_wl_shell_surface `
 """
 function wl_shell_surface_destroy(wl_shell_surface_)
-    ccall((:wl_shell_surface_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface},), wl_shell_surface_)
+    ccall((:wl_shell_surface_destroy, libwayland_client), Cvoid, (Ptr{wl_shell_surface},), wl_shell_surface_)
 end
 
 """
@@ -2243,7 +2243,7 @@ end
 A client must respond to a ping event with a pong request or the client may be deemed unresponsive.
 """
 function wl_shell_surface_pong(wl_shell_surface_, serial)
-    ccall((:wl_shell_surface_pong, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, UInt32), wl_shell_surface_, serial)
+    ccall((:wl_shell_surface_pong, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, UInt32), wl_shell_surface_, serial)
 end
 
 """
@@ -2256,7 +2256,7 @@ Start a pointer-driven move of the surface.
 This request must be used in response to a button press event. The server may ignore move requests depending on the state of the surface (e.g. fullscreen or maximized).
 """
 function wl_shell_surface_move(wl_shell_surface_, seat, serial)
-    ccall((:wl_shell_surface_move, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_seat}, UInt32), wl_shell_surface_, seat, serial)
+    ccall((:wl_shell_surface_move, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_seat}, UInt32), wl_shell_surface_, seat, serial)
 end
 
 """
@@ -2269,7 +2269,7 @@ Start a pointer-driven resizing of the surface.
 This request must be used in response to a button press event. The server may ignore resize requests depending on the state of the surface (e.g. fullscreen or maximized).
 """
 function wl_shell_surface_resize(wl_shell_surface_, seat, serial, edges)
-    ccall((:wl_shell_surface_resize, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_seat}, UInt32, UInt32), wl_shell_surface_, seat, serial, edges)
+    ccall((:wl_shell_surface_resize, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_seat}, UInt32, UInt32), wl_shell_surface_, seat, serial, edges)
 end
 
 """
@@ -2282,7 +2282,7 @@ Map the surface as a toplevel surface.
 A toplevel surface is not fullscreen, maximized or transient.
 """
 function wl_shell_surface_set_toplevel(wl_shell_surface_)
-    ccall((:wl_shell_surface_set_toplevel, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface},), wl_shell_surface_)
+    ccall((:wl_shell_surface_set_toplevel, libwayland_client), Cvoid, (Ptr{wl_shell_surface},), wl_shell_surface_)
 end
 
 """
@@ -2297,7 +2297,7 @@ The x and y arguments specify the location of the upper left corner of the surfa
 The flags argument controls details of the transient behaviour.
 """
 function wl_shell_surface_set_transient(wl_shell_surface_, parent, x, y, flags)
-    ccall((:wl_shell_surface_set_transient, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_surface}, Int32, Int32, UInt32), wl_shell_surface_, parent, x, y, flags)
+    ccall((:wl_shell_surface_set_transient, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_surface}, Int32, Int32, UInt32), wl_shell_surface_, parent, x, y, flags)
 end
 
 """
@@ -2320,7 +2320,7 @@ A method of "fill" means we don't scale up the buffer, however any output scale 
 The compositor must reply to this request with a configure event with the dimensions for the output on which the surface will be made fullscreen.
 """
 function wl_shell_surface_set_fullscreen(wl_shell_surface_, method, framerate, output)
-    ccall((:wl_shell_surface_set_fullscreen, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, UInt32, UInt32, Ptr{wl_output}), wl_shell_surface_, method, framerate, output)
+    ccall((:wl_shell_surface_set_fullscreen, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, UInt32, UInt32, Ptr{wl_output}), wl_shell_surface_, method, framerate, output)
 end
 
 """
@@ -2339,7 +2339,7 @@ The popup grab continues until the window is destroyed or a mouse button is pres
 The x and y arguments specify the location of the upper left corner of the surface relative to the upper left corner of the parent surface, in surface-local coordinates.
 """
 function wl_shell_surface_set_popup(wl_shell_surface_, seat, serial, parent, x, y, flags)
-    ccall((:wl_shell_surface_set_popup, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_seat}, UInt32, Ptr{wl_surface}, Int32, Int32, UInt32), wl_shell_surface_, seat, serial, parent, x, y, flags)
+    ccall((:wl_shell_surface_set_popup, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_seat}, UInt32, Ptr{wl_surface}, Int32, Int32, UInt32), wl_shell_surface_, seat, serial, parent, x, y, flags)
 end
 
 """
@@ -2358,7 +2358,7 @@ A maximized surface typically fills the entire output it is bound to, except for
 The details depend on the compositor implementation.
 """
 function wl_shell_surface_set_maximized(wl_shell_surface_, output)
-    ccall((:wl_shell_surface_set_maximized, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_output}), wl_shell_surface_, output)
+    ccall((:wl_shell_surface_set_maximized, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{wl_output}), wl_shell_surface_, output)
 end
 
 """
@@ -2373,7 +2373,7 @@ This string may be used to identify the surface in a task bar, window list, or o
 The string must be encoded in UTF-8.
 """
 function wl_shell_surface_set_title(wl_shell_surface_, title)
-    ccall((:wl_shell_surface_set_title, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{Cchar}), wl_shell_surface_, title)
+    ccall((:wl_shell_surface_set_title, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{Cchar}), wl_shell_surface_, title)
 end
 
 """
@@ -2386,7 +2386,7 @@ Set a class for the surface.
 The surface class identifies the general class of applications to which the surface belongs. A common convention is to use the file name (or the full path if it is a non-standard location) of the application's .desktop file as the class.
 """
 function wl_shell_surface_set_class(wl_shell_surface_, class_)
-    ccall((:wl_shell_surface_set_class, Symbol("libwayland-client")), Cvoid, (Ptr{wl_shell_surface}, Ptr{Cchar}), wl_shell_surface_, class_)
+    ccall((:wl_shell_surface_set_class, libwayland_client), Cvoid, (Ptr{wl_shell_surface}, Ptr{Cchar}), wl_shell_surface_, class_)
 end
 
 """
@@ -2433,7 +2433,7 @@ end
 ` iface_wl_surface`
 """
 function wl_surface_add_listener(wl_surface_, listener, data)
-    ccall((:wl_surface_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_surface}, Ptr{wl_surface_listener}, Ptr{Cvoid}), wl_surface_, listener, data)
+    ccall((:wl_surface_add_listener, libwayland_client), Cint, (Ptr{wl_surface}, Ptr{wl_surface_listener}, Ptr{Cvoid}), wl_surface_, listener, data)
 end
 
 """
@@ -2442,7 +2442,7 @@ end
 ` iface_wl_surface `
 """
 function wl_surface_set_user_data(wl_surface_, user_data)
-    ccall((:wl_surface_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Ptr{Cvoid}), wl_surface_, user_data)
+    ccall((:wl_surface_set_user_data, libwayland_client), Cvoid, (Ptr{wl_surface}, Ptr{Cvoid}), wl_surface_, user_data)
 end
 
 """
@@ -2451,11 +2451,11 @@ end
 ` iface_wl_surface `
 """
 function wl_surface_get_user_data(wl_surface_)
-    ccall((:wl_surface_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_surface},), wl_surface_)
+    ccall((:wl_surface_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_surface},), wl_surface_)
 end
 
 function wl_surface_get_version(wl_surface_)
-    ccall((:wl_surface_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_surface},), wl_surface_)
+    ccall((:wl_surface_get_version, libwayland_client), UInt32, (Ptr{wl_surface},), wl_surface_)
 end
 
 """
@@ -2466,7 +2466,7 @@ end
 Deletes the surface and invalidates its object ID.
 """
 function wl_surface_destroy(wl_surface_)
-    ccall((:wl_surface_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface},), wl_surface_)
+    ccall((:wl_surface_destroy, libwayland_client), Cvoid, (Ptr{wl_surface},), wl_surface_)
 end
 
 """
@@ -2493,7 +2493,7 @@ Destroying the [`wl_buffer`](@ref) after [`wl_buffer`](@ref).release does not ch
 If [`wl_surface`](@ref).attach is sent with a NULL [`wl_buffer`](@ref), the following [`wl_surface`](@ref).commit will remove the surface content.
 """
 function wl_surface_attach(wl_surface_, buffer, x, y)
-    ccall((:wl_surface_attach, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Ptr{wl_buffer}, Int32, Int32), wl_surface_, buffer, x, y)
+    ccall((:wl_surface_attach, libwayland_client), Cvoid, (Ptr{wl_surface}, Ptr{wl_buffer}, Int32, Int32), wl_surface_, buffer, x, y)
 end
 
 """
@@ -2514,7 +2514,7 @@ The initial value for pending damage is empty: no damage. [`wl_surface`](@ref).d
 Note! New clients should not use this request. Instead damage can be posted with [`wl_surface`](@ref).damage\\_buffer which uses buffer coordinates instead of surface coordinates.
 """
 function wl_surface_damage(wl_surface_, x, y, width, height)
-    ccall((:wl_surface_damage, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Int32, Int32, Int32, Int32), wl_surface_, x, y, width, height)
+    ccall((:wl_surface_damage, libwayland_client), Cvoid, (Ptr{wl_surface}, Int32, Int32, Int32, Int32), wl_surface_, x, y, width, height)
 end
 
 """
@@ -2537,7 +2537,7 @@ The object returned by this request will be destroyed by the compositor after th
 The callback\\_data passed in the callback is the current time, in milliseconds, with an undefined base.
 """
 function wl_surface_frame(wl_surface_)
-    ccall((:wl_surface_frame, Symbol("libwayland-client")), Ptr{wl_callback}, (Ptr{wl_surface},), wl_surface_)
+    ccall((:wl_surface_frame, libwayland_client), Ptr{wl_callback}, (Ptr{wl_surface},), wl_surface_)
 end
 
 """
@@ -2560,7 +2560,7 @@ Opaque region is double-buffered state, see [`wl_surface`](@ref).commit.
 The initial value for an opaque region is empty. Setting the pending opaque region has copy semantics, and the [`wl_region`](@ref) object can be destroyed immediately. A NULL [`wl_region`](@ref) causes the pending opaque region to be set to empty.
 """
 function wl_surface_set_opaque_region(wl_surface_, region)
-    ccall((:wl_surface_set_opaque_region, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Ptr{wl_region}), wl_surface_, region)
+    ccall((:wl_surface_set_opaque_region, libwayland_client), Cvoid, (Ptr{wl_surface}, Ptr{wl_region}), wl_surface_, region)
 end
 
 """
@@ -2581,7 +2581,7 @@ Input region is double-buffered state, see [`wl_surface`](@ref).commit.
 The initial value for an input region is infinite. That means the whole surface will accept input. Setting the pending input region has copy semantics, and the [`wl_region`](@ref) object can be destroyed immediately. A NULL [`wl_region`](@ref) causes the input region to be set to infinite.
 """
 function wl_surface_set_input_region(wl_surface_, region)
-    ccall((:wl_surface_set_input_region, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Ptr{wl_region}), wl_surface_, region)
+    ccall((:wl_surface_set_input_region, libwayland_client), Cvoid, (Ptr{wl_surface}, Ptr{wl_region}), wl_surface_, region)
 end
 
 """
@@ -2598,7 +2598,7 @@ All requests that need a commit to become effective are documented to affect dou
 Other interfaces may add further double-buffered surface state.
 """
 function wl_surface_commit(wl_surface_)
-    ccall((:wl_surface_commit, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface},), wl_surface_)
+    ccall((:wl_surface_commit, libwayland_client), Cvoid, (Ptr{wl_surface},), wl_surface_)
 end
 
 """
@@ -2621,7 +2621,7 @@ Note that if the transform value includes 90 or 270 degree rotation, the width o
 If transform is not one of the values from the [`wl_output`](@ref).transform enum the invalid\\_transform protocol error is raised.
 """
 function wl_surface_set_buffer_transform(wl_surface_, transform)
-    ccall((:wl_surface_set_buffer_transform, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Int32), wl_surface_, transform)
+    ccall((:wl_surface_set_buffer_transform, libwayland_client), Cvoid, (Ptr{wl_surface}, Int32), wl_surface_, transform)
 end
 
 """
@@ -2644,7 +2644,7 @@ Note that if the scale is larger than 1, then you have to attach a buffer that i
 If scale is not positive the invalid\\_scale protocol error is raised.
 """
 function wl_surface_set_buffer_scale(wl_surface_, scale)
-    ccall((:wl_surface_set_buffer_scale, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Int32), wl_surface_, scale)
+    ccall((:wl_surface_set_buffer_scale, libwayland_client), Cvoid, (Ptr{wl_surface}, Int32), wl_surface_, scale)
 end
 
 """
@@ -2667,7 +2667,7 @@ This request differs from [`wl_surface`](@ref).damage in only one way - it takes
 Note: Because buffer transformation changes and damage requests may be interleaved in the protocol stream, it is impossible to determine the actual mapping between surface and buffer damage until [`wl_surface`](@ref).commit time. Therefore, compositors wishing to take both kinds of damage into account will have to accumulate damage from the two requests separately and only transform from one to the other after receiving the [`wl_surface`](@ref).commit.
 """
 function wl_surface_damage_buffer(wl_surface_, x, y, width, height)
-    ccall((:wl_surface_damage_buffer, Symbol("libwayland-client")), Cvoid, (Ptr{wl_surface}, Int32, Int32, Int32, Int32), wl_surface_, x, y, width, height)
+    ccall((:wl_surface_damage_buffer, libwayland_client), Cvoid, (Ptr{wl_surface}, Int32, Int32, Int32, Int32), wl_surface_, x, y, width, height)
 end
 
 """
@@ -2731,7 +2731,7 @@ end
 ` iface_wl_seat`
 """
 function wl_seat_add_listener(wl_seat_, listener, data)
-    ccall((:wl_seat_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_seat}, Ptr{wl_seat_listener}, Ptr{Cvoid}), wl_seat_, listener, data)
+    ccall((:wl_seat_add_listener, libwayland_client), Cint, (Ptr{wl_seat}, Ptr{wl_seat_listener}, Ptr{Cvoid}), wl_seat_, listener, data)
 end
 
 """
@@ -2740,7 +2740,7 @@ end
 ` iface_wl_seat `
 """
 function wl_seat_set_user_data(wl_seat_, user_data)
-    ccall((:wl_seat_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_seat}, Ptr{Cvoid}), wl_seat_, user_data)
+    ccall((:wl_seat_set_user_data, libwayland_client), Cvoid, (Ptr{wl_seat}, Ptr{Cvoid}), wl_seat_, user_data)
 end
 
 """
@@ -2749,11 +2749,11 @@ end
 ` iface_wl_seat `
 """
 function wl_seat_get_user_data(wl_seat_)
-    ccall((:wl_seat_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_seat},), wl_seat_)
+    ccall((:wl_seat_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_seat},), wl_seat_)
 end
 
 function wl_seat_get_version(wl_seat_)
-    ccall((:wl_seat_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_seat},), wl_seat_)
+    ccall((:wl_seat_get_version, libwayland_client), UInt32, (Ptr{wl_seat},), wl_seat_)
 end
 
 """
@@ -2762,7 +2762,7 @@ end
 ` iface_wl_seat `
 """
 function wl_seat_destroy(wl_seat_)
-    ccall((:wl_seat_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_seat},), wl_seat_)
+    ccall((:wl_seat_destroy, libwayland_client), Cvoid, (Ptr{wl_seat},), wl_seat_)
 end
 
 """
@@ -2775,7 +2775,7 @@ The ID provided will be initialized to the [`wl_pointer`](@ref) interface for th
 This request only takes effect if the seat has the pointer capability, or has had the pointer capability in the past. It is a protocol violation to issue this request on a seat that has never had the pointer capability. The missing\\_capability error will be sent in this case.
 """
 function wl_seat_get_pointer(wl_seat_)
-    ccall((:wl_seat_get_pointer, Symbol("libwayland-client")), Ptr{wl_pointer}, (Ptr{wl_seat},), wl_seat_)
+    ccall((:wl_seat_get_pointer, libwayland_client), Ptr{wl_pointer}, (Ptr{wl_seat},), wl_seat_)
 end
 
 """
@@ -2788,7 +2788,7 @@ The ID provided will be initialized to the [`wl_keyboard`](@ref) interface for t
 This request only takes effect if the seat has the keyboard capability, or has had the keyboard capability in the past. It is a protocol violation to issue this request on a seat that has never had the keyboard capability. The missing\\_capability error will be sent in this case.
 """
 function wl_seat_get_keyboard(wl_seat_)
-    ccall((:wl_seat_get_keyboard, Symbol("libwayland-client")), Ptr{wl_keyboard}, (Ptr{wl_seat},), wl_seat_)
+    ccall((:wl_seat_get_keyboard, libwayland_client), Ptr{wl_keyboard}, (Ptr{wl_seat},), wl_seat_)
 end
 
 """
@@ -2801,7 +2801,7 @@ The ID provided will be initialized to the [`wl_touch`](@ref) interface for this
 This request only takes effect if the seat has the touch capability, or has had the touch capability in the past. It is a protocol violation to issue this request on a seat that has never had the touch capability. The missing\\_capability error will be sent in this case.
 """
 function wl_seat_get_touch(wl_seat_)
-    ccall((:wl_seat_get_touch, Symbol("libwayland-client")), Ptr{wl_touch}, (Ptr{wl_seat},), wl_seat_)
+    ccall((:wl_seat_get_touch, libwayland_client), Ptr{wl_touch}, (Ptr{wl_seat},), wl_seat_)
 end
 
 """
@@ -2812,7 +2812,7 @@ end
 Using this request a client can tell the server that it is not going to use the seat object anymore.
 """
 function wl_seat_release(wl_seat_)
-    ccall((:wl_seat_release, Symbol("libwayland-client")), Cvoid, (Ptr{wl_seat},), wl_seat_)
+    ccall((:wl_seat_release, libwayland_client), Cvoid, (Ptr{wl_seat},), wl_seat_)
 end
 
 """
@@ -2928,7 +2928,7 @@ end
 ` iface_wl_pointer`
 """
 function wl_pointer_add_listener(wl_pointer_, listener, data)
-    ccall((:wl_pointer_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_pointer}, Ptr{wl_pointer_listener}, Ptr{Cvoid}), wl_pointer_, listener, data)
+    ccall((:wl_pointer_add_listener, libwayland_client), Cint, (Ptr{wl_pointer}, Ptr{wl_pointer_listener}, Ptr{Cvoid}), wl_pointer_, listener, data)
 end
 
 """
@@ -2937,7 +2937,7 @@ end
 ` iface_wl_pointer `
 """
 function wl_pointer_set_user_data(wl_pointer_, user_data)
-    ccall((:wl_pointer_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_pointer}, Ptr{Cvoid}), wl_pointer_, user_data)
+    ccall((:wl_pointer_set_user_data, libwayland_client), Cvoid, (Ptr{wl_pointer}, Ptr{Cvoid}), wl_pointer_, user_data)
 end
 
 """
@@ -2946,11 +2946,11 @@ end
 ` iface_wl_pointer `
 """
 function wl_pointer_get_user_data(wl_pointer_)
-    ccall((:wl_pointer_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_pointer},), wl_pointer_)
+    ccall((:wl_pointer_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_pointer},), wl_pointer_)
 end
 
 function wl_pointer_get_version(wl_pointer_)
-    ccall((:wl_pointer_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_pointer},), wl_pointer_)
+    ccall((:wl_pointer_get_version, libwayland_client), UInt32, (Ptr{wl_pointer},), wl_pointer_)
 end
 
 """
@@ -2959,7 +2959,7 @@ end
 ` iface_wl_pointer `
 """
 function wl_pointer_destroy(wl_pointer_)
-    ccall((:wl_pointer_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_pointer},), wl_pointer_)
+    ccall((:wl_pointer_destroy, libwayland_client), Cvoid, (Ptr{wl_pointer},), wl_pointer_)
 end
 
 """
@@ -2980,7 +2980,7 @@ The hotspot can also be updated by passing the currently set pointer surface to 
 The current and pending input regions of the [`wl_surface`](@ref) are cleared, and [`wl_surface`](@ref).set\\_input\\_region is ignored until the [`wl_surface`](@ref) is no longer used as the cursor. When the use as a cursor ends, the current and pending input regions become undefined, and the [`wl_surface`](@ref) is unmapped.
 """
 function wl_pointer_set_cursor(wl_pointer_, serial, surface, hotspot_x, hotspot_y)
-    ccall((:wl_pointer_set_cursor, Symbol("libwayland-client")), Cvoid, (Ptr{wl_pointer}, UInt32, Ptr{wl_surface}, Int32, Int32), wl_pointer_, serial, surface, hotspot_x, hotspot_y)
+    ccall((:wl_pointer_set_cursor, libwayland_client), Cvoid, (Ptr{wl_pointer}, UInt32, Ptr{wl_surface}, Int32, Int32), wl_pointer_, serial, surface, hotspot_x, hotspot_y)
 end
 
 """
@@ -2993,7 +2993,7 @@ Using this request a client can tell the server that it is not going to use the 
 This request destroys the pointer proxy object, so clients must not call [`wl_pointer_destroy`](@ref)() after using this request.
 """
 function wl_pointer_release(wl_pointer_)
-    ccall((:wl_pointer_release, Symbol("libwayland-client")), Cvoid, (Ptr{wl_pointer},), wl_pointer_)
+    ccall((:wl_pointer_release, libwayland_client), Cvoid, (Ptr{wl_pointer},), wl_pointer_)
 end
 
 """
@@ -3065,7 +3065,7 @@ end
 ` iface_wl_keyboard`
 """
 function wl_keyboard_add_listener(wl_keyboard_, listener, data)
-    ccall((:wl_keyboard_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_keyboard}, Ptr{wl_keyboard_listener}, Ptr{Cvoid}), wl_keyboard_, listener, data)
+    ccall((:wl_keyboard_add_listener, libwayland_client), Cint, (Ptr{wl_keyboard}, Ptr{wl_keyboard_listener}, Ptr{Cvoid}), wl_keyboard_, listener, data)
 end
 
 """
@@ -3074,7 +3074,7 @@ end
 ` iface_wl_keyboard `
 """
 function wl_keyboard_set_user_data(wl_keyboard_, user_data)
-    ccall((:wl_keyboard_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_keyboard}, Ptr{Cvoid}), wl_keyboard_, user_data)
+    ccall((:wl_keyboard_set_user_data, libwayland_client), Cvoid, (Ptr{wl_keyboard}, Ptr{Cvoid}), wl_keyboard_, user_data)
 end
 
 """
@@ -3083,11 +3083,11 @@ end
 ` iface_wl_keyboard `
 """
 function wl_keyboard_get_user_data(wl_keyboard_)
-    ccall((:wl_keyboard_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_keyboard},), wl_keyboard_)
+    ccall((:wl_keyboard_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_keyboard},), wl_keyboard_)
 end
 
 function wl_keyboard_get_version(wl_keyboard_)
-    ccall((:wl_keyboard_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_keyboard},), wl_keyboard_)
+    ccall((:wl_keyboard_get_version, libwayland_client), UInt32, (Ptr{wl_keyboard},), wl_keyboard_)
 end
 
 """
@@ -3096,7 +3096,7 @@ end
 ` iface_wl_keyboard `
 """
 function wl_keyboard_destroy(wl_keyboard_)
-    ccall((:wl_keyboard_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_keyboard},), wl_keyboard_)
+    ccall((:wl_keyboard_destroy, libwayland_client), Cvoid, (Ptr{wl_keyboard},), wl_keyboard_)
 end
 
 """
@@ -3105,7 +3105,7 @@ end
 ` iface_wl_keyboard`
 """
 function wl_keyboard_release(wl_keyboard_)
-    ccall((:wl_keyboard_release, Symbol("libwayland-client")), Cvoid, (Ptr{wl_keyboard},), wl_keyboard_)
+    ccall((:wl_keyboard_release, libwayland_client), Cvoid, (Ptr{wl_keyboard},), wl_keyboard_)
 end
 
 """
@@ -3141,7 +3141,7 @@ end
 ` iface_wl_touch`
 """
 function wl_touch_add_listener(wl_touch_, listener, data)
-    ccall((:wl_touch_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_touch}, Ptr{wl_touch_listener}, Ptr{Cvoid}), wl_touch_, listener, data)
+    ccall((:wl_touch_add_listener, libwayland_client), Cint, (Ptr{wl_touch}, Ptr{wl_touch_listener}, Ptr{Cvoid}), wl_touch_, listener, data)
 end
 
 """
@@ -3150,7 +3150,7 @@ end
 ` iface_wl_touch `
 """
 function wl_touch_set_user_data(wl_touch_, user_data)
-    ccall((:wl_touch_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_touch}, Ptr{Cvoid}), wl_touch_, user_data)
+    ccall((:wl_touch_set_user_data, libwayland_client), Cvoid, (Ptr{wl_touch}, Ptr{Cvoid}), wl_touch_, user_data)
 end
 
 """
@@ -3159,11 +3159,11 @@ end
 ` iface_wl_touch `
 """
 function wl_touch_get_user_data(wl_touch_)
-    ccall((:wl_touch_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_touch},), wl_touch_)
+    ccall((:wl_touch_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_touch},), wl_touch_)
 end
 
 function wl_touch_get_version(wl_touch_)
-    ccall((:wl_touch_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_touch},), wl_touch_)
+    ccall((:wl_touch_get_version, libwayland_client), UInt32, (Ptr{wl_touch},), wl_touch_)
 end
 
 """
@@ -3172,7 +3172,7 @@ end
 ` iface_wl_touch `
 """
 function wl_touch_destroy(wl_touch_)
-    ccall((:wl_touch_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_touch},), wl_touch_)
+    ccall((:wl_touch_destroy, libwayland_client), Cvoid, (Ptr{wl_touch},), wl_touch_)
 end
 
 """
@@ -3181,7 +3181,7 @@ end
 ` iface_wl_touch`
 """
 function wl_touch_release(wl_touch_)
-    ccall((:wl_touch_release, Symbol("libwayland-client")), Cvoid, (Ptr{wl_touch},), wl_touch_)
+    ccall((:wl_touch_release, libwayland_client), Cvoid, (Ptr{wl_touch},), wl_touch_)
 end
 
 """
@@ -3292,7 +3292,7 @@ end
 ` iface_wl_output`
 """
 function wl_output_add_listener(wl_output_, listener, data)
-    ccall((:wl_output_add_listener, Symbol("libwayland-client")), Cint, (Ptr{wl_output}, Ptr{wl_output_listener}, Ptr{Cvoid}), wl_output_, listener, data)
+    ccall((:wl_output_add_listener, libwayland_client), Cint, (Ptr{wl_output}, Ptr{wl_output_listener}, Ptr{Cvoid}), wl_output_, listener, data)
 end
 
 """
@@ -3301,7 +3301,7 @@ end
 ` iface_wl_output `
 """
 function wl_output_set_user_data(wl_output_, user_data)
-    ccall((:wl_output_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_output}, Ptr{Cvoid}), wl_output_, user_data)
+    ccall((:wl_output_set_user_data, libwayland_client), Cvoid, (Ptr{wl_output}, Ptr{Cvoid}), wl_output_, user_data)
 end
 
 """
@@ -3310,11 +3310,11 @@ end
 ` iface_wl_output `
 """
 function wl_output_get_user_data(wl_output_)
-    ccall((:wl_output_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_output},), wl_output_)
+    ccall((:wl_output_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_output},), wl_output_)
 end
 
 function wl_output_get_version(wl_output_)
-    ccall((:wl_output_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_output},), wl_output_)
+    ccall((:wl_output_get_version, libwayland_client), UInt32, (Ptr{wl_output},), wl_output_)
 end
 
 """
@@ -3323,7 +3323,7 @@ end
 ` iface_wl_output `
 """
 function wl_output_destroy(wl_output_)
-    ccall((:wl_output_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_output},), wl_output_)
+    ccall((:wl_output_destroy, libwayland_client), Cvoid, (Ptr{wl_output},), wl_output_)
 end
 
 """
@@ -3334,7 +3334,7 @@ end
 Using this request a client can tell the server that it is not going to use the output object anymore.
 """
 function wl_output_release(wl_output_)
-    ccall((:wl_output_release, Symbol("libwayland-client")), Cvoid, (Ptr{wl_output},), wl_output_)
+    ccall((:wl_output_release, libwayland_client), Cvoid, (Ptr{wl_output},), wl_output_)
 end
 
 """
@@ -3343,7 +3343,7 @@ end
 ` iface_wl_region `
 """
 function wl_region_set_user_data(wl_region_, user_data)
-    ccall((:wl_region_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_region}, Ptr{Cvoid}), wl_region_, user_data)
+    ccall((:wl_region_set_user_data, libwayland_client), Cvoid, (Ptr{wl_region}, Ptr{Cvoid}), wl_region_, user_data)
 end
 
 """
@@ -3352,11 +3352,11 @@ end
 ` iface_wl_region `
 """
 function wl_region_get_user_data(wl_region_)
-    ccall((:wl_region_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_region},), wl_region_)
+    ccall((:wl_region_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_region},), wl_region_)
 end
 
 function wl_region_get_version(wl_region_)
-    ccall((:wl_region_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_region},), wl_region_)
+    ccall((:wl_region_get_version, libwayland_client), UInt32, (Ptr{wl_region},), wl_region_)
 end
 
 """
@@ -3367,7 +3367,7 @@ end
 Destroy the region. This will invalidate the object ID.
 """
 function wl_region_destroy(wl_region_)
-    ccall((:wl_region_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_region},), wl_region_)
+    ccall((:wl_region_destroy, libwayland_client), Cvoid, (Ptr{wl_region},), wl_region_)
 end
 
 """
@@ -3378,7 +3378,7 @@ end
 Add the specified rectangle to the region.
 """
 function wl_region_add(wl_region_, x, y, width, height)
-    ccall((:wl_region_add, Symbol("libwayland-client")), Cvoid, (Ptr{wl_region}, Int32, Int32, Int32, Int32), wl_region_, x, y, width, height)
+    ccall((:wl_region_add, libwayland_client), Cvoid, (Ptr{wl_region}, Int32, Int32, Int32, Int32), wl_region_, x, y, width, height)
 end
 
 """
@@ -3389,7 +3389,7 @@ end
 Subtract the specified rectangle from the region.
 """
 function wl_region_subtract(wl_region_, x, y, width, height)
-    ccall((:wl_region_subtract, Symbol("libwayland-client")), Cvoid, (Ptr{wl_region}, Int32, Int32, Int32, Int32), wl_region_, x, y, width, height)
+    ccall((:wl_region_subtract, libwayland_client), Cvoid, (Ptr{wl_region}, Int32, Int32, Int32, Int32), wl_region_, x, y, width, height)
 end
 
 """
@@ -3409,7 +3409,7 @@ end
 ` iface_wl_subcompositor `
 """
 function wl_subcompositor_set_user_data(wl_subcompositor_, user_data)
-    ccall((:wl_subcompositor_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subcompositor}, Ptr{Cvoid}), wl_subcompositor_, user_data)
+    ccall((:wl_subcompositor_set_user_data, libwayland_client), Cvoid, (Ptr{wl_subcompositor}, Ptr{Cvoid}), wl_subcompositor_, user_data)
 end
 
 """
@@ -3418,11 +3418,11 @@ end
 ` iface_wl_subcompositor `
 """
 function wl_subcompositor_get_user_data(wl_subcompositor_)
-    ccall((:wl_subcompositor_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_subcompositor},), wl_subcompositor_)
+    ccall((:wl_subcompositor_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_subcompositor},), wl_subcompositor_)
 end
 
 function wl_subcompositor_get_version(wl_subcompositor_)
-    ccall((:wl_subcompositor_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_subcompositor},), wl_subcompositor_)
+    ccall((:wl_subcompositor_get_version, libwayland_client), UInt32, (Ptr{wl_subcompositor},), wl_subcompositor_)
 end
 
 """
@@ -3433,7 +3433,7 @@ end
 Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, [`wl_subsurface`](@ref) objects included.
 """
 function wl_subcompositor_destroy(wl_subcompositor_)
-    ccall((:wl_subcompositor_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subcompositor},), wl_subcompositor_)
+    ccall((:wl_subcompositor_destroy, libwayland_client), Cvoid, (Ptr{wl_subcompositor},), wl_subcompositor_)
 end
 
 """
@@ -3450,7 +3450,7 @@ Adding sub-surfaces to a parent is a double-buffered operation on the parent (se
 This request modifies the behaviour of [`wl_surface`](@ref).commit request on the sub-surface, see the documentation on [`wl_subsurface`](@ref) interface.
 """
 function wl_subcompositor_get_subsurface(wl_subcompositor_, surface, parent)
-    ccall((:wl_subcompositor_get_subsurface, Symbol("libwayland-client")), Ptr{wl_subsurface}, (Ptr{wl_subcompositor}, Ptr{wl_surface}, Ptr{wl_surface}), wl_subcompositor_, surface, parent)
+    ccall((:wl_subcompositor_get_subsurface, libwayland_client), Ptr{wl_subsurface}, (Ptr{wl_subcompositor}, Ptr{wl_surface}, Ptr{wl_surface}), wl_subcompositor_, surface, parent)
 end
 
 """
@@ -3470,7 +3470,7 @@ end
 ` iface_wl_subsurface `
 """
 function wl_subsurface_set_user_data(wl_subsurface_, user_data)
-    ccall((:wl_subsurface_set_user_data, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subsurface}, Ptr{Cvoid}), wl_subsurface_, user_data)
+    ccall((:wl_subsurface_set_user_data, libwayland_client), Cvoid, (Ptr{wl_subsurface}, Ptr{Cvoid}), wl_subsurface_, user_data)
 end
 
 """
@@ -3479,11 +3479,11 @@ end
 ` iface_wl_subsurface `
 """
 function wl_subsurface_get_user_data(wl_subsurface_)
-    ccall((:wl_subsurface_get_user_data, Symbol("libwayland-client")), Ptr{Cvoid}, (Ptr{wl_subsurface},), wl_subsurface_)
+    ccall((:wl_subsurface_get_user_data, libwayland_client), Ptr{Cvoid}, (Ptr{wl_subsurface},), wl_subsurface_)
 end
 
 function wl_subsurface_get_version(wl_subsurface_)
-    ccall((:wl_subsurface_get_version, Symbol("libwayland-client")), UInt32, (Ptr{wl_subsurface},), wl_subsurface_)
+    ccall((:wl_subsurface_get_version, libwayland_client), UInt32, (Ptr{wl_subsurface},), wl_subsurface_)
 end
 
 """
@@ -3494,7 +3494,7 @@ end
 The sub-surface interface is removed from the [`wl_surface`](@ref) object that was turned into a sub-surface with a [`wl_subcompositor`](@ref).get\\_subsurface request. The [`wl_surface`](@ref)'s association to the parent is deleted, and the [`wl_surface`](@ref) loses its role as a sub-surface. The [`wl_surface`](@ref) is unmapped immediately.
 """
 function wl_subsurface_destroy(wl_subsurface_)
-    ccall((:wl_subsurface_destroy, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subsurface},), wl_subsurface_)
+    ccall((:wl_subsurface_destroy, libwayland_client), Cvoid, (Ptr{wl_subsurface},), wl_subsurface_)
 end
 
 """
@@ -3511,7 +3511,7 @@ If more than one set\\_position request is invoked by the client before the comm
 The initial position is 0, 0.
 """
 function wl_subsurface_set_position(wl_subsurface_, x, y)
-    ccall((:wl_subsurface_set_position, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subsurface}, Int32, Int32), wl_subsurface_, x, y)
+    ccall((:wl_subsurface_set_position, libwayland_client), Cvoid, (Ptr{wl_subsurface}, Int32, Int32), wl_subsurface_, x, y)
 end
 
 """
@@ -3526,7 +3526,7 @@ The z-order is double-buffered. Requests are handled in order and applied immedi
 A new sub-surface is initially added as the top-most in the stack of its siblings and parent.
 """
 function wl_subsurface_place_above(wl_subsurface_, sibling)
-    ccall((:wl_subsurface_place_above, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subsurface}, Ptr{wl_surface}), wl_subsurface_, sibling)
+    ccall((:wl_subsurface_place_above, libwayland_client), Cvoid, (Ptr{wl_subsurface}, Ptr{wl_surface}), wl_subsurface_, sibling)
 end
 
 """
@@ -3537,7 +3537,7 @@ end
 The sub-surface is placed just below the reference surface. See [`wl_subsurface`](@ref).place\\_above.
 """
 function wl_subsurface_place_below(wl_subsurface_, sibling)
-    ccall((:wl_subsurface_place_below, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subsurface}, Ptr{wl_surface}), wl_subsurface_, sibling)
+    ccall((:wl_subsurface_place_below, libwayland_client), Cvoid, (Ptr{wl_subsurface}, Ptr{wl_surface}), wl_subsurface_, sibling)
 end
 
 """
@@ -3552,7 +3552,7 @@ In synchronized mode, [`wl_surface`](@ref).commit on a sub-surface will accumula
 See [`wl_subsurface`](@ref) for the recursive effect of this mode.
 """
 function wl_subsurface_set_sync(wl_subsurface_)
-    ccall((:wl_subsurface_set_sync, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subsurface},), wl_subsurface_)
+    ccall((:wl_subsurface_set_sync, libwayland_client), Cvoid, (Ptr{wl_subsurface},), wl_subsurface_)
 end
 
 """
@@ -3571,7 +3571,7 @@ Note: even if a sub-surface is set to desynchronized, a parent sub-surface may o
 If a surface's parent surface behaves as desynchronized, then the cached state is applied on set\\_desync.
 """
 function wl_subsurface_set_desync(wl_subsurface_)
-    ccall((:wl_subsurface_set_desync, Symbol("libwayland-client")), Cvoid, (Ptr{wl_subsurface},), wl_subsurface_)
+    ccall((:wl_subsurface_set_desync, libwayland_client), Cvoid, (Ptr{wl_subsurface},), wl_subsurface_)
 end
 
 """

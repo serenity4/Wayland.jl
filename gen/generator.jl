@@ -1,0 +1,42 @@
+using Clang.Generators
+using Clang.Generators.JLLEnvs
+using Wayland_jll
+
+cd(@__DIR__)
+
+# get include directory & wayland-client.h
+WL_INCLUDE = joinpath(Wayland_jll.artifact_dir, "include")
+WL_HEADERS = [joinpath(WL_INCLUDE, "wayland-client.h")]
+
+# for target in JLLEnvs.JLL_ENV_TRIPLES
+for target in ["x86_64-linux-gnu"]
+    @info "processing $target"
+
+    # programmatically add options
+    general = Dict{String,Any}()
+    codegen = Dict{String,Any}()
+    options = Dict{String,Any}(
+        "general" => general,
+        "codegen" => codegen,
+        )
+    general["library_name"] = "Symbol(\"libwayland-client\")"
+    general["output_file_path"] = joinpath(dirname(@__DIR__), "lib", "$target.jl")
+    general["use_deterministic_symbol"] = true
+    general["print_using_CEnum"] = false
+    general["printer_blacklist"] = [
+        # "WLAPI_PTR",
+        # "WLAPI_CALL",
+        ]
+    general["extract_c_comment_style"] = "doxygen"
+    general["struct_field_comment_style"] = "outofline"
+    general["enumerator_comment_style"] = "outofline"
+    codegen["add_record_constructors"] = true
+    codegen["union_single_constructor"] = true
+    codegen["opaque_as_mutable_struct"] = false
+
+    # add compiler flags
+    args = get_default_args(target)
+    ctx = create_context(WL_HEADERS, args, options)
+
+    build!(ctx)
+end

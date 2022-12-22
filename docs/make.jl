@@ -21,7 +21,7 @@ makedocs(;
     repo = "https://github.com/serenity4/Wayland.jl/blob/{commit}{path}#L{line}",
     sitename = "Wayland.jl",
     authors = "serenity4 <cedric.bel@hotmail.fr>",
-    strict = true,
+    strict = Documenter.except(:missing_docs, :cross_references),
     doctest = false,
 )
 

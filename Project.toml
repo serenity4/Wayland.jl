@@ -3,6 +3,9 @@ uuid = "abcd75fe-6551-422e-8b89-a5943ccecfb1"
 authors = ["Cédric Belmant"]
 version = "0.1.0"
 
+[deps]
+WindowAbstractions = "e18202ca-4a7d-4de8-b056-fa6bbd7de157"
+
 [compat]
 julia = "1.8"
 

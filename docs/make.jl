@@ -23,7 +23,6 @@ makedocs(;
     authors = "serenity4 <cedric.bel@hotmail.fr>",
     strict = true,
     doctest = false,
-    checkdocs = :exports,
 )
 
 deploydocs(

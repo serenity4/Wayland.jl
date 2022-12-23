@@ -18,9 +18,9 @@ end
   EVENT_TYPE_DESTRUCTOR
 end
 
-ArgumentType(node::Node) = getproperty(@__MODULE__, Symbol(:ARGUMENT_TYPE_, uppercase(node["type"])))::ArgumentType
-RequestType(node::Node) = getproperty(@__MODULE__, Symbol(:REQUEST_TYPE_, uppercase(node["type"])))::RequestType
-EventType(node::Node) = getproperty(@__MODULE__, Symbol(:EVENT_TYPE_, uppercase(node["type"])))::EventType
+ArgumentType(type::String) = getproperty(@__MODULE__, Symbol(:ARGUMENT_TYPE_, uppercase(type)))::ArgumentType
+RequestType(type::String) = getproperty(@__MODULE__, Symbol(:REQUEST_TYPE_, uppercase(type)))::RequestType
+EventType(type::String) = getproperty(@__MODULE__, Symbol(:EVENT_TYPE_, uppercase(type)))::EventType
 
 get_event_type(node::Node) = haskey(node, "type") ? EventType(node["type"]) : nothing
 get_request_type(node::Node) = haskey(node, "type") ? RequestType(node["type"]) : nothing
@@ -55,7 +55,7 @@ struct Argument
   description::Optional{String}
 end
 
-Argument(node::Node) = Argument(node["name"], ArgumentType(node), get_interface(node), get_description(node))
+Argument(node::Node) = Argument(node["name"], ArgumentType(node["type"]), get_interface(node), get_description(node))
 
 struct Request
   name::String

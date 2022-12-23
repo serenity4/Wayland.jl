@@ -26,38 +26,49 @@ get_event_type(node::Node) = haskey(node, "type") ? EventType(node["type"]) : no
 get_request_type(node::Node) = haskey(node, "type") ? RequestType(node["type"]) : nothing
 get_since(node::Node) = haskey(node, "since") ? parse(Int, node["since"]) : nothing
 get_interface(node::Node) = haskey(node, "interface") ? node["interface"] : nothing
+get_summary(node::Node) = haskey(node, "summary") ? node["summary"] : nothing
 function get_description(node::Node)
   node = findfirst(".//description", node)
   isnothing(node) && return
-  node.content
+  Description(node)
 end
+
+struct Description
+  text::String
+  summary::Optional{String}
+end
+
+Description(node::Node) = Description(node.content, get_summary(node))
 
 struct EnumValue
   name::String
   value::Int
-  description::Optional{String}
+  summary::Optional{String}
+  description::Optional{Description}
 end
 
-EnumValue(node::Node) = EnumValue(node["name"], parse(UInt, node["value"]), get_description(node))
+EnumValue(node::Node) = EnumValue(node["name"], parse(UInt, node["value"]), get_summary(node), get_description(node))
 
 struct Enum
   name::String
-  description::Optional{String}
   values::Vector{EnumValue}
   bitfield::Bool
+  since::Optional{Int}
+  description::Optional{Description}
 end
 
-Enum(node::Node) = Enum(node["name"], get_description(node), EnumValue.(findall(".//entry", node)), haskey(node, "bitfield") ? node["bitfield"] = true : false)
+Enum(node::Node) = Enum(node["name"], EnumValue.(findall(".//entry", node)), haskey(node, "bitfield") ? node["bitfield"] = true : false, get_since(node), get_description(node))
 
 struct Argument
   name::String
   type::ArgumentType
+  summary::Optional{String}
   interface::Optional{String}
   isnullable::Bool
-  description::Optional{String}
+  description::Optional{Description}
 end
 
-Argument(node::Node) = Argument(node["name"], ArgumentType(node["type"]), get_interface(node), haskey(node, "allow-null"), get_description(node))
+Argument(node::Node) = Argument(node["name"], ArgumentType(node["type"]), get_summary(node), get_interface(node), haskey(node, "allow-null"), get_description(node))
 
 abstract type Message end
 
@@ -66,7 +77,7 @@ struct Request <: Message
   args::Vector{Argument}
   type::Optional{RequestType}
   since::Optional{Int}
-  description::Optional{String}
+  description::Optional{Description}
 end
 
 Request(node::Node) = Request(node["name"], Argument.(findall(".//arg", node)), get_request_type(node), get_since(node), get_description(node))
@@ -76,7 +87,7 @@ struct Event <: Message
   args::Vector{Argument}
   type::Optional{EventType}
   since::Optional{Int}
-  description::Optional{String}
+  description::Optional{Description}
 end
 
 Event(node::Node) = Event(node["name"], Argument.(findall(".//arg", node)), get_event_type(node), get_since(node), get_description(node))
@@ -87,7 +98,7 @@ struct Interface
   requests::Vector{Request}
   events::Vector{Event}
   enums::Vector{Enum}
-  description::Optional{String}
+  description::Optional{Description}
 end
 
 function Interface(node::Node)

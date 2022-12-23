@@ -43,7 +43,7 @@ for target in ["x86_64-linux-gnu"]
     # add compiler flags
     args = get_default_args(target)
     # avoid incompatible wayland-server definitions
-    push!(args, "-DWL_HIDE_DEPRECATED")
+    push!(args, "-DWL_HIDE_DEPRECATED", "-DWAYLAND_CLIENT_PROTOCOL_H", "-DWAYLAND_SERVER_PROTOCOL_H")
     ctx = create_context(WL_HEADERS, args, options)
 
     build!(ctx)

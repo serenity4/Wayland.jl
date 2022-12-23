@@ -24,6 +24,7 @@ EventType(type::String) = getproperty(@__MODULE__, Symbol(:EVENT_TYPE_, uppercas
 
 get_event_type(node::Node) = haskey(node, "type") ? EventType(node["type"]) : nothing
 get_request_type(node::Node) = haskey(node, "type") ? RequestType(node["type"]) : nothing
+get_since(node::Node) = haskey(node, "since") ? parse(Int, node["since"]) : nothing
 get_interface(node::Node) = haskey(node, "interface") ? node["interface"] : nothing
 function get_description(node::Node)
   node = findfirst(".//description", node)
@@ -52,32 +53,37 @@ struct Argument
   name::String
   type::ArgumentType
   interface::Optional{String}
+  isnullable::Bool
   description::Optional{String}
 end
 
-Argument(node::Node) = Argument(node["name"], ArgumentType(node["type"]), get_interface(node), get_description(node))
+Argument(node::Node) = Argument(node["name"], ArgumentType(node["type"]), get_interface(node), haskey(node, "allow-null"), get_description(node))
 
-struct Request
+abstract type Message end
+
+struct Request <: Message
   name::String
   args::Vector{Argument}
   type::Optional{RequestType}
+  since::Optional{Int}
   description::Optional{String}
 end
 
-Request(node::Node) = Request(node["name"], Argument.(findall(".//arg", node)), get_request_type(node), get_description(node))
+Request(node::Node) = Request(node["name"], Argument.(findall(".//arg", node)), get_request_type(node), get_since(node), get_description(node))
 
-struct Event
+struct Event <: Message
   name::String
   args::Vector{Argument}
   type::Optional{EventType}
+  since::Optional{Int}
   description::Optional{String}
 end
 
-Event(node::Node) = Event(node["name"], Argument.(findall(".//arg", node)), get_event_type(node), get_description(node))
+Event(node::Node) = Event(node["name"], Argument.(findall(".//arg", node)), get_event_type(node), get_since(node), get_description(node))
 
 struct Interface
   name::String
-  version::VersionNumber
+  version::Int
   requests::Vector{Request}
   events::Vector{Event}
   enums::Vector{Enum}
@@ -97,5 +103,20 @@ function Interface(node::Node)
   for enode in findall(".//enum", node)
     push!(enums, Enum(enode))
   end
-  Interface(node["name"], parse(VersionNumber, node["version"]), requests, events, enums, get_description(node))
+  Interface(node["name"], parse(Int, node["version"]), requests, events, enums, get_description(node))
+end
+
+Interface(name::AbstractString) = Interface(findfirst(".//interface[@name = \"$name\"]", xroot[]))
+
+function find(f, vec)
+  i = findfirst(f, vec)
+  isnothing(i) && return
+  vec[i]
+end
+
+name(x) = x.name
+
+function Base.getindex(itf::Interface, str::AbstractString)
+  f = ==(str) ∘ name
+  @something(find(f, itf.requests), find(f, itf.events), find(f, itf.enums), throw(KeyError(str)))
 end

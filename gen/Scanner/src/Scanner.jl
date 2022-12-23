@@ -21,6 +21,7 @@ export xroot,
   Argument,
   Request,
   Event,
-  Interface
+  Interface,
+  get_interfaces
 
 end # module Scanner

@@ -74,9 +74,9 @@ function null_indices(itfs)
       for msg in getproperty(itf, field)
         isempty(msg.args) && continue
         for arg in msg.args
+          offset += 1
           if !contains(signature(arg), r"[on]")
             push!(indices, offset)
-            offset += 1
           end
         end
       end

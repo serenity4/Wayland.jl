@@ -10,4 +10,4 @@ ptrlength(x::Ptr{Cvoid}) = 1
 ptrlength(xs) = length(xs)
 getptr(x) = pointer(x)
 getptr(x::Ptr{Cvoid}) = x
-getptr(ptr::Ptr{T}, i::Integer) where {T} = ptr + i * sizeof(T)
+getptr(ptr::Ptr{T}, i::Integer) where {T} = ptr + (i - 1) * sizeof(T)

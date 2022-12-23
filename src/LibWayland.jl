@@ -1,7 +1,12 @@
 module LibWayland
 
-using Wayland_jll: libwayland_client, libwayland_cursor, libwayland_egl, libwayland_server
+# using Wayland_jll: libwayland_client, libwayland_cursor, libwayland_egl, libwayland_server
 using CEnum
+
+const libwayland_client = Symbol("libwayland-client")
+const libwayland_cursor = Symbol("libwayland-cursor")
+const libwayland_egl = Symbol("libwayland-egl")
+const libwayland_server = Symbol("libwayland-server")
 
 const IS_LIBC_MUSL = occursin("musl", Base.BUILD_TRIPLET)
 

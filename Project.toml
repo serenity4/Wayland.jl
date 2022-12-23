@@ -18,6 +18,7 @@ julia = "1.8"
 [extras]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+ThreadPools = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
 
 [targets]
-test = ["Test", "Documenter"]
+test = ["Test", "Documenter", "ThreadPools"]

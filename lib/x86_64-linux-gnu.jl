@@ -1,3 +1,15 @@
+const __uid_t = Cuint
+
+const __gid_t = Cuint
+
+const __pid_t = Cint
+
+const gid_t = __gid_t
+
+const uid_t = __uid_t
+
+const pid_t = __pid_t
+
 """
     wl_message
 
@@ -484,11 +496,11 @@ Dispatcher function type alias
 
 A dispatcher is a function that handles the emitting of callbacks in client code. For programs directly using the C library, this is done by using libffi to call function pointers. When binding to languages other than C, dispatchers provide a way to abstract the function calling process to be friendlier to other function calling systems.
 
-A dispatcher takes five arguments: The first is the dispatcher-specific implementation associated with the target object. The second is the object upon which the callback is being invoked (either [`wl_proxy`](@ref) or wl\\_resource). The third and fourth arguments are the opcode and the [`wl_message`](@ref) corresponding to the callback. The final argument is an array of arguments received from the other process via the wire protocol.
+A dispatcher takes five arguments: The first is the dispatcher-specific implementation associated with the target object. The second is the object upon which the callback is being invoked (either [`wl_proxy`](@ref) or [`wl_resource`](@ref)). The third and fourth arguments are the opcode and the [`wl_message`](@ref) corresponding to the callback. The final argument is an array of arguments received from the other process via the wire protocol.
 
 ### Parameters
 * `"const`: void *" Dispatcher-specific implementation data
-* `"void`: *" Callback invocation target ([`wl_proxy`](@ref) or `wl_resource`)
+* `"void`: *" Callback invocation target ([`wl_proxy`](@ref) or [`wl_resource`](@ref))
 * `uint32_t`: Callback opcode
 * `"const`: struct [`wl_message`](@ref) *" Callback message signature
 * `"union`: [`wl_argument`](@ref) *" Array of received arguments
@@ -501,19 +513,19 @@ const wl_dispatcher_func_t = Ptr{Cvoid}
 """
 Log function type alias
 
-The C implementation of the Wayland protocol abstracts the details of logging. Users may customize the logging behavior, with a function conforming to the [`wl_log_func_t`](@ref) type, via [`wl_log_set_handler_client`](@ref) and `wl_log_set_handler_server`.
+The C implementation of the Wayland protocol abstracts the details of logging. Users may customize the logging behavior, with a function conforming to the [`wl_log_func_t`](@ref) type, via [`wl_log_set_handler_client`](@ref) and [`wl_log_set_handler_server`](@ref).
 
 A [`wl_log_func_t`](@ref) must conform to the expectations of `vprintf`, and expects two arguments: a string to write and a corresponding variable argument list. While the string to write may contain format specifiers and use values in the variable argument list, the behavior of any [`wl_log_func_t`](@ref) depends on the implementation.
 
 !!! note
 
-    Take care to not confuse this with `wl_protocol_logger_func_t`, which is a specific server-side logger for requests and events.
+    Take care to not confuse this with [`wl_protocol_logger_func_t`](@ref), which is a specific server-side logger for requests and events.
 
 ### Parameters
 * `"const`: char *" String to write to the log, containing optional format specifiers
 * `"va_list"`: Variable argument list
 ### See also
-[`wl_log_set_handler_client`](@ref), wl\\_log\\_set\\_handler\\_server
+[`wl_log_set_handler_client`](@ref), [`wl_log_set_handler_server`](@ref)
 """
 const wl_log_func_t = Ptr{Cvoid}
 
@@ -527,7 +539,7 @@ Return value of an iterator function
 | WL\\_ITERATOR\\_STOP     | Stop the iteration      |
 | WL\\_ITERATOR\\_CONTINUE | Continue the iteration  |
 ### See also
-wl\\_client\\_for\\_each\\_resource\\_iterator\\_func\\_t, wl\\_client\\_for\\_each\\_resource
+[`wl_client_for_each_resource_iterator_func_t`](@ref), [`wl_client_for_each_resource`](@ref)
 """
 @cenum wl_iterator_result::UInt32 begin
     WL_ITERATOR_STOP = 0
@@ -3574,12 +3586,1867 @@ function wl_subsurface_set_desync(wl_subsurface_)
     ccall((:wl_subsurface_set_desync, libwayland_client), Cvoid, (Ptr{wl_subsurface},), wl_subsurface_)
 end
 
+const wl_client = Cvoid
+
+function wl_client_from_link(link)
+    ccall((:wl_client_from_link, libwayland_server), Ptr{wl_client}, (Ptr{wl_list},), link)
+end
+
+function wl_client_get_link(client)
+    ccall((:wl_client_get_link, libwayland_server), Ptr{wl_list}, (Ptr{wl_client},), client)
+end
+
+const wl_resource = Cvoid
+
+function wl_resource_from_link(resource)
+    ccall((:wl_resource_from_link, libwayland_server), Ptr{wl_resource}, (Ptr{wl_list},), resource)
+end
+
+function wl_resource_get_link(resource)
+    ccall((:wl_resource_get_link, libwayland_server), Ptr{wl_list}, (Ptr{wl_resource},), resource)
+end
+
+@cenum __JL_Ctag_21::UInt32 begin
+    WL_EVENT_READABLE = 1
+    WL_EVENT_WRITABLE = 2
+    WL_EVENT_HANGUP = 4
+    WL_EVENT_ERROR = 8
+end
+
+# typedef int ( * wl_event_loop_fd_func_t ) ( int fd , uint32_t mask , void * data )
+"""
+File descriptor dispatch function type
+
+Functions of this type are used as callbacks for file descriptor events.
+
+### Parameters
+* `fd`: The file descriptor delivering the event.
+* `mask`: Describes the kind of the event as a bitwise-or of: `WL_EVENT_READABLE`, `WL_EVENT_WRITABLE`, `WL_EVENT_HANGUP`, `WL_EVENT_ERROR`.
+* `data`: The user data argument of the related [`wl_event_loop_add_fd`](@ref)() call.
+### Returns
+If the event source is registered for re-check with [`wl_event_source_check`](@ref)(): 0 for all done, 1 for needing a re-check. If not registered, the return value is ignored and should be zero.
+### See also
+[`wl_event_loop_add_fd`](@ref)()  [`wl_event_source`](@ref)
+"""
+const wl_event_loop_fd_func_t = Ptr{Cvoid}
+
+# typedef int ( * wl_event_loop_timer_func_t ) ( void * data )
+"""
+Timer dispatch function type
+
+Functions of this type are used as callbacks for timer expiry.
+
+### Parameters
+* `data`: The user data argument of the related [`wl_event_loop_add_timer`](@ref)() call.
+### Returns
+If the event source is registered for re-check with [`wl_event_source_check`](@ref)(): 0 for all done, 1 for needing a re-check. If not registered, the return value is ignored and should be zero.
+### See also
+[`wl_event_loop_add_timer`](@ref)()  [`wl_event_source`](@ref)
+"""
+const wl_event_loop_timer_func_t = Ptr{Cvoid}
+
+# typedef int ( * wl_event_loop_signal_func_t ) ( int signal_number , void * data )
+"""
+Signal dispatch function type
+
+Functions of this type are used as callbacks for (POSIX) signals.
+
+### Parameters
+* `signal_number`:
+* `data`: The user data argument of the related [`wl_event_loop_add_signal`](@ref)() call.
+### Returns
+If the event source is registered for re-check with [`wl_event_source_check`](@ref)(): 0 for all done, 1 for needing a re-check. If not registered, the return value is ignored and should be zero.
+### See also
+[`wl_event_loop_add_signal`](@ref)()  [`wl_event_source`](@ref)
+"""
+const wl_event_loop_signal_func_t = Ptr{Cvoid}
+
+# typedef void ( * wl_event_loop_idle_func_t ) ( void * data )
+"""
+Idle task function type
+
+Functions of this type are used as callbacks before blocking in [`wl_event_loop_dispatch`](@ref)().
+
+### Parameters
+* `data`: The user data argument of the related [`wl_event_loop_add_idle`](@ref)() call.
+### See also
+[`wl_event_loop_add_idle`](@ref)() [`wl_event_loop_dispatch`](@ref)()  [`wl_event_source`](@ref)
+"""
+const wl_event_loop_idle_func_t = Ptr{Cvoid}
+
+const wl_event_loop = Cvoid
+
+"""
+    wl_event_loop_create()
+
+` wl_event_source`
+
+An abstract event source
+
+This is the generic type for fd, timer, signal, and idle sources. Functions that operate on specific source types must not be used with a different type, even if the function signature allows it.
+"""
+function wl_event_loop_create()
+    ccall((:wl_event_loop_create, libwayland_server), Ptr{wl_event_loop}, ())
+end
+
+function wl_event_loop_destroy(loop)
+    ccall((:wl_event_loop_destroy, libwayland_server), Cvoid, (Ptr{wl_event_loop},), loop)
+end
+
+const wl_event_source = Cvoid
+
+function wl_event_loop_add_fd(loop, fd, mask, func, data)
+    ccall((:wl_event_loop_add_fd, libwayland_server), Ptr{wl_event_source}, (Ptr{wl_event_loop}, Cint, UInt32, wl_event_loop_fd_func_t, Ptr{Cvoid}), loop, fd, mask, func, data)
+end
+
+function wl_event_source_fd_update(source, mask)
+    ccall((:wl_event_source_fd_update, libwayland_server), Cint, (Ptr{wl_event_source}, UInt32), source, mask)
+end
+
+function wl_event_loop_add_timer(loop, func, data)
+    ccall((:wl_event_loop_add_timer, libwayland_server), Ptr{wl_event_source}, (Ptr{wl_event_loop}, wl_event_loop_timer_func_t, Ptr{Cvoid}), loop, func, data)
+end
+
+function wl_event_loop_add_signal(loop, signal_number, func, data)
+    ccall((:wl_event_loop_add_signal, libwayland_server), Ptr{wl_event_source}, (Ptr{wl_event_loop}, Cint, wl_event_loop_signal_func_t, Ptr{Cvoid}), loop, signal_number, func, data)
+end
+
+function wl_event_source_timer_update(source, ms_delay)
+    ccall((:wl_event_source_timer_update, libwayland_server), Cint, (Ptr{wl_event_source}, Cint), source, ms_delay)
+end
+
+function wl_event_source_remove(source)
+    ccall((:wl_event_source_remove, libwayland_server), Cint, (Ptr{wl_event_source},), source)
+end
+
+function wl_event_source_check(source)
+    ccall((:wl_event_source_check, libwayland_server), Cvoid, (Ptr{wl_event_source},), source)
+end
+
+function wl_event_loop_dispatch(loop, timeout)
+    ccall((:wl_event_loop_dispatch, libwayland_server), Cint, (Ptr{wl_event_loop}, Cint), loop, timeout)
+end
+
+function wl_event_loop_dispatch_idle(loop)
+    ccall((:wl_event_loop_dispatch_idle, libwayland_server), Cvoid, (Ptr{wl_event_loop},), loop)
+end
+
+function wl_event_loop_add_idle(loop, func, data)
+    ccall((:wl_event_loop_add_idle, libwayland_server), Ptr{wl_event_source}, (Ptr{wl_event_loop}, wl_event_loop_idle_func_t, Ptr{Cvoid}), loop, func, data)
+end
+
+function wl_event_loop_get_fd(loop)
+    ccall((:wl_event_loop_get_fd, libwayland_server), Cint, (Ptr{wl_event_loop},), loop)
+end
+
+# typedef void ( * wl_notify_func_t ) ( struct wl_listener * listener , void * data )
+const wl_notify_func_t = Ptr{Cvoid}
+
+"""
+    wl_listener
+
+` wl_listener`
+
+A single listener for Wayland signals
+
+[`wl_listener`](@ref) provides the means to listen for [`wl_signal`](@ref) notifications. Many Wayland objects use [`wl_listener`](@ref) for notification of significant events like object destruction.
+
+Clients should create [`wl_listener`](@ref) objects manually and can register them as listeners to signals using #[`wl_signal_add`](@ref), assuming the signal is directly accessible. For opaque structs like [`wl_event_loop`](@ref), adding a listener should be done through provided accessor methods. A listener can only listen to one signal at a time.
+
+```c++
+ struct wl_listener your_listener;
+ your_listener.notify = your_callback_method;
+ // Direct access
+ wl_signal_add(&some_object->destroy_signal, &your_listener);
+ // Accessor access
+ wl_event_loop *loop = ...;
+ wl_event_loop_add_destroy_listener(loop, &your_listener);
+```
+
+If the listener is part of a larger struct, #[`wl_container_of`](@ref) can be used to retrieve a pointer to it:
+
+```c++
+ void your_listener(struct wl_listener *listener, void *data)
+ {
+ 	struct your_data *data;
+ 	your_data = wl_container_of(listener, data, your_member_name);
+ }
+```
+
+If you need to remove a listener from a signal, use [`wl_list_remove`](@ref)().
+
+```c++
+ wl_list_remove(&your_listener.link);
+```
+
+### See also
+[`wl_signal`](@ref)
+"""
+struct wl_listener
+    link::wl_list
+    notify::wl_notify_func_t
+end
+
+function wl_event_loop_add_destroy_listener(loop, listener)
+    ccall((:wl_event_loop_add_destroy_listener, libwayland_server), Cvoid, (Ptr{wl_event_loop}, Ptr{wl_listener}), loop, listener)
+end
+
+function wl_event_loop_get_destroy_listener(loop, notify)
+    ccall((:wl_event_loop_get_destroy_listener, libwayland_server), Ptr{wl_listener}, (Ptr{wl_event_loop}, wl_notify_func_t), loop, notify)
+end
+
+function wl_display_create()
+    ccall((:wl_display_create, libwayland_server), Ptr{wl_display}, ())
+end
+
+function wl_display_destroy(display)
+    ccall((:wl_display_destroy, libwayland_server), Cvoid, (Ptr{wl_display},), display)
+end
+
+function wl_display_get_event_loop(display)
+    ccall((:wl_display_get_event_loop, libwayland_server), Ptr{wl_event_loop}, (Ptr{wl_display},), display)
+end
+
+function wl_display_add_socket(display, name)
+    ccall((:wl_display_add_socket, libwayland_server), Cint, (Ptr{wl_display}, Ptr{Cchar}), display, name)
+end
+
+function wl_display_add_socket_auto(display)
+    ccall((:wl_display_add_socket_auto, libwayland_server), Ptr{Cchar}, (Ptr{wl_display},), display)
+end
+
+function wl_display_add_socket_fd(display, sock_fd)
+    ccall((:wl_display_add_socket_fd, libwayland_server), Cint, (Ptr{wl_display}, Cint), display, sock_fd)
+end
+
+function wl_display_terminate(display)
+    ccall((:wl_display_terminate, libwayland_server), Cvoid, (Ptr{wl_display},), display)
+end
+
+function wl_display_run(display)
+    ccall((:wl_display_run, libwayland_server), Cvoid, (Ptr{wl_display},), display)
+end
+
+function wl_display_flush_clients(display)
+    ccall((:wl_display_flush_clients, libwayland_server), Cvoid, (Ptr{wl_display},), display)
+end
+
+function wl_display_destroy_clients(display)
+    ccall((:wl_display_destroy_clients, libwayland_server), Cvoid, (Ptr{wl_display},), display)
+end
+
+# typedef void ( * wl_global_bind_func_t ) ( struct wl_client * client , void * data , uint32_t version , uint32_t id )
+const wl_global_bind_func_t = Ptr{Cvoid}
+
+function wl_display_get_serial(display)
+    ccall((:wl_display_get_serial, libwayland_server), UInt32, (Ptr{wl_display},), display)
+end
+
+function wl_display_next_serial(display)
+    ccall((:wl_display_next_serial, libwayland_server), UInt32, (Ptr{wl_display},), display)
+end
+
+function wl_display_add_destroy_listener(display, listener)
+    ccall((:wl_display_add_destroy_listener, libwayland_server), Cvoid, (Ptr{wl_display}, Ptr{wl_listener}), display, listener)
+end
+
+function wl_display_add_client_created_listener(display, listener)
+    ccall((:wl_display_add_client_created_listener, libwayland_server), Cvoid, (Ptr{wl_display}, Ptr{wl_listener}), display, listener)
+end
+
+function wl_display_get_destroy_listener(display, notify)
+    ccall((:wl_display_get_destroy_listener, libwayland_server), Ptr{wl_listener}, (Ptr{wl_display}, wl_notify_func_t), display, notify)
+end
+
+const wl_global = Cvoid
+
+function wl_global_create(display, interface, version, data, bind)
+    ccall((:wl_global_create, libwayland_server), Ptr{wl_global}, (Ptr{wl_display}, Ptr{wl_interface}, Cint, Ptr{Cvoid}, wl_global_bind_func_t), display, interface, version, data, bind)
+end
+
+function wl_global_remove(_global)
+    ccall((:wl_global_remove, libwayland_server), Cvoid, (Ptr{wl_global},), _global)
+end
+
+function wl_global_destroy(_global)
+    ccall((:wl_global_destroy, libwayland_server), Cvoid, (Ptr{wl_global},), _global)
+end
+
+# typedef bool ( * wl_display_global_filter_func_t ) ( const struct wl_client * client , const struct wl_global * global , void * data )
+"""
+A filter function for [`wl_global`](@ref) objects
+
+A filter function enables the server to decide which globals to advertise to each client.
+
+When a [`wl_global`](@ref) filter is set, the given callback function will be called during [`wl_global`](@ref) advertisement and binding.
+
+This function should return true if the global object should be made visible to the client or false otherwise.
+
+### Parameters
+* `client`: The client object
+* `global`: The global object to show or hide
+* `data`: The user data pointer
+"""
+const wl_display_global_filter_func_t = Ptr{Cvoid}
+
+function wl_display_set_global_filter(display, filter, data)
+    ccall((:wl_display_set_global_filter, libwayland_server), Cvoid, (Ptr{wl_display}, wl_display_global_filter_func_t, Ptr{Cvoid}), display, filter, data)
+end
+
+function wl_global_get_interface(_global)
+    ccall((:wl_global_get_interface, libwayland_server), Ptr{wl_interface}, (Ptr{wl_global},), _global)
+end
+
+function wl_global_get_user_data(_global)
+    ccall((:wl_global_get_user_data, libwayland_server), Ptr{Cvoid}, (Ptr{wl_global},), _global)
+end
+
+function wl_global_set_user_data(_global, data)
+    ccall((:wl_global_set_user_data, libwayland_server), Cvoid, (Ptr{wl_global}, Ptr{Cvoid}), _global, data)
+end
+
+function wl_client_create(display, fd)
+    ccall((:wl_client_create, libwayland_server), Ptr{wl_client}, (Ptr{wl_display}, Cint), display, fd)
+end
+
+function wl_display_get_client_list(display)
+    ccall((:wl_display_get_client_list, libwayland_server), Ptr{wl_list}, (Ptr{wl_display},), display)
+end
+
+function wl_client_destroy(client)
+    ccall((:wl_client_destroy, libwayland_server), Cvoid, (Ptr{wl_client},), client)
+end
+
+function wl_client_flush(client)
+    ccall((:wl_client_flush, libwayland_server), Cvoid, (Ptr{wl_client},), client)
+end
+
+function wl_client_get_credentials(client, pid, uid, gid)
+    ccall((:wl_client_get_credentials, libwayland_server), Cvoid, (Ptr{wl_client}, Ptr{pid_t}, Ptr{uid_t}, Ptr{gid_t}), client, pid, uid, gid)
+end
+
+function wl_client_get_fd(client)
+    ccall((:wl_client_get_fd, libwayland_server), Cint, (Ptr{wl_client},), client)
+end
+
+function wl_client_add_destroy_listener(client, listener)
+    ccall((:wl_client_add_destroy_listener, libwayland_server), Cvoid, (Ptr{wl_client}, Ptr{wl_listener}), client, listener)
+end
+
+function wl_client_get_destroy_listener(client, notify)
+    ccall((:wl_client_get_destroy_listener, libwayland_server), Ptr{wl_listener}, (Ptr{wl_client}, wl_notify_func_t), client, notify)
+end
+
+function wl_client_get_object(client, id)
+    ccall((:wl_client_get_object, libwayland_server), Ptr{wl_resource}, (Ptr{wl_client}, UInt32), client, id)
+end
+
+function wl_client_post_no_memory(client)
+    ccall((:wl_client_post_no_memory, libwayland_server), Cvoid, (Ptr{wl_client},), client)
+end
+
+function wl_client_add_resource_created_listener(client, listener)
+    ccall((:wl_client_add_resource_created_listener, libwayland_server), Cvoid, (Ptr{wl_client}, Ptr{wl_listener}), client, listener)
+end
+
+# typedef enum wl_iterator_result ( * wl_client_for_each_resource_iterator_func_t ) ( struct wl_resource * resource , void * user_data )
+const wl_client_for_each_resource_iterator_func_t = Ptr{Cvoid}
+
+function wl_client_for_each_resource(client, iterator, user_data)
+    ccall((:wl_client_for_each_resource, libwayland_server), Cvoid, (Ptr{wl_client}, wl_client_for_each_resource_iterator_func_t, Ptr{Cvoid}), client, iterator, user_data)
+end
+
+"""
+    wl_signal
+
+` wl_signal`
+
+A source of a type of observable event
+
+Signals are recognized points where significant events can be observed. Compositors as well as the server can provide signals. Observers are [`wl_listener`](@ref)'s that are added through #[`wl_signal_add`](@ref). Signals are emitted using #[`wl_signal_emit`](@ref), which will invoke all listeners until that listener is removed by [`wl_list_remove`](@ref)() (or whenever the signal is destroyed).
+
+### See also
+[`wl_listener`](@ref) for more information on using [`wl_signal`](@ref)
+"""
+struct wl_signal
+    listener_list::wl_list
+end
+
+"""
+    wl_signal_init(signal)
+
+Initialize a new wl_signal for use.
+
+[`wl_signal`](@ref)
+
+### Parameters
+* `signal`: The signal that will be initialized
+"""
+function wl_signal_init(signal)
+    ccall((:wl_signal_init, libwayland_server), Cvoid, (Ptr{wl_signal},), signal)
+end
+
+"""
+    wl_signal_add(signal, listener)
+
+Add the specified listener to this signal.
+
+[`wl_signal`](@ref)
+
+### Parameters
+* `signal`: The signal that will emit events to the listener
+* `listener`: The listener to add
+"""
+function wl_signal_add(signal, listener)
+    ccall((:wl_signal_add, libwayland_server), Cvoid, (Ptr{wl_signal}, Ptr{wl_listener}), signal, listener)
+end
+
+"""
+    wl_signal_get(signal, notify)
+
+Gets the listener struct for the specified callback.
+
+[`wl_signal`](@ref)
+
+### Parameters
+* `signal`: The signal that contains the specified listener
+* `notify`: The listener that is the target of this search
+### Returns
+the list item that corresponds to the specified listener, or NULL if none was found
+"""
+function wl_signal_get(signal, notify)
+    ccall((:wl_signal_get, libwayland_server), Ptr{wl_listener}, (Ptr{wl_signal}, wl_notify_func_t), signal, notify)
+end
+
+"""
+    wl_signal_emit(signal, data)
+
+Emits this signal, notifying all registered listeners.
+
+[`wl_signal`](@ref)
+
+### Parameters
+* `signal`: The signal object that will emit the signal
+* `data`: The data that will be emitted with the signal
+"""
+function wl_signal_emit(signal, data)
+    ccall((:wl_signal_emit, libwayland_server), Cvoid, (Ptr{wl_signal}, Ptr{Cvoid}), signal, data)
+end
+
+# typedef void ( * wl_resource_destroy_func_t ) ( struct wl_resource * resource )
+const wl_resource_destroy_func_t = Ptr{Cvoid}
+
+function wl_resource_post_event_array(resource, opcode, args)
+    ccall((:wl_resource_post_event_array, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{wl_argument}), resource, opcode, args)
+end
+
+function wl_resource_queue_event_array(resource, opcode, args)
+    ccall((:wl_resource_queue_event_array, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{wl_argument}), resource, opcode, args)
+end
+
+function wl_resource_post_no_memory(resource)
+    ccall((:wl_resource_post_no_memory, libwayland_server), Cvoid, (Ptr{wl_resource},), resource)
+end
+
+function wl_client_get_display(client)
+    ccall((:wl_client_get_display, libwayland_server), Ptr{wl_display}, (Ptr{wl_client},), client)
+end
+
+function wl_resource_create(client, interface, version, id)
+    ccall((:wl_resource_create, libwayland_server), Ptr{wl_resource}, (Ptr{wl_client}, Ptr{wl_interface}, Cint, UInt32), client, interface, version, id)
+end
+
+function wl_resource_set_implementation(resource, implementation, data, destroy)
+    ccall((:wl_resource_set_implementation, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{Cvoid}, Ptr{Cvoid}, wl_resource_destroy_func_t), resource, implementation, data, destroy)
+end
+
+function wl_resource_set_dispatcher(resource, dispatcher, implementation, data, destroy)
+    ccall((:wl_resource_set_dispatcher, libwayland_server), Cvoid, (Ptr{wl_resource}, wl_dispatcher_func_t, Ptr{Cvoid}, Ptr{Cvoid}, wl_resource_destroy_func_t), resource, dispatcher, implementation, data, destroy)
+end
+
+function wl_resource_destroy(resource)
+    ccall((:wl_resource_destroy, libwayland_server), Cvoid, (Ptr{wl_resource},), resource)
+end
+
+function wl_resource_get_id(resource)
+    ccall((:wl_resource_get_id, libwayland_server), UInt32, (Ptr{wl_resource},), resource)
+end
+
+function wl_resource_find_for_client(list, client)
+    ccall((:wl_resource_find_for_client, libwayland_server), Ptr{wl_resource}, (Ptr{wl_list}, Ptr{wl_client}), list, client)
+end
+
+function wl_resource_get_client(resource)
+    ccall((:wl_resource_get_client, libwayland_server), Ptr{wl_client}, (Ptr{wl_resource},), resource)
+end
+
+function wl_resource_set_user_data(resource, data)
+    ccall((:wl_resource_set_user_data, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{Cvoid}), resource, data)
+end
+
+function wl_resource_get_user_data(resource)
+    ccall((:wl_resource_get_user_data, libwayland_server), Ptr{Cvoid}, (Ptr{wl_resource},), resource)
+end
+
+function wl_resource_get_version(resource)
+    ccall((:wl_resource_get_version, libwayland_server), Cint, (Ptr{wl_resource},), resource)
+end
+
+function wl_resource_set_destructor(resource, destroy)
+    ccall((:wl_resource_set_destructor, libwayland_server), Cvoid, (Ptr{wl_resource}, wl_resource_destroy_func_t), resource, destroy)
+end
+
+function wl_resource_instance_of(resource, interface, implementation)
+    ccall((:wl_resource_instance_of, libwayland_server), Cint, (Ptr{wl_resource}, Ptr{wl_interface}, Ptr{Cvoid}), resource, interface, implementation)
+end
+
+function wl_resource_get_class(resource)
+    ccall((:wl_resource_get_class, libwayland_server), Ptr{Cchar}, (Ptr{wl_resource},), resource)
+end
+
+function wl_resource_add_destroy_listener(resource, listener)
+    ccall((:wl_resource_add_destroy_listener, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{wl_listener}), resource, listener)
+end
+
+function wl_resource_get_destroy_listener(resource, notify)
+    ccall((:wl_resource_get_destroy_listener, libwayland_server), Ptr{wl_listener}, (Ptr{wl_resource}, wl_notify_func_t), resource, notify)
+end
+
+const wl_shm_buffer = Cvoid
+
+function wl_shm_buffer_get(resource)
+    ccall((:wl_shm_buffer_get, libwayland_server), Ptr{wl_shm_buffer}, (Ptr{wl_resource},), resource)
+end
+
+function wl_shm_buffer_begin_access(buffer)
+    ccall((:wl_shm_buffer_begin_access, libwayland_server), Cvoid, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_buffer_end_access(buffer)
+    ccall((:wl_shm_buffer_end_access, libwayland_server), Cvoid, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_buffer_get_data(buffer)
+    ccall((:wl_shm_buffer_get_data, libwayland_server), Ptr{Cvoid}, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_buffer_get_stride(buffer)
+    ccall((:wl_shm_buffer_get_stride, libwayland_server), Int32, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_buffer_get_format(buffer)
+    ccall((:wl_shm_buffer_get_format, libwayland_server), UInt32, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_buffer_get_width(buffer)
+    ccall((:wl_shm_buffer_get_width, libwayland_server), Int32, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_buffer_get_height(buffer)
+    ccall((:wl_shm_buffer_get_height, libwayland_server), Int32, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_buffer_ref_pool(buffer)
+    ccall((:wl_shm_buffer_ref_pool, libwayland_server), Ptr{wl_shm_pool}, (Ptr{wl_shm_buffer},), buffer)
+end
+
+function wl_shm_pool_unref(pool)
+    ccall((:wl_shm_pool_unref, libwayland_server), Cvoid, (Ptr{wl_shm_pool},), pool)
+end
+
+function wl_display_init_shm(display)
+    ccall((:wl_display_init_shm, libwayland_server), Cint, (Ptr{wl_display},), display)
+end
+
+function wl_display_add_shm_format(display, format)
+    ccall((:wl_display_add_shm_format, libwayland_server), Ptr{UInt32}, (Ptr{wl_display}, UInt32), display, format)
+end
+
+function wl_shm_buffer_create(client, id, width, height, stride, format)
+    ccall((:wl_shm_buffer_create, libwayland_server), Ptr{wl_shm_buffer}, (Ptr{wl_client}, UInt32, Int32, Int32, Int32, UInt32), client, id, width, height, stride, format)
+end
+
+function wl_log_set_handler_server(handler)
+    ccall((:wl_log_set_handler_server, libwayland_server), Cvoid, (wl_log_func_t,), handler)
+end
+
+@cenum wl_protocol_logger_type::UInt32 begin
+    WL_PROTOCOL_LOGGER_REQUEST = 0
+    WL_PROTOCOL_LOGGER_EVENT = 1
+end
+
+struct wl_protocol_logger_message
+    resource::Ptr{wl_resource}
+    message_opcode::Cint
+    message::Ptr{wl_message}
+    arguments_count::Cint
+    arguments::Ptr{wl_argument}
+end
+
+# typedef void ( * wl_protocol_logger_func_t ) ( void * user_data , enum wl_protocol_logger_type direction , const struct wl_protocol_logger_message * message )
+const wl_protocol_logger_func_t = Ptr{Cvoid}
+
+const wl_protocol_logger = Cvoid
+
+function wl_display_add_protocol_logger(display, arg2, user_data)
+    ccall((:wl_display_add_protocol_logger, libwayland_server), Ptr{wl_protocol_logger}, (Ptr{wl_display}, wl_protocol_logger_func_t, Ptr{Cvoid}), display, arg2, user_data)
+end
+
+function wl_protocol_logger_destroy(logger)
+    ccall((:wl_protocol_logger_destroy, libwayland_server), Cvoid, (Ptr{wl_protocol_logger},), logger)
+end
+
+"""
+    wl_display_interface
+
+` iface_wl_display`
+
+` wl_display_interface`
+
+| Field          | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| sync           | asynchronous roundtrip  The sync request asks the server to emit the 'done' event on the returned [`wl_callback`](@ref) object. Since requests are handled in-order and events are delivered in-order, this can be used as a barrier to ensure all previous requests and the resulting events have been handled.  The object returned by this request will be destroyed by the compositor after the callback is fired and as such the client must not attempt to use it after that point.  The callback\\_data passed in the callback is the event serial.  ### Parameters * `callback`: callback object for the sync request |
+| get\\_registry | get global registry object  This request creates a registry object that allows the client to list and bind the global objects available from the compositor.  It should be noted that the server side resources consumed in response to a get\\_registry request can only be released when the client disconnects, not when the client side proxy is destroyed. Therefore, clients should invoke get\\_registry as infrequently as possible to avoid wasting memory.  ### Parameters * `registry`: global registry object                                                                                                     |
+"""
+struct wl_display_interface
+    sync::Ptr{Cvoid}
+    get_registry::Ptr{Cvoid}
+end
+
+"""
+    wl_registry_interface
+
+` iface_wl_registry`
+
+` wl_registry_interface`
+
+| Field | Note                                                                                                                                                                                                                                                                                                      |
+| :---- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bind  | bind an object to the display  Binds a new, client-created object to the server using the specified name as the identifier.  ### Parameters * `name`: unique numeric name of the object * `interface`: name of the objects interface * `version`: version of the objects interface * `id`: bounded object |
+"""
+struct wl_registry_interface
+    bind::Ptr{Cvoid}
+end
+
+"""
+    wl_registry_send_global(resource_, name, interface, version)
+
+` iface_wl_registry`
+
+Sends an global event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `name`: numeric name of the global object
+* `interface`: interface implemented by the object
+* `version`: interface version
+"""
+function wl_registry_send_global(resource_, name, interface, version)
+    ccall((:wl_registry_send_global, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{Cchar}, UInt32), resource_, name, interface, version)
+end
+
+"""
+    wl_registry_send_global_remove(resource_, name)
+
+` iface_wl_registry`
+
+Sends an global\\_remove event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `name`: numeric name of the global object
+"""
+function wl_registry_send_global_remove(resource_, name)
+    ccall((:wl_registry_send_global_remove, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, name)
+end
+
+"""
+    wl_callback_send_done(resource_, callback_data)
+
+` iface_wl_callback`
+
+Sends an done event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `callback_data`: request-specific data for the callback
+"""
+function wl_callback_send_done(resource_, callback_data)
+    ccall((:wl_callback_send_done, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, callback_data)
+end
+
+"""
+    wl_compositor_interface
+
+` iface_wl_compositor`
+
+` wl_compositor_interface`
+
+| Field            | Note                                                                                                    |
+| :--------------- | :------------------------------------------------------------------------------------------------------ |
+| create\\_surface | create new surface  Ask the compositor to create a new surface.  ### Parameters * `id`: the new surface |
+| create\\_region  | create new region  Ask the compositor to create a new region.  ### Parameters * `id`: the new region    |
+"""
+struct wl_compositor_interface
+    create_surface::Ptr{Cvoid}
+    create_region::Ptr{Cvoid}
+end
+
+"""
+    wl_shm_pool_interface
+
+` iface_wl_shm_pool`
+
+` wl_shm_pool_interface`
+
+| Field           | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :-------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| create\\_buffer | create a buffer from the pool  Create a [`wl_buffer`](@ref) object from the pool.  The buffer is created offset bytes into the pool and has width and height as specified. The stride argument specifies the number of bytes from the beginning of one row to the beginning of the next. The format is the pixel format of the buffer and must be one of those advertised through the [`wl_shm`](@ref).format event.  A buffer will keep a reference to the pool it was created from so it is valid to destroy the pool immediately after creating a buffer from it.  ### Parameters * `id`: buffer to create * `offset`: buffer byte offset within the pool * `width`: buffer width, in pixels * `height`: buffer height, in pixels * `stride`: number of bytes from the beginning of one row to the beginning of the next row * `format`: buffer pixel format |
+| destroy         | destroy the pool  Destroy the shared memory pool.  The mmapped memory will be released when all buffers that have been created from this pool are gone.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| resize          | change the size of the pool mapping  This request will cause the server to remap the backing memory for the pool from the file descriptor passed when the pool was created, but using the new size. This request can only be used to make the pool bigger.  ### Parameters * `size`: new size of the pool, in bytes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+"""
+struct wl_shm_pool_interface
+    create_buffer::Ptr{Cvoid}
+    destroy::Ptr{Cvoid}
+    resize::Ptr{Cvoid}
+end
+
+"""
+    wl_shm_interface
+
+` iface_wl_shm`
+
+` wl_shm_interface`
+
+| Field         | Note                                                                                                                                                                                                                                                                                                                                              |
+| :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| create\\_pool | create a shm pool  Create a new [`wl_shm_pool`](@ref) object.  The pool can be used to create shared memory based buffer objects. The server will mmap size bytes of the passed file descriptor, to use as backing memory for the pool.  ### Parameters * `id`: pool to create * `fd`: file descriptor for the pool * `size`: pool size, in bytes |
+"""
+struct wl_shm_interface
+    create_pool::Ptr{Cvoid}
+end
+
+"""
+    wl_shm_send_format(resource_, format)
+
+` iface_wl_shm`
+
+Sends an format event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `format`: buffer pixel format
+"""
+function wl_shm_send_format(resource_, format)
+    ccall((:wl_shm_send_format, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, format)
+end
+
+"""
+    wl_buffer_interface
+
+` iface_wl_buffer`
+
+` wl_buffer_interface`
+
+| Field   | Note                                                                                                                                                                                                          |
+| :------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| destroy | destroy a buffer  Destroy a buffer. If and how you need to release the backing storage is defined by the buffer factory interface.  For possible side-effects to a surface, see [`wl_surface`](@ref).attach.  |
+"""
+struct wl_buffer_interface
+    destroy::Ptr{Cvoid}
+end
+
+"""
+    wl_buffer_send_release(resource_)
+
+` iface_wl_buffer`
+
+Sends an release event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_buffer_send_release(resource_)
+    ccall((:wl_buffer_send_release, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_data_offer_interface
+
+` iface_wl_data_offer`
+
+` wl_data_offer_interface`
+
+| Field         | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| :------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| accept        | accept one of the offered mime types  Indicate that the client can accept the given mime type, or NULL for not accepted.  For objects of version 2 or older, this request is used by the client to give feedback whether the client can receive the given mime type, or NULL if none is accepted; the feedback does not determine whether the drag-and-drop operation succeeds or not.  For objects of version 3 or newer, this request determines the final result of the drag-and-drop operation. If the end result is that no mime types were accepted, the drag-and-drop operation will be cancelled and the corresponding drag source will receive [`wl_data_source`](@ref).cancelled. Clients may still use this event in conjunction with [`wl_data_source`](@ref).action for feedback.  ### Parameters * `serial`: serial number of the accept request * `mime_type`: mime type accepted by the client                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| receive       | request that the data is transferred  To transfer the offered data, the client issues this request and indicates the mime type it wants to receive. The transfer happens through the passed file descriptor (typically created with the pipe system call). The source client writes the data in the mime type representation requested and then closes the file descriptor.  The receiving client reads from the read end of the pipe until EOF and then closes its end, at which point the transfer is complete.  This request may happen multiple times for different mime types, both before and after [`wl_data_device`](@ref).drop. Drag-and-drop destination clients may preemptively fetch data or examine it more closely to determine acceptance.  ### Parameters * `mime_type`: mime type desired by receiver * `fd`: file descriptor for data transfer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| destroy       | destroy data offer  Destroy the data offer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| finish        | the offer will no longer be used  Notifies the compositor that the drag destination successfully finished the drag-and-drop operation.  Upon receiving this request, the compositor will emit [`wl_data_source`](@ref).dnd\\_finished on the drag source client.  It is a client error to perform other requests than [`wl_data_offer`](@ref).destroy after this one. It is also an error to perform this request after a NULL mime type has been set in [`wl_data_offer`](@ref).accept or no action was received through [`wl_data_offer`](@ref).action.  If [`wl_data_offer`](@ref).finish request is received for a non drag and drop operation, the invalid\\_finish protocol error is raised.  \\since 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| set\\_actions | set the available/preferred drag-and-drop actions  Sets the actions that the destination side client supports for this operation. This request may trigger the emission of [`wl_data_source`](@ref).action and [`wl_data_offer`](@ref).action events if the compositor needs to change the selected action.  This request can be called multiple times throughout the drag-and-drop operation, typically in response to [`wl_data_device`](@ref).enter or [`wl_data_device`](@ref).motion events.  This request determines the final result of the drag-and-drop operation. If the end result is that no action is accepted, the drag source will receive [`wl_data_source`](@ref).cancelled.  The dnd\\_actions argument must contain only values expressed in the [`wl_data_device_manager`](@ref).dnd\\_actions enum, and the preferred\\_action argument must only contain one of those values set, otherwise it will result in a protocol error.  While managing an "ask" action, the destination drag-and-drop client may perform further [`wl_data_offer`](@ref).receive requests, and is expected to perform one last [`wl_data_offer`](@ref).set\\_actions request with a preferred action other than "ask" (and optionally [`wl_data_offer`](@ref).accept) before requesting [`wl_data_offer`](@ref).finish, in order to convey the action selected by the user. If the preferred action is not in the [`wl_data_offer`](@ref).source\\_actions mask, an error will be raised.  If the "ask" action is dismissed (e.g. user cancellation), the client is expected to perform [`wl_data_offer`](@ref).destroy right away.  This request can only be made on drag-and-drop offers, a protocol error will be raised otherwise.  \\since 3  ### Parameters * `dnd_actions`: actions supported by the destination client * `preferred_action`: action preferred by the destination client |
+"""
+struct wl_data_offer_interface
+    accept::Ptr{Cvoid}
+    receive::Ptr{Cvoid}
+    destroy::Ptr{Cvoid}
+    finish::Ptr{Cvoid}
+    set_actions::Ptr{Cvoid}
+end
+
+"""
+    wl_data_offer_send_offer(resource_, mime_type)
+
+` iface_wl_data_offer`
+
+Sends an offer event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `mime_type`: offered mime type
+"""
+function wl_data_offer_send_offer(resource_, mime_type)
+    ccall((:wl_data_offer_send_offer, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{Cchar}), resource_, mime_type)
+end
+
+"""
+    wl_data_offer_send_source_actions(resource_, source_actions)
+
+` iface_wl_data_offer`
+
+Sends an source\\_actions event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `source_actions`: actions offered by the data source
+"""
+function wl_data_offer_send_source_actions(resource_, source_actions)
+    ccall((:wl_data_offer_send_source_actions, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, source_actions)
+end
+
+"""
+    wl_data_offer_send_action(resource_, dnd_action)
+
+` iface_wl_data_offer`
+
+Sends an action event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `dnd_action`: action selected by the compositor
+"""
+function wl_data_offer_send_action(resource_, dnd_action)
+    ccall((:wl_data_offer_send_action, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, dnd_action)
+end
+
+"""
+    wl_data_source_interface
+
+` iface_wl_data_source`
+
+` wl_data_source_interface`
+
+| Field         | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| :------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| offer         | add an offered mime type  This request adds a mime type to the set of mime types advertised to targets. Can be called several times to offer multiple types.  ### Parameters * `mime_type`: mime type offered by the data source                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| destroy       | destroy the data source  Destroy the data source.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| set\\_actions | set the available drag-and-drop actions  Sets the actions that the source side client supports for this operation. This request may trigger [`wl_data_source`](@ref).action and [`wl_data_offer`](@ref).action events if the compositor needs to change the selected action.  The dnd\\_actions argument must contain only values expressed in the [`wl_data_device_manager`](@ref).dnd\\_actions enum, otherwise it will result in a protocol error.  This request must be made once only, and can only be made on sources used in drag-and-drop, so it must be performed before [`wl_data_device`](@ref).start\\_drag. Attempting to use the source other than for drag-and-drop will raise a protocol error.  \\since 3  ### Parameters * `dnd_actions`: actions supported by the data source |
+"""
+struct wl_data_source_interface
+    offer::Ptr{Cvoid}
+    destroy::Ptr{Cvoid}
+    set_actions::Ptr{Cvoid}
+end
+
+"""
+    wl_data_source_send_target(resource_, mime_type)
+
+` iface_wl_data_source`
+
+Sends an target event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `mime_type`: mime type accepted by the target
+"""
+function wl_data_source_send_target(resource_, mime_type)
+    ccall((:wl_data_source_send_target, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{Cchar}), resource_, mime_type)
+end
+
+"""
+    wl_data_source_send_send(resource_, mime_type, fd)
+
+` iface_wl_data_source`
+
+Sends an send event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `mime_type`: mime type for the data
+* `fd`: file descriptor for the data
+"""
+function wl_data_source_send_send(resource_, mime_type, fd)
+    ccall((:wl_data_source_send_send, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{Cchar}, Int32), resource_, mime_type, fd)
+end
+
+"""
+    wl_data_source_send_cancelled(resource_)
+
+` iface_wl_data_source`
+
+Sends an cancelled event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_data_source_send_cancelled(resource_)
+    ccall((:wl_data_source_send_cancelled, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_data_source_send_dnd_drop_performed(resource_)
+
+` iface_wl_data_source`
+
+Sends an dnd\\_drop\\_performed event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_data_source_send_dnd_drop_performed(resource_)
+    ccall((:wl_data_source_send_dnd_drop_performed, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_data_source_send_dnd_finished(resource_)
+
+` iface_wl_data_source`
+
+Sends an dnd\\_finished event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_data_source_send_dnd_finished(resource_)
+    ccall((:wl_data_source_send_dnd_finished, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_data_source_send_action(resource_, dnd_action)
+
+` iface_wl_data_source`
+
+Sends an action event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `dnd_action`: action selected by the compositor
+"""
+function wl_data_source_send_action(resource_, dnd_action)
+    ccall((:wl_data_source_send_action, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, dnd_action)
+end
+
+"""
+    wl_data_device_interface
+
+` iface_wl_data_device`
+
+` wl_data_device_interface`
+
+| Field           | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :-------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| start\\_drag    | start drag-and-drop operation  This request asks the compositor to start a drag-and-drop operation on behalf of the client.  The source argument is the data source that provides the data for the eventual data transfer. If source is NULL, enter, leave and motion events are sent only to the client that initiated the drag and the client is expected to handle the data passing internally. If source is destroyed, the drag-and-drop session will be cancelled.  The origin surface is the surface where the drag originates and the client must have an active implicit grab that matches the serial.  The icon surface is an optional (can be NULL) surface that provides an icon to be moved around with the cursor. Initially, the top-left corner of the icon surface is placed at the cursor hotspot, but subsequent [`wl_surface`](@ref).attach request can move the relative position. Attach requests must be confirmed with [`wl_surface`](@ref).commit as usual. The icon surface is given the role of a drag-and-drop icon. If the icon surface already has another role, it raises a protocol error.  The current and pending input regions of the icon [`wl_surface`](@ref) are cleared, and [`wl_surface`](@ref).set\\_input\\_region is ignored until the [`wl_surface`](@ref) is no longer used as the icon surface. When the use as an icon ends, the current and pending input regions become undefined, and the [`wl_surface`](@ref) is unmapped.  ### Parameters * `source`: data source for the eventual transfer * `origin`: surface where the drag originates * `icon`: drag-and-drop icon surface * `serial`: serial number of the implicit grab on the origin |
+| set\\_selection | copy data to the selection  This request asks the compositor to set the selection to the data from the source on behalf of the client.  To unset the selection, set the source to NULL.  ### Parameters * `source`: data source for the selection * `serial`: serial number of the event that triggered this request                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| release         | destroy data device  This request destroys the data device.  \\since 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+"""
+struct wl_data_device_interface
+    start_drag::Ptr{Cvoid}
+    set_selection::Ptr{Cvoid}
+    release::Ptr{Cvoid}
+end
+
+"""
+    wl_data_device_send_data_offer(resource_, id)
+
+` iface_wl_data_device`
+
+Sends an data\\_offer event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `id`: the new data\\_offer object
+"""
+function wl_data_device_send_data_offer(resource_, id)
+    ccall((:wl_data_device_send_data_offer, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{wl_resource}), resource_, id)
+end
+
+"""
+    wl_data_device_send_enter(resource_, serial, surface, x, y, id)
+
+` iface_wl_data_device`
+
+Sends an enter event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the enter event
+* `surface`: client surface entered
+* `x`: surface-local x coordinate
+* `y`: surface-local y coordinate
+* `id`: source data\\_offer object
+"""
+function wl_data_device_send_enter(resource_, serial, surface, x, y, id)
+    ccall((:wl_data_device_send_enter, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{wl_resource}, wl_fixed_t, wl_fixed_t, Ptr{wl_resource}), resource_, serial, surface, x, y, id)
+end
+
+"""
+    wl_data_device_send_leave(resource_)
+
+` iface_wl_data_device`
+
+Sends an leave event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_data_device_send_leave(resource_)
+    ccall((:wl_data_device_send_leave, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_data_device_send_motion(resource_, time, x, y)
+
+` iface_wl_data_device`
+
+Sends an motion event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `time`: timestamp with millisecond granularity
+* `x`: surface-local x coordinate
+* `y`: surface-local y coordinate
+"""
+function wl_data_device_send_motion(resource_, time, x, y)
+    ccall((:wl_data_device_send_motion, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, wl_fixed_t, wl_fixed_t), resource_, time, x, y)
+end
+
+"""
+    wl_data_device_send_drop(resource_)
+
+` iface_wl_data_device`
+
+Sends an drop event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_data_device_send_drop(resource_)
+    ccall((:wl_data_device_send_drop, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_data_device_send_selection(resource_, id)
+
+` iface_wl_data_device`
+
+Sends an selection event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `id`: selection data\\_offer object
+"""
+function wl_data_device_send_selection(resource_, id)
+    ccall((:wl_data_device_send_selection, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{wl_resource}), resource_, id)
+end
+
+"""
+    wl_data_device_manager_interface
+
+` iface_wl_data_device_manager`
+
+` wl_data_device_manager_interface`
+
+| Field                  | Note                                                                                                                                                              |
+| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| create\\_data\\_source | create a new data source  Create a new data source.  ### Parameters * `id`: data source to create                                                                 |
+| get\\_data\\_device    | create a new data device  Create a new data device for a given seat.  ### Parameters * `id`: data device to create * `seat`: seat associated with the data device |
+"""
+struct wl_data_device_manager_interface
+    create_data_source::Ptr{Cvoid}
+    get_data_device::Ptr{Cvoid}
+end
+
+"""
+    wl_shell_interface
+
+` iface_wl_shell`
+
+` wl_shell_interface`
+
+| Field                 | Note                                                                                                                                                                                                                                                                                                                                                                                                              |
+| :-------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| get\\_shell\\_surface | create a shell surface from a surface  Create a shell surface for an existing surface. This gives the [`wl_surface`](@ref) the role of a shell surface. If the [`wl_surface`](@ref) already has another role, it raises a protocol error.  Only one shell surface can be associated with a given surface.  ### Parameters * `id`: shell surface to create * `surface`: surface to be given the shell surface role |
+"""
+struct wl_shell_interface
+    get_shell_surface::Ptr{Cvoid}
+end
+
+"""
+    wl_shell_surface_interface
+
+` iface_wl_shell_surface`
+
+` wl_shell_surface_interface`
+
+| Field            | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| :--------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| pong             | respond to a ping event  A client must respond to a ping event with a pong request or the client may be deemed unresponsive.  ### Parameters * `serial`: serial number of the ping event                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| move             | start an interactive move  Start a pointer-driven move of the surface.  This request must be used in response to a button press event. The server may ignore move requests depending on the state of the surface (e.g. fullscreen or maximized).  ### Parameters * `seat`: seat whose pointer is used * `serial`: serial number of the implicit grab on the pointer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| resize           | start an interactive resize  Start a pointer-driven resizing of the surface.  This request must be used in response to a button press event. The server may ignore resize requests depending on the state of the surface (e.g. fullscreen or maximized).  ### Parameters * `seat`: seat whose pointer is used * `serial`: serial number of the implicit grab on the pointer * `edges`: which edge or corner is being dragged                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| set\\_toplevel   | make the surface a toplevel surface  Map the surface as a toplevel surface.  A toplevel surface is not fullscreen, maximized or transient.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| set\\_transient  | make the surface a transient surface  Map the surface relative to an existing surface.  The x and y arguments specify the location of the upper left corner of the surface relative to the upper left corner of the parent surface, in surface-local coordinates.  The flags argument controls details of the transient behaviour.  ### Parameters * `parent`: parent surface * `x`: surface-local x coordinate * `y`: surface-local y coordinate * `flags`: transient surface behavior                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| set\\_fullscreen | make the surface a fullscreen surface  Map the surface as a fullscreen surface.  If an output parameter is given then the surface will be made fullscreen on that output. If the client does not specify the output then the compositor will apply its policy - usually choosing the output on which the surface has the biggest surface area.  The client may specify a method to resolve a size conflict between the output size and the surface size - this is provided through the method parameter.  The framerate parameter is used only when the method is set to "driver", to indicate the preferred framerate. A value of 0 indicates that the client does not care about framerate. The framerate is specified in mHz, that is framerate of 60000 is 60Hz.  A method of "scale" or "driver" implies a scaling operation of the surface, either via a direct scaling operation or a change of the output mode. This will override any kind of output scaling, so that mapping a surface with a buffer size equal to the mode can fill the screen independent of buffer\\_scale.  A method of "fill" means we don't scale up the buffer, however any output scale is applied. This means that you may run into an edge case where the application maps a buffer with the same size of the output mode but buffer\\_scale 1 (thus making a surface larger than the output). In this case it is allowed to downscale the results to fit the screen.  The compositor must reply to this request with a configure event with the dimensions for the output on which the surface will be made fullscreen.  ### Parameters * `method`: method for resolving size conflict * `framerate`: framerate in mHz * `output`: output on which the surface is to be fullscreen |
+| set\\_popup      | make the surface a popup surface  Map the surface as a popup.  A popup surface is a transient surface with an added pointer grab.  An existing implicit grab will be changed to owner-events mode, and the popup grab will continue after the implicit grab ends (i.e. releasing the mouse button does not cause the popup to be unmapped).  The popup grab continues until the window is destroyed or a mouse button is pressed in any other client's window. A click in any of the client's surfaces is reported as normal, however, clicks in other clients' surfaces will be discarded and trigger the callback.  The x and y arguments specify the location of the upper left corner of the surface relative to the upper left corner of the parent surface, in surface-local coordinates.  ### Parameters * `seat`: seat whose pointer is used * `serial`: serial number of the implicit grab on the pointer * `parent`: parent surface * `x`: surface-local x coordinate * `y`: surface-local y coordinate * `flags`: transient surface behavior                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| set\\_maximized  | make the surface a maximized surface  Map the surface as a maximized surface.  If an output parameter is given then the surface will be maximized on that output. If the client does not specify the output then the compositor will apply its policy - usually choosing the output on which the surface has the biggest surface area.  The compositor will reply with a configure event telling the expected new surface size. The operation is completed on the next buffer attach to this surface.  A maximized surface typically fills the entire output it is bound to, except for desktop elements such as panels. This is the main difference between a maximized shell surface and a fullscreen shell surface.  The details depend on the compositor implementation.  ### Parameters * `output`: output on which the surface is to be maximized                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| set\\_title      | set surface title  Set a short title for the surface.  This string may be used to identify the surface in a task bar, window list, or other user interface elements provided by the compositor.  The string must be encoded in UTF-8.  ### Parameters * `title`: surface title                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| set\\_class      | set surface class  Set a class for the surface.  The surface class identifies the general class of applications to which the surface belongs. A common convention is to use the file name (or the full path if it is a non-standard location) of the application's .desktop file as the class.  ### Parameters * `class_`: surface class                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+"""
+struct wl_shell_surface_interface
+    pong::Ptr{Cvoid}
+    move::Ptr{Cvoid}
+    resize::Ptr{Cvoid}
+    set_toplevel::Ptr{Cvoid}
+    set_transient::Ptr{Cvoid}
+    set_fullscreen::Ptr{Cvoid}
+    set_popup::Ptr{Cvoid}
+    set_maximized::Ptr{Cvoid}
+    set_title::Ptr{Cvoid}
+    set_class::Ptr{Cvoid}
+end
+
+"""
+    wl_shell_surface_send_ping(resource_, serial)
+
+` iface_wl_shell_surface`
+
+Sends an ping event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the ping
+"""
+function wl_shell_surface_send_ping(resource_, serial)
+    ccall((:wl_shell_surface_send_ping, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, serial)
+end
+
+"""
+    wl_shell_surface_send_configure(resource_, edges, width, height)
+
+` iface_wl_shell_surface`
+
+Sends an configure event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `edges`: how the surface was resized
+* `width`: new width of the surface
+* `height`: new height of the surface
+"""
+function wl_shell_surface_send_configure(resource_, edges, width, height)
+    ccall((:wl_shell_surface_send_configure, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Int32, Int32), resource_, edges, width, height)
+end
+
+"""
+    wl_shell_surface_send_popup_done(resource_)
+
+` iface_wl_shell_surface`
+
+Sends an popup\\_done event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_shell_surface_send_popup_done(resource_)
+    ccall((:wl_shell_surface_send_popup_done, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_surface_interface
+
+` iface_wl_surface`
+
+` wl_surface_interface`
+
+| Field                    | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| destroy                  | delete surface  Deletes the surface and invalidates its object ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| attach                   | set the surface contents  Set a buffer as the content of this surface.  The new size of the surface is calculated based on the buffer size transformed by the inverse buffer\\_transform and the inverse buffer\\_scale. This means that at commit time the supplied buffer size must be an integer multiple of the buffer\\_scale. If that's not the case, an invalid\\_size error is sent.  The x and y arguments specify the location of the new pending buffer's upper left corner, relative to the current buffer's upper left corner, in surface-local coordinates. In other words, the x and y, combined with the new surface size define in which directions the surface's size changes.  Surface contents are double-buffered state, see [`wl_surface`](@ref).commit.  The initial surface contents are void; there is no content. [`wl_surface`](@ref).attach assigns the given [`wl_buffer`](@ref) as the pending [`wl_buffer`](@ref). [`wl_surface`](@ref).commit makes the pending [`wl_buffer`](@ref) the new surface contents, and the size of the surface becomes the size calculated from the [`wl_buffer`](@ref), as described above. After commit, there is no pending buffer until the next attach.  Committing a pending [`wl_buffer`](@ref) allows the compositor to read the pixels in the [`wl_buffer`](@ref). The compositor may access the pixels at any time after the [`wl_surface`](@ref).commit request. When the compositor will not access the pixels anymore, it will send the [`wl_buffer`](@ref).release event. Only after receiving [`wl_buffer`](@ref).release, the client may reuse the [`wl_buffer`](@ref). A [`wl_buffer`](@ref) that has been attached and then replaced by another attach instead of committed will not receive a release event, and is not used by the compositor.  If a pending [`wl_buffer`](@ref) has been committed to more than one [`wl_surface`](@ref), the delivery of [`wl_buffer`](@ref).release events becomes undefined. A well behaved client should not rely on [`wl_buffer`](@ref).release events in this case. Alternatively, a client could create multiple [`wl_buffer`](@ref) objects from the same backing storage or use wp\\_linux\\_buffer\\_release.  Destroying the [`wl_buffer`](@ref) after [`wl_buffer`](@ref).release does not change the surface contents. However, if the client destroys the [`wl_buffer`](@ref) before receiving the [`wl_buffer`](@ref).release event, the surface contents become undefined immediately.  If [`wl_surface`](@ref).attach is sent with a NULL [`wl_buffer`](@ref), the following [`wl_surface`](@ref).commit will remove the surface content.  ### Parameters * `buffer`: buffer of surface contents * `x`: surface-local x coordinate * `y`: surface-local y coordinate |
+| damage                   | mark part of the surface damaged  This request is used to describe the regions where the pending buffer is different from the current surface contents, and where the surface therefore needs to be repainted. The compositor ignores the parts of the damage that fall outside of the surface.  Damage is double-buffered state, see [`wl_surface`](@ref).commit.  The damage rectangle is specified in surface-local coordinates, where x and y specify the upper left corner of the damage rectangle.  The initial value for pending damage is empty: no damage. [`wl_surface`](@ref).damage adds pending damage: the new pending damage is the union of old pending damage and the given rectangle.  [`wl_surface`](@ref).commit assigns pending damage as the current damage, and clears pending damage. The server will clear the current damage as it repaints the surface.  Note! New clients should not use this request. Instead damage can be posted with [`wl_surface`](@ref).damage\\_buffer which uses buffer coordinates instead of surface coordinates.  ### Parameters * `x`: surface-local x coordinate * `y`: surface-local y coordinate * `width`: width of damage rectangle * `height`: height of damage rectangle                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| frame                    | request a frame throttling hint  Request a notification when it is a good time to start drawing a new frame, by creating a frame callback. This is useful for throttling redrawing operations, and driving animations.  When a client is animating on a [`wl_surface`](@ref), it can use the 'frame' request to get notified when it is a good time to draw and commit the next frame of animation. If the client commits an update earlier than that, it is likely that some updates will not make it to the display, and the client is wasting resources by drawing too often.  The frame request will take effect on the next [`wl_surface`](@ref).commit. The notification will only be posted for one frame unless requested again. For a [`wl_surface`](@ref), the notifications are posted in the order the frame requests were committed.  The server must send the notifications so that a client will not send excessive updates, while still allowing the highest possible update rate for clients that wait for the reply before drawing again. The server should give some time for the client to draw and commit after sending the frame callback events to let it hit the next output refresh.  A server should avoid signaling the frame callbacks if the surface is not visible in any way, e.g. the surface is off-screen, or completely obscured by other opaque surfaces.  The object returned by this request will be destroyed by the compositor after the callback is fired and as such the client must not attempt to use it after that point.  The callback\\_data passed in the callback is the current time, in milliseconds, with an undefined base.  ### Parameters * `callback`: callback object for the frame request                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| set\\_opaque\\_region    | set opaque region  This request sets the region of the surface that contains opaque content.  The opaque region is an optimization hint for the compositor that lets it optimize the redrawing of content behind opaque regions. Setting an opaque region is not required for correct behaviour, but marking transparent content as opaque will result in repaint artifacts.  The opaque region is specified in surface-local coordinates.  The compositor ignores the parts of the opaque region that fall outside of the surface.  Opaque region is double-buffered state, see [`wl_surface`](@ref).commit.  [`wl_surface`](@ref).set\\_opaque\\_region changes the pending opaque region. [`wl_surface`](@ref).commit copies the pending region to the current region. Otherwise, the pending and current regions are never changed.  The initial value for an opaque region is empty. Setting the pending opaque region has copy semantics, and the [`wl_region`](@ref) object can be destroyed immediately. A NULL [`wl_region`](@ref) causes the pending opaque region to be set to empty.  ### Parameters * `region`: opaque region of the surface                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| set\\_input\\_region     | set input region  This request sets the region of the surface that can receive pointer and touch events.  Input events happening outside of this region will try the next surface in the server surface stack. The compositor ignores the parts of the input region that fall outside of the surface.  The input region is specified in surface-local coordinates.  Input region is double-buffered state, see [`wl_surface`](@ref).commit.  [`wl_surface`](@ref).set\\_input\\_region changes the pending input region. [`wl_surface`](@ref).commit copies the pending region to the current region. Otherwise the pending and current regions are never changed, except cursor and icon surfaces are special cases, see [`wl_pointer`](@ref).set\\_cursor and [`wl_data_device`](@ref).start\\_drag.  The initial value for an input region is infinite. That means the whole surface will accept input. Setting the pending input region has copy semantics, and the [`wl_region`](@ref) object can be destroyed immediately. A NULL [`wl_region`](@ref) causes the input region to be set to infinite.  ### Parameters * `region`: input region of the surface                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| commit                   | commit pending surface state  Surface state (input, opaque, and damage regions, attached buffers, etc.) is double-buffered. Protocol requests modify the pending state, as opposed to the current state in use by the compositor. A commit request atomically applies all pending state, replacing the current state. After commit, the new pending state is as documented for each related request.  On commit, a pending [`wl_buffer`](@ref) is applied first, and all other state second. This means that all coordinates in double-buffered state are relative to the new [`wl_buffer`](@ref) coming into use, except for [`wl_surface`](@ref).attach itself. If there is no pending [`wl_buffer`](@ref), the coordinates are relative to the current surface contents.  All requests that need a commit to become effective are documented to affect double-buffered state.  Other interfaces may add further double-buffered surface state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| set\\_buffer\\_transform | sets the buffer transformation  This request sets an optional transformation on how the compositor interprets the contents of the buffer attached to the surface. The accepted values for the transform parameter are the values for [`wl_output`](@ref).transform.  Buffer transform is double-buffered state, see [`wl_surface`](@ref).commit.  A newly created surface has its buffer transformation set to normal.  [`wl_surface`](@ref).set\\_buffer\\_transform changes the pending buffer transformation. [`wl_surface`](@ref).commit copies the pending buffer transformation to the current one. Otherwise, the pending and current values are never changed.  The purpose of this request is to allow clients to render content according to the output transform, thus permitting the compositor to use certain optimizations even if the display is rotated. Using hardware overlays and scanning out a client buffer for fullscreen surfaces are examples of such optimizations. Those optimizations are highly dependent on the compositor implementation, so the use of this request should be considered on a case-by-case basis.  Note that if the transform value includes 90 or 270 degree rotation, the width of the buffer will become the surface height and the height of the buffer will become the surface width.  If transform is not one of the values from the [`wl_output`](@ref).transform enum the invalid\\_transform protocol error is raised.  \\since 2  ### Parameters * `transform`: transform for interpreting buffer contents                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| set\\_buffer\\_scale     | sets the buffer scaling factor  This request sets an optional scaling factor on how the compositor interprets the contents of the buffer attached to the window.  Buffer scale is double-buffered state, see [`wl_surface`](@ref).commit.  A newly created surface has its buffer scale set to 1.  [`wl_surface`](@ref).set\\_buffer\\_scale changes the pending buffer scale. [`wl_surface`](@ref).commit copies the pending buffer scale to the current one. Otherwise, the pending and current values are never changed.  The purpose of this request is to allow clients to supply higher resolution buffer data for use on high resolution outputs. It is intended that you pick the same buffer scale as the scale of the output that the surface is displayed on. This means the compositor can avoid scaling when rendering the surface on that output.  Note that if the scale is larger than 1, then you have to attach a buffer that is larger (by a factor of scale in each dimension) than the desired surface size.  If scale is not positive the invalid\\_scale protocol error is raised.  \\since 3  ### Parameters * `scale`: positive scale for interpreting buffer contents                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| damage\\_buffer          | mark part of the surface damaged using buffer coordinates  This request is used to describe the regions where the pending buffer is different from the current surface contents, and where the surface therefore needs to be repainted. The compositor ignores the parts of the damage that fall outside of the surface.  Damage is double-buffered state, see [`wl_surface`](@ref).commit.  The damage rectangle is specified in buffer coordinates, where x and y specify the upper left corner of the damage rectangle.  The initial value for pending damage is empty: no damage. [`wl_surface`](@ref).damage\\_buffer adds pending damage: the new pending damage is the union of old pending damage and the given rectangle.  [`wl_surface`](@ref).commit assigns pending damage as the current damage, and clears pending damage. The server will clear the current damage as it repaints the surface.  This request differs from [`wl_surface`](@ref).damage in only one way - it takes damage in buffer coordinates instead of surface-local coordinates. While this generally is more intuitive than surface coordinates, it is especially desirable when using wp\\_viewport or when a drawing library (like EGL) is unaware of buffer scale and buffer transform.  Note: Because buffer transformation changes and damage requests may be interleaved in the protocol stream, it is impossible to determine the actual mapping between surface and buffer damage until [`wl_surface`](@ref).commit time. Therefore, compositors wishing to take both kinds of damage into account will have to accumulate damage from the two requests separately and only transform from one to the other after receiving the [`wl_surface`](@ref).commit.  \\since 4  ### Parameters * `x`: buffer-local x coordinate * `y`: buffer-local y coordinate * `width`: width of damage rectangle * `height`: height of damage rectangle                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+"""
+struct wl_surface_interface
+    destroy::Ptr{Cvoid}
+    attach::Ptr{Cvoid}
+    damage::Ptr{Cvoid}
+    frame::Ptr{Cvoid}
+    set_opaque_region::Ptr{Cvoid}
+    set_input_region::Ptr{Cvoid}
+    commit::Ptr{Cvoid}
+    set_buffer_transform::Ptr{Cvoid}
+    set_buffer_scale::Ptr{Cvoid}
+    damage_buffer::Ptr{Cvoid}
+end
+
+"""
+    wl_surface_send_enter(resource_, output)
+
+` iface_wl_surface`
+
+Sends an enter event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `output`: output entered by the surface
+"""
+function wl_surface_send_enter(resource_, output)
+    ccall((:wl_surface_send_enter, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{wl_resource}), resource_, output)
+end
+
+"""
+    wl_surface_send_leave(resource_, output)
+
+` iface_wl_surface`
+
+Sends an leave event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `output`: output left by the surface
+"""
+function wl_surface_send_leave(resource_, output)
+    ccall((:wl_surface_send_leave, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{wl_resource}), resource_, output)
+end
+
+"""
+    wl_seat_interface
+
+` iface_wl_seat`
+
+` wl_seat_interface`
+
+| Field          | Note                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| get\\_pointer  | return pointer object  The ID provided will be initialized to the [`wl_pointer`](@ref) interface for this seat.  This request only takes effect if the seat has the pointer capability, or has had the pointer capability in the past. It is a protocol violation to issue this request on a seat that has never had the pointer capability. The missing\\_capability error will be sent in this case.  ### Parameters * `id`: seat pointer       |
+| get\\_keyboard | return keyboard object  The ID provided will be initialized to the [`wl_keyboard`](@ref) interface for this seat.  This request only takes effect if the seat has the keyboard capability, or has had the keyboard capability in the past. It is a protocol violation to issue this request on a seat that has never had the keyboard capability. The missing\\_capability error will be sent in this case.  ### Parameters * `id`: seat keyboard |
+| get\\_touch    | return touch object  The ID provided will be initialized to the [`wl_touch`](@ref) interface for this seat.  This request only takes effect if the seat has the touch capability, or has had the touch capability in the past. It is a protocol violation to issue this request on a seat that has never had the touch capability. The missing\\_capability error will be sent in this case.  ### Parameters * `id`: seat touch interface         |
+| release        | release the seat object  Using this request a client can tell the server that it is not going to use the seat object anymore.  \\since 5                                                                                                                                                                                                                                                                                                          |
+"""
+struct wl_seat_interface
+    get_pointer::Ptr{Cvoid}
+    get_keyboard::Ptr{Cvoid}
+    get_touch::Ptr{Cvoid}
+    release::Ptr{Cvoid}
+end
+
+"""
+    wl_seat_send_capabilities(resource_, capabilities)
+
+` iface_wl_seat`
+
+Sends an capabilities event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `capabilities`: capabilities of the seat
+"""
+function wl_seat_send_capabilities(resource_, capabilities)
+    ccall((:wl_seat_send_capabilities, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, capabilities)
+end
+
+"""
+    wl_seat_send_name(resource_, name)
+
+` iface_wl_seat`
+
+Sends an name event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `name`: seat identifier
+"""
+function wl_seat_send_name(resource_, name)
+    ccall((:wl_seat_send_name, libwayland_server), Cvoid, (Ptr{wl_resource}, Ptr{Cchar}), resource_, name)
+end
+
+"""
+    wl_pointer_interface
+
+` iface_wl_pointer`
+
+` wl_pointer_interface`
+
+| Field        | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| set\\_cursor | set the pointer surface  Set the pointer surface, i.e., the surface that contains the pointer image (cursor). This request gives the surface the role of a cursor. If the surface already has another role, it raises a protocol error.  The cursor actually changes only if the pointer focus for this device is one of the requesting client's surfaces or the surface parameter is the current pointer surface. If there was a previous surface set with this request it is replaced. If surface is NULL, the pointer image is hidden.  The parameters hotspot\\_x and hotspot\\_y define the position of the pointer surface relative to the pointer location. Its top-left corner is always at (x, y) - (hotspot\\_x, hotspot\\_y), where (x, y) are the coordinates of the pointer location, in surface-local coordinates.  On surface.attach requests to the pointer surface, hotspot\\_x and hotspot\\_y are decremented by the x and y parameters passed to the request. Attach must be confirmed by [`wl_surface`](@ref).commit as usual.  The hotspot can also be updated by passing the currently set pointer surface to this request with new values for hotspot\\_x and hotspot\\_y.  The current and pending input regions of the [`wl_surface`](@ref) are cleared, and [`wl_surface`](@ref).set\\_input\\_region is ignored until the [`wl_surface`](@ref) is no longer used as the cursor. When the use as a cursor ends, the current and pending input regions become undefined, and the [`wl_surface`](@ref) is unmapped.  ### Parameters * `serial`: serial number of the enter event * `surface`: pointer surface * `hotspot_x`: surface-local x coordinate * `hotspot_y`: surface-local y coordinate |
+| release      | release the pointer object  Using this request a client can tell the server that it is not going to use the pointer object anymore.  This request destroys the pointer proxy object, so clients must not call [`wl_pointer_destroy`](@ref)() after using this request.  \\since 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+"""
+struct wl_pointer_interface
+    set_cursor::Ptr{Cvoid}
+    release::Ptr{Cvoid}
+end
+
+"""
+    wl_pointer_send_enter(resource_, serial, surface, surface_x, surface_y)
+
+` iface_wl_pointer`
+
+Sends an enter event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the enter event
+* `surface`: surface entered by the pointer
+* `surface_x`: surface-local x coordinate
+* `surface_y`: surface-local y coordinate
+"""
+function wl_pointer_send_enter(resource_, serial, surface, surface_x, surface_y)
+    ccall((:wl_pointer_send_enter, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{wl_resource}, wl_fixed_t, wl_fixed_t), resource_, serial, surface, surface_x, surface_y)
+end
+
+"""
+    wl_pointer_send_leave(resource_, serial, surface)
+
+` iface_wl_pointer`
+
+Sends an leave event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the leave event
+* `surface`: surface left by the pointer
+"""
+function wl_pointer_send_leave(resource_, serial, surface)
+    ccall((:wl_pointer_send_leave, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{wl_resource}), resource_, serial, surface)
+end
+
+"""
+    wl_pointer_send_motion(resource_, time, surface_x, surface_y)
+
+` iface_wl_pointer`
+
+Sends an motion event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `time`: timestamp with millisecond granularity
+* `surface_x`: surface-local x coordinate
+* `surface_y`: surface-local y coordinate
+"""
+function wl_pointer_send_motion(resource_, time, surface_x, surface_y)
+    ccall((:wl_pointer_send_motion, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, wl_fixed_t, wl_fixed_t), resource_, time, surface_x, surface_y)
+end
+
+"""
+    wl_pointer_send_button(resource_, serial, time, button, state)
+
+` iface_wl_pointer`
+
+Sends an button event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the button event
+* `time`: timestamp with millisecond granularity
+* `button`: button that produced the event
+* `state`: physical state of the button
+"""
+function wl_pointer_send_button(resource_, serial, time, button, state)
+    ccall((:wl_pointer_send_button, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, UInt32, UInt32, UInt32), resource_, serial, time, button, state)
+end
+
+"""
+    wl_pointer_send_axis(resource_, time, axis, value)
+
+` iface_wl_pointer`
+
+Sends an axis event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `time`: timestamp with millisecond granularity
+* `axis`: axis type
+* `value`: length of vector in surface-local coordinate space
+"""
+function wl_pointer_send_axis(resource_, time, axis, value)
+    ccall((:wl_pointer_send_axis, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, UInt32, wl_fixed_t), resource_, time, axis, value)
+end
+
+"""
+    wl_pointer_send_frame(resource_)
+
+` iface_wl_pointer`
+
+Sends an frame event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_pointer_send_frame(resource_)
+    ccall((:wl_pointer_send_frame, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_pointer_send_axis_source(resource_, axis_source)
+
+` iface_wl_pointer`
+
+Sends an axis\\_source event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `axis_source`: source of the axis event
+"""
+function wl_pointer_send_axis_source(resource_, axis_source)
+    ccall((:wl_pointer_send_axis_source, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32), resource_, axis_source)
+end
+
+"""
+    wl_pointer_send_axis_stop(resource_, time, axis)
+
+` iface_wl_pointer`
+
+Sends an axis\\_stop event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `time`: timestamp with millisecond granularity
+* `axis`: the axis stopped with this event
+"""
+function wl_pointer_send_axis_stop(resource_, time, axis)
+    ccall((:wl_pointer_send_axis_stop, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, UInt32), resource_, time, axis)
+end
+
+"""
+    wl_pointer_send_axis_discrete(resource_, axis, discrete)
+
+` iface_wl_pointer`
+
+Sends an axis\\_discrete event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `axis`: axis type
+* `discrete`: number of steps
+"""
+function wl_pointer_send_axis_discrete(resource_, axis, discrete)
+    ccall((:wl_pointer_send_axis_discrete, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Int32), resource_, axis, discrete)
+end
+
+"""
+    wl_keyboard_interface
+
+` iface_wl_keyboard`
+
+` wl_keyboard_interface`
+
+| Field   | Note                                    |
+| :------ | :-------------------------------------- |
+| release | release the keyboard object  \\since 3  |
+"""
+struct wl_keyboard_interface
+    release::Ptr{Cvoid}
+end
+
+"""
+    wl_keyboard_send_keymap(resource_, format, fd, size)
+
+` iface_wl_keyboard`
+
+Sends an keymap event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `format`: keymap format
+* `fd`: keymap file descriptor
+* `size`: keymap size, in bytes
+"""
+function wl_keyboard_send_keymap(resource_, format, fd, size)
+    ccall((:wl_keyboard_send_keymap, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Int32, UInt32), resource_, format, fd, size)
+end
+
+"""
+    wl_keyboard_send_enter(resource_, serial, surface, keys)
+
+` iface_wl_keyboard`
+
+Sends an enter event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the enter event
+* `surface`: surface gaining keyboard focus
+* `keys`: the currently pressed keys
+"""
+function wl_keyboard_send_enter(resource_, serial, surface, keys)
+    ccall((:wl_keyboard_send_enter, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{wl_resource}, Ptr{wl_array}), resource_, serial, surface, keys)
+end
+
+"""
+    wl_keyboard_send_leave(resource_, serial, surface)
+
+` iface_wl_keyboard`
+
+Sends an leave event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the leave event
+* `surface`: surface that lost keyboard focus
+"""
+function wl_keyboard_send_leave(resource_, serial, surface)
+    ccall((:wl_keyboard_send_leave, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Ptr{wl_resource}), resource_, serial, surface)
+end
+
+"""
+    wl_keyboard_send_key(resource_, serial, time, key, state)
+
+` iface_wl_keyboard`
+
+Sends an key event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the key event
+* `time`: timestamp with millisecond granularity
+* `key`: key that produced the event
+* `state`: physical state of the key
+"""
+function wl_keyboard_send_key(resource_, serial, time, key, state)
+    ccall((:wl_keyboard_send_key, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, UInt32, UInt32, UInt32), resource_, serial, time, key, state)
+end
+
+"""
+    wl_keyboard_send_modifiers(resource_, serial, mods_depressed, mods_latched, mods_locked, group)
+
+` iface_wl_keyboard`
+
+Sends an modifiers event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the modifiers event
+* `mods_depressed`: depressed modifiers
+* `mods_latched`: latched modifiers
+* `mods_locked`: locked modifiers
+* `group`: keyboard layout
+"""
+function wl_keyboard_send_modifiers(resource_, serial, mods_depressed, mods_latched, mods_locked, group)
+    ccall((:wl_keyboard_send_modifiers, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, UInt32, UInt32, UInt32, UInt32), resource_, serial, mods_depressed, mods_latched, mods_locked, group)
+end
+
+"""
+    wl_keyboard_send_repeat_info(resource_, rate, delay)
+
+` iface_wl_keyboard`
+
+Sends an repeat\\_info event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `rate`: the rate of repeating keys in characters per second
+* `delay`: delay in milliseconds since key down until repeating starts
+"""
+function wl_keyboard_send_repeat_info(resource_, rate, delay)
+    ccall((:wl_keyboard_send_repeat_info, libwayland_server), Cvoid, (Ptr{wl_resource}, Int32, Int32), resource_, rate, delay)
+end
+
+"""
+    wl_touch_interface
+
+` iface_wl_touch`
+
+` wl_touch_interface`
+
+| Field   | Note                                 |
+| :------ | :----------------------------------- |
+| release | release the touch object  \\since 3  |
+"""
+struct wl_touch_interface
+    release::Ptr{Cvoid}
+end
+
+"""
+    wl_touch_send_down(resource_, serial, time, surface, id, x, y)
+
+` iface_wl_touch`
+
+Sends an down event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the touch down event
+* `time`: timestamp with millisecond granularity
+* `surface`: surface touched
+* `id`: the unique ID of this touch point
+* `x`: surface-local x coordinate
+* `y`: surface-local y coordinate
+"""
+function wl_touch_send_down(resource_, serial, time, surface, id, x, y)
+    ccall((:wl_touch_send_down, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, UInt32, Ptr{wl_resource}, Int32, wl_fixed_t, wl_fixed_t), resource_, serial, time, surface, id, x, y)
+end
+
+"""
+    wl_touch_send_up(resource_, serial, time, id)
+
+` iface_wl_touch`
+
+Sends an up event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `serial`: serial number of the touch up event
+* `time`: timestamp with millisecond granularity
+* `id`: the unique ID of this touch point
+"""
+function wl_touch_send_up(resource_, serial, time, id)
+    ccall((:wl_touch_send_up, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, UInt32, Int32), resource_, serial, time, id)
+end
+
+"""
+    wl_touch_send_motion(resource_, time, id, x, y)
+
+` iface_wl_touch`
+
+Sends an motion event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `time`: timestamp with millisecond granularity
+* `id`: the unique ID of this touch point
+* `x`: surface-local x coordinate
+* `y`: surface-local y coordinate
+"""
+function wl_touch_send_motion(resource_, time, id, x, y)
+    ccall((:wl_touch_send_motion, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Int32, wl_fixed_t, wl_fixed_t), resource_, time, id, x, y)
+end
+
+"""
+    wl_touch_send_frame(resource_)
+
+` iface_wl_touch`
+
+Sends an frame event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_touch_send_frame(resource_)
+    ccall((:wl_touch_send_frame, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_touch_send_cancel(resource_)
+
+` iface_wl_touch`
+
+Sends an cancel event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_touch_send_cancel(resource_)
+    ccall((:wl_touch_send_cancel, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_touch_send_shape(resource_, id, major, minor)
+
+` iface_wl_touch`
+
+Sends an shape event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `id`: the unique ID of this touch point
+* `major`: length of the major axis in surface-local coordinates
+* `minor`: length of the minor axis in surface-local coordinates
+"""
+function wl_touch_send_shape(resource_, id, major, minor)
+    ccall((:wl_touch_send_shape, libwayland_server), Cvoid, (Ptr{wl_resource}, Int32, wl_fixed_t, wl_fixed_t), resource_, id, major, minor)
+end
+
+"""
+    wl_touch_send_orientation(resource_, id, orientation)
+
+` iface_wl_touch`
+
+Sends an orientation event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `id`: the unique ID of this touch point
+* `orientation`: angle between major axis and positive surface y-axis in degrees
+"""
+function wl_touch_send_orientation(resource_, id, orientation)
+    ccall((:wl_touch_send_orientation, libwayland_server), Cvoid, (Ptr{wl_resource}, Int32, wl_fixed_t), resource_, id, orientation)
+end
+
+"""
+    wl_output_interface
+
+` iface_wl_output`
+
+` wl_output_interface`
+
+| Field   | Note                                                                                                                                          |
+| :------ | :-------------------------------------------------------------------------------------------------------------------------------------------- |
+| release | release the output object  Using this request a client can tell the server that it is not going to use the output object anymore.  \\since 3  |
+"""
+struct wl_output_interface
+    release::Ptr{Cvoid}
+end
+
+"""
+    wl_output_send_geometry(resource_, x, y, physical_width, physical_height, subpixel, make, model, transform)
+
+` iface_wl_output`
+
+Sends an geometry event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `x`: x position within the global compositor space
+* `y`: y position within the global compositor space
+* `physical_width`: width in millimeters of the output
+* `physical_height`: height in millimeters of the output
+* `subpixel`: subpixel orientation of the output
+* `make`: textual description of the manufacturer
+* `model`: textual description of the model
+* `transform`: transform that maps framebuffer to output
+"""
+function wl_output_send_geometry(resource_, x, y, physical_width, physical_height, subpixel, make, model, transform)
+    ccall((:wl_output_send_geometry, libwayland_server), Cvoid, (Ptr{wl_resource}, Int32, Int32, Int32, Int32, Int32, Ptr{Cchar}, Ptr{Cchar}, Int32), resource_, x, y, physical_width, physical_height, subpixel, make, model, transform)
+end
+
+"""
+    wl_output_send_mode(resource_, flags, width, height, refresh)
+
+` iface_wl_output`
+
+Sends an mode event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `flags`: bitfield of mode flags
+* `width`: width of the mode in hardware units
+* `height`: height of the mode in hardware units
+* `refresh`: vertical refresh rate in mHz
+"""
+function wl_output_send_mode(resource_, flags, width, height, refresh)
+    ccall((:wl_output_send_mode, libwayland_server), Cvoid, (Ptr{wl_resource}, UInt32, Int32, Int32, Int32), resource_, flags, width, height, refresh)
+end
+
+"""
+    wl_output_send_done(resource_)
+
+` iface_wl_output`
+
+Sends an done event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+"""
+function wl_output_send_done(resource_)
+    ccall((:wl_output_send_done, libwayland_server), Cvoid, (Ptr{wl_resource},), resource_)
+end
+
+"""
+    wl_output_send_scale(resource_, factor)
+
+` iface_wl_output`
+
+Sends an scale event to the client owning the resource.
+
+### Parameters
+* `resource_`: The client's resource
+* `factor`: scaling factor of output
+"""
+function wl_output_send_scale(resource_, factor)
+    ccall((:wl_output_send_scale, libwayland_server), Cvoid, (Ptr{wl_resource}, Int32), resource_, factor)
+end
+
+"""
+    wl_region_interface
+
+` iface_wl_region`
+
+` wl_region_interface`
+
+| Field    | Note                                                                                                                                                                                                                        |
+| :------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| destroy  | destroy region  Destroy the region. This will invalidate the object ID.                                                                                                                                                     |
+| add      | add rectangle to region  Add the specified rectangle to the region.  ### Parameters * `x`: region-local x coordinate * `y`: region-local y coordinate * `width`: rectangle width * `height`: rectangle height               |
+| subtract | subtract rectangle from region  Subtract the specified rectangle from the region.  ### Parameters * `x`: region-local x coordinate * `y`: region-local y coordinate * `width`: rectangle width * `height`: rectangle height |
+"""
+struct wl_region_interface
+    destroy::Ptr{Cvoid}
+    add::Ptr{Cvoid}
+    subtract::Ptr{Cvoid}
+end
+
+"""
+    wl_subcompositor_interface
+
+` iface_wl_subcompositor`
+
+` wl_subcompositor_interface`
+
+| Field            | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| destroy          | unbind from the subcompositor interface  Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, [`wl_subsurface`](@ref) objects included.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| get\\_subsurface | give a surface the role sub-surface  Create a sub-surface interface for the given surface, and associate it with the given parent surface. This turns a plain [`wl_surface`](@ref) into a sub-surface.  The to-be sub-surface must not already have another role, and it must not have an existing [`wl_subsurface`](@ref) object. Otherwise a protocol error is raised.  Adding sub-surfaces to a parent is a double-buffered operation on the parent (see [`wl_surface`](@ref).commit). The effect of adding a sub-surface becomes visible on the next time the state of the parent surface is applied.  This request modifies the behaviour of [`wl_surface`](@ref).commit request on the sub-surface, see the documentation on [`wl_subsurface`](@ref) interface.  ### Parameters * `id`: the new sub-surface object ID * `surface`: the surface to be turned into a sub-surface * `parent`: the parent surface |
+"""
+struct wl_subcompositor_interface
+    destroy::Ptr{Cvoid}
+    get_subsurface::Ptr{Cvoid}
+end
+
+"""
+    wl_subsurface_interface
+
+` iface_wl_subsurface`
+
+` wl_subsurface_interface`
+
+| Field          | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| destroy        | remove sub-surface interface  The sub-surface interface is removed from the [`wl_surface`](@ref) object that was turned into a sub-surface with a [`wl_subcompositor`](@ref).get\\_subsurface request. The [`wl_surface`](@ref)'s association to the parent is deleted, and the [`wl_surface`](@ref) loses its role as a sub-surface. The [`wl_surface`](@ref) is unmapped immediately.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| set\\_position | reposition the sub-surface  This schedules a sub-surface position change. The sub-surface will be moved so that its origin (top left corner pixel) will be at the location x, y of the parent surface coordinate system. The coordinates are not restricted to the parent surface area. Negative values are allowed.  The scheduled coordinates will take effect whenever the state of the parent surface is applied. When this happens depends on whether the parent surface is in synchronized mode or not. See [`wl_subsurface`](@ref).set\\_sync and [`wl_subsurface`](@ref).set\\_desync for details.  If more than one set\\_position request is invoked by the client before the commit of the parent surface, the position of a new request always replaces the scheduled position from any previous request.  The initial position is 0, 0.  ### Parameters * `x`: x coordinate in the parent surface * `y`: y coordinate in the parent surface                                                           |
+| place\\_above  | restack the sub-surface  This sub-surface is taken from the stack, and put back just above the reference surface, changing the z-order of the sub-surfaces. The reference surface must be one of the sibling surfaces, or the parent surface. Using any other surface, including this sub-surface, will cause a protocol error.  The z-order is double-buffered. Requests are handled in order and applied immediately to a pending state. The final pending state is copied to the active state the next time the state of the parent surface is applied. When this happens depends on whether the parent surface is in synchronized mode or not. See [`wl_subsurface`](@ref).set\\_sync and [`wl_subsurface`](@ref).set\\_desync for details.  A new sub-surface is initially added as the top-most in the stack of its siblings and parent.  ### Parameters * `sibling`: the reference surface                                                                                                                  |
+| place\\_below  | restack the sub-surface  The sub-surface is placed just below the reference surface. See [`wl_subsurface`](@ref).place\\_above.  ### Parameters * `sibling`: the reference surface                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| set\\_sync     | set sub-surface to synchronized mode  Change the commit behaviour of the sub-surface to synchronized mode, also described as the parent dependent mode.  In synchronized mode, [`wl_surface`](@ref).commit on a sub-surface will accumulate the committed state in a cache, but the state will not be applied and hence will not change the compositor output. The cached state is applied to the sub-surface immediately after the parent surface's state is applied. This ensures atomic updates of the parent and all its synchronized sub-surfaces. Applying the cached state will invalidate the cache, so further parent surface commits do not (re-)apply old state.  See [`wl_subsurface`](@ref) for the recursive effect of this mode.                                                                                                                                                                                                                                                                    |
+| set\\_desync   | set sub-surface to desynchronized mode  Change the commit behaviour of the sub-surface to desynchronized mode, also described as independent or freely running mode.  In desynchronized mode, [`wl_surface`](@ref).commit on a sub-surface will apply the pending state directly, without caching, as happens normally with a [`wl_surface`](@ref). Calling [`wl_surface`](@ref).commit on the parent surface has no effect on the sub-surface's [`wl_surface`](@ref) state. This mode allows a sub-surface to be updated on its own.  If cached state exists when [`wl_surface`](@ref).commit is called in desynchronized mode, the pending state is added to the cached state, and applied as a whole. This invalidates the cache.  Note: even if a sub-surface is set to desynchronized, a parent sub-surface may override it to behave as synchronized. For details, see [`wl_subsurface`](@ref).  If a surface's parent surface behaves as desynchronized, then the cached state is applied on set\\_desync.  |
+"""
+struct wl_subsurface_interface
+    destroy::Ptr{Cvoid}
+    set_position::Ptr{Cvoid}
+    place_above::Ptr{Cvoid}
+    place_below::Ptr{Cvoid}
+    set_sync::Ptr{Cvoid}
+    set_desync::Ptr{Cvoid}
+end
+
 """
 ` wl_object`
 
 A protocol object.
 
-A [`wl_object`](@ref) is an opaque struct identifying the protocol object underlying a [`wl_proxy`](@ref) or `wl_resource`.
+A [`wl_object`](@ref) is an opaque struct identifying the protocol object underlying a [`wl_proxy`](@ref) or [`wl_resource`](@ref).
 
 !!! note
 
@@ -3966,4 +5833,114 @@ const WL_SUBSURFACE_PLACE_BELOW_SINCE_VERSION = 1
 const WL_SUBSURFACE_SET_SYNC_SINCE_VERSION = 1
 
 const WL_SUBSURFACE_SET_DESYNC_SINCE_VERSION = 1
+
+const WL_DISPLAY_ERROR = 0
+
+const WL_DISPLAY_DELETE_ID = 1
+
+const WL_REGISTRY_GLOBAL = 0
+
+const WL_REGISTRY_GLOBAL_REMOVE = 1
+
+const WL_CALLBACK_DONE = 0
+
+const WL_SHM_FORMAT = 0
+
+const WL_BUFFER_RELEASE = 0
+
+const WL_DATA_OFFER_OFFER = 0
+
+const WL_DATA_OFFER_SOURCE_ACTIONS = 1
+
+const WL_DATA_OFFER_ACTION = 2
+
+const WL_DATA_SOURCE_TARGET = 0
+
+const WL_DATA_SOURCE_SEND = 1
+
+const WL_DATA_SOURCE_CANCELLED = 2
+
+const WL_DATA_SOURCE_DND_DROP_PERFORMED = 3
+
+const WL_DATA_SOURCE_DND_FINISHED = 4
+
+const WL_DATA_SOURCE_ACTION = 5
+
+const WL_DATA_DEVICE_DATA_OFFER = 0
+
+const WL_DATA_DEVICE_ENTER = 1
+
+const WL_DATA_DEVICE_LEAVE = 2
+
+const WL_DATA_DEVICE_MOTION = 3
+
+const WL_DATA_DEVICE_DROP = 4
+
+const WL_DATA_DEVICE_SELECTION = 5
+
+const WL_SHELL_SURFACE_PING = 0
+
+const WL_SHELL_SURFACE_CONFIGURE = 1
+
+const WL_SHELL_SURFACE_POPUP_DONE = 2
+
+const WL_SURFACE_ENTER = 0
+
+const WL_SURFACE_LEAVE = 1
+
+const WL_SEAT_CAPABILITIES = 0
+
+const WL_SEAT_NAME = 1
+
+const WL_POINTER_ENTER = 0
+
+const WL_POINTER_LEAVE = 1
+
+const WL_POINTER_MOTION = 2
+
+const WL_POINTER_BUTTON = 3
+
+const WL_POINTER_AXIS = 4
+
+const WL_POINTER_FRAME = 5
+
+const WL_POINTER_AXIS_SOURCE = 6
+
+const WL_POINTER_AXIS_STOP = 7
+
+const WL_POINTER_AXIS_DISCRETE = 8
+
+const WL_KEYBOARD_KEYMAP = 0
+
+const WL_KEYBOARD_ENTER = 1
+
+const WL_KEYBOARD_LEAVE = 2
+
+const WL_KEYBOARD_KEY = 3
+
+const WL_KEYBOARD_MODIFIERS = 4
+
+const WL_KEYBOARD_REPEAT_INFO = 5
+
+const WL_TOUCH_DOWN = 0
+
+const WL_TOUCH_UP = 1
+
+const WL_TOUCH_MOTION = 2
+
+const WL_TOUCH_FRAME = 3
+
+const WL_TOUCH_CANCEL = 4
+
+const WL_TOUCH_SHAPE = 5
+
+const WL_TOUCH_ORIENTATION = 6
+
+const WL_OUTPUT_GEOMETRY = 0
+
+const WL_OUTPUT_MODE = 1
+
+const WL_OUTPUT_DONE = 2
+
+const WL_OUTPUT_SCALE = 3
 

@@ -6,7 +6,7 @@ cd(@__DIR__)
 
 # get include directory & wayland-client.h
 WL_INCLUDE = joinpath(Wayland_jll.artifact_dir, "include")
-WL_HEADERS = [joinpath(WL_INCLUDE, "wayland-client.h")]
+WL_HEADERS = [joinpath(WL_INCLUDE, "wayland-client.h"), joinpath(WL_INCLUDE, "wayland-server.h")]
 
 # for target in JLLEnvs.JLL_ENV_TRIPLES
 for target in ["x86_64-linux-gnu"]
@@ -42,6 +42,8 @@ for target in ["x86_64-linux-gnu"]
 
     # add compiler flags
     args = get_default_args(target)
+    # avoid incompatible wayland-server definitions
+    push!(args, "-DWL_HIDE_DEPRECATED")
     ctx = create_context(WL_HEADERS, args, options)
 
     build!(ctx)

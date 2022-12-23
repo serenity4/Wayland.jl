@@ -7,11 +7,6 @@ ENV["JULIA_DEBUG"] = ""
 # ENV["WAYLAND_DISPLAY"] = "wayland-1"
 
 @testset "Wayland.jl" begin
-    @test isa(WL.LibWayland, Module)
-    display = wl_display_connect(C_NULL)
-    if display == C_NULL
-        @error "Could not connect to a Wayland display"
-    else
-        @test_broken registry = wl_display_get_registry(display)
-    end
+  include("server.jl")
+  include("client.jl") # make sure that a server is running somewhere.
 end;

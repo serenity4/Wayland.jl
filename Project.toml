@@ -4,6 +4,7 @@ authors = ["Cédric Belmant"]
 version = "0.1.0"
 
 [deps]
+BitMasks = "a3e06817-fd65-4797-8291-16f435bc2529"
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 Wayland_jll = "a2964d1f-97da-50d4-b82a-358c7fce9d89"

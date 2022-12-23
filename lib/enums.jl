@@ -1,0 +1,250 @@
+@enum WlDisplayError::Int32 begin
+        WL_DISPLAY_INVALID_OBJECT = 0
+        WL_DISPLAY_INVALID_METHOD = 1
+        WL_DISPLAY_NO_MEMORY = 2
+        WL_DISPLAY_IMPLEMENTATION = 3
+    end
+
+@enum WlShmError::Int32 begin
+        WL_SHM_INVALID_FORMAT = 0
+        WL_SHM_INVALID_STRIDE = 1
+        WL_SHM_INVALID_FD = 2
+    end
+
+@enum WlShmFormat::Int32 begin
+        WL_SHM_ARGB8888 = 0
+        WL_SHM_XRGB8888 = 1
+        WL_SHM_C8 = 538982467
+        WL_SHM_RGB332 = 943867730
+        WL_SHM_BGR233 = 944916290
+        WL_SHM_XRGB4444 = 842093144
+        WL_SHM_XBGR4444 = 842089048
+        WL_SHM_RGBX4444 = 842094674
+        WL_SHM_BGRX4444 = 842094658
+        WL_SHM_ARGB4444 = 842093121
+        WL_SHM_ABGR4444 = 842089025
+        WL_SHM_RGBA4444 = 842088786
+        WL_SHM_BGRA4444 = 842088770
+        WL_SHM_XRGB1555 = 892424792
+        WL_SHM_XBGR1555 = 892420696
+        WL_SHM_RGBX5551 = 892426322
+        WL_SHM_BGRX5551 = 892426306
+        WL_SHM_ARGB1555 = 892424769
+        WL_SHM_ABGR1555 = 892420673
+        WL_SHM_RGBA5551 = 892420434
+        WL_SHM_BGRA5551 = 892420418
+        WL_SHM_RGB565 = 909199186
+        WL_SHM_BGR565 = 909199170
+        WL_SHM_RGB888 = 875710290
+        WL_SHM_BGR888 = 875710274
+        WL_SHM_XBGR8888 = 875709016
+        WL_SHM_RGBX8888 = 875714642
+        WL_SHM_BGRX8888 = 875714626
+        WL_SHM_ABGR8888 = 875708993
+        WL_SHM_RGBA8888 = 875708754
+        WL_SHM_BGRA8888 = 875708738
+        WL_SHM_XRGB2101010 = 808669784
+        WL_SHM_XBGR2101010 = 808665688
+        WL_SHM_RGBX1010102 = 808671314
+        WL_SHM_BGRX1010102 = 808671298
+        WL_SHM_ARGB2101010 = 808669761
+        WL_SHM_ABGR2101010 = 808665665
+        WL_SHM_RGBA1010102 = 808665426
+        WL_SHM_BGRA1010102 = 808665410
+        WL_SHM_YUYV = 1448695129
+        WL_SHM_YVYU = 1431918169
+        WL_SHM_UYVY = 1498831189
+        WL_SHM_VYUY = 1498765654
+        WL_SHM_AYUV = 1448433985
+        WL_SHM_NV12 = 842094158
+        WL_SHM_NV21 = 825382478
+        WL_SHM_NV16 = 909203022
+        WL_SHM_NV61 = 825644622
+        WL_SHM_YUV410 = 961959257
+        WL_SHM_YVU410 = 961893977
+        WL_SHM_YUV411 = 825316697
+        WL_SHM_YVU411 = 825316953
+        WL_SHM_YUV420 = 842093913
+        WL_SHM_YVU420 = 842094169
+        WL_SHM_YUV422 = 909202777
+        WL_SHM_YVU422 = 909203033
+        WL_SHM_YUV444 = 875713881
+        WL_SHM_YVU444 = 875714137
+        WL_SHM_R8 = 538982482
+        WL_SHM_R16 = 540422482
+        WL_SHM_RG88 = 943212370
+        WL_SHM_GR88 = 943215175
+        WL_SHM_RG1616 = 842221394
+        WL_SHM_GR1616 = 842224199
+        WL_SHM_XRGB16161616F = 1211388504
+        WL_SHM_XBGR16161616F = 1211384408
+        WL_SHM_ARGB16161616F = 1211388481
+        WL_SHM_ABGR16161616F = 1211384385
+        WL_SHM_XYUV8888 = 1448434008
+        WL_SHM_VUY888 = 875713878
+        WL_SHM_VUY101010 = 808670550
+        WL_SHM_Y210 = 808530521
+        WL_SHM_Y212 = 842084953
+        WL_SHM_Y216 = 909193817
+        WL_SHM_Y410 = 808531033
+        WL_SHM_Y412 = 842085465
+        WL_SHM_Y416 = 909194329
+        WL_SHM_XVYU2101010 = 808670808
+        WL_SHM_XVYU12_16161616 = 909334104
+        WL_SHM_XVYU16161616 = 942954072
+        WL_SHM_Y0L0 = 810299481
+        WL_SHM_X0L0 = 810299480
+        WL_SHM_Y0L2 = 843853913
+        WL_SHM_X0L2 = 843853912
+        WL_SHM_YUV420_8BIT = 942691673
+        WL_SHM_YUV420_10BIT = 808539481
+        WL_SHM_XRGB8888_A8 = 943805016
+        WL_SHM_XBGR8888_A8 = 943800920
+        WL_SHM_RGBX8888_A8 = 943806546
+        WL_SHM_BGRX8888_A8 = 943806530
+        WL_SHM_RGB888_A8 = 943798354
+        WL_SHM_BGR888_A8 = 943798338
+        WL_SHM_RGB565_A8 = 943797586
+        WL_SHM_BGR565_A8 = 943797570
+        WL_SHM_NV24 = 875714126
+        WL_SHM_NV42 = 842290766
+        WL_SHM_P210 = 808530512
+        WL_SHM_P010 = 808530000
+        WL_SHM_P012 = 842084432
+        WL_SHM_P016 = 909193296
+        WL_SHM_AXBXGXRX106106106106 = 808534593
+        WL_SHM_NV15 = 892425806
+        WL_SHM_Q410 = 808531025
+        WL_SHM_Q401 = 825242705
+    end
+
+@enum WlDataOfferError::Int32 begin
+        WL_DATA_OFFER_INVALID_FINISH = 0
+        WL_DATA_OFFER_INVALID_ACTION_MASK = 1
+        WL_DATA_OFFER_INVALID_ACTION = 2
+        WL_DATA_OFFER_INVALID_OFFER = 3
+    end
+
+@enum WlDataSourceError::Int32 begin
+        WL_DATA_SOURCE_INVALID_ACTION_MASK = 0
+        WL_DATA_SOURCE_INVALID_SOURCE = 1
+    end
+
+@enum WlDataDeviceError::Int32 begin
+        WL_DATA_DEVICE_ROLE = 0
+    end
+
+@bitmask WlDataDeviceManagerDndAction::UInt32 begin
+        WL_DATA_DEVICE_MANAGER_NONE = 0
+        WL_DATA_DEVICE_MANAGER_COPY = 1
+        WL_DATA_DEVICE_MANAGER_MOVE = 2
+        WL_DATA_DEVICE_MANAGER_ASK = 4
+    end
+
+@enum WlShellError::Int32 begin
+        WL_SHELL_ROLE = 0
+    end
+
+@bitmask WlShellSurfaceResize::UInt32 begin
+        WL_SHELL_SURFACE_NONE = 0
+        WL_SHELL_SURFACE_TOP = 1
+        WL_SHELL_SURFACE_BOTTOM = 2
+        WL_SHELL_SURFACE_LEFT = 4
+        WL_SHELL_SURFACE_TOP_LEFT = 5
+        WL_SHELL_SURFACE_BOTTOM_LEFT = 6
+        WL_SHELL_SURFACE_RIGHT = 8
+        WL_SHELL_SURFACE_TOP_RIGHT = 9
+        WL_SHELL_SURFACE_BOTTOM_RIGHT = 10
+    end
+
+@bitmask WlShellSurfaceTransient::UInt32 begin
+        WL_SHELL_SURFACE_INACTIVE = 1
+    end
+
+@enum WlShellSurfaceFullscreenMethod::Int32 begin
+        WL_SHELL_SURFACE_DEFAULT = 0
+        WL_SHELL_SURFACE_SCALE = 1
+        WL_SHELL_SURFACE_DRIVER = 2
+        WL_SHELL_SURFACE_FILL = 3
+    end
+
+@enum WlSurfaceError::Int32 begin
+        WL_SURFACE_INVALID_SCALE = 0
+        WL_SURFACE_INVALID_TRANSFORM = 1
+        WL_SURFACE_INVALID_SIZE = 2
+    end
+
+@bitmask WlSeatCapability::UInt32 begin
+        WL_SEAT_POINTER = 1
+        WL_SEAT_KEYBOARD = 2
+        WL_SEAT_TOUCH = 4
+    end
+
+@enum WlSeatError::Int32 begin
+        WL_SEAT_MISSING_CAPABILITY = 0
+    end
+
+@enum WlPointerError::Int32 begin
+        WL_POINTER_ROLE = 0
+    end
+
+@enum WlPointerButtonState::Int32 begin
+        WL_POINTER_RELEASED = 0
+        WL_POINTER_PRESSED = 1
+    end
+
+@enum WlPointerAxis::Int32 begin
+        WL_POINTER_VERTICAL_SCROLL = 0
+        WL_POINTER_HORIZONTAL_SCROLL = 1
+    end
+
+@enum WlPointerAxisSource::Int32 begin
+        WL_POINTER_WHEEL = 0
+        WL_POINTER_FINGER = 1
+        WL_POINTER_CONTINUOUS = 2
+        WL_POINTER_WHEEL_TILT = 3
+    end
+
+@enum WlKeyboardKeymapFormat::Int32 begin
+        WL_KEYBOARD_NO_KEYMAP = 0
+        WL_KEYBOARD_XKB_V1 = 1
+    end
+
+@enum WlKeyboardKeyState::Int32 begin
+        WL_KEYBOARD_RELEASED = 0
+        WL_KEYBOARD_PRESSED = 1
+    end
+
+@enum WlOutputSubpixel::Int32 begin
+        WL_OUTPUT_UNKNOWN = 0
+        WL_OUTPUT_NONE = 1
+        WL_OUTPUT_HORIZONTAL_RGB = 2
+        WL_OUTPUT_HORIZONTAL_BGR = 3
+        WL_OUTPUT_VERTICAL_RGB = 4
+        WL_OUTPUT_VERTICAL_BGR = 5
+    end
+
+@enum WlOutputTransform::Int32 begin
+        WL_OUTPUT_NORMAL = 0
+        WL_OUTPUT_90 = 1
+        WL_OUTPUT_180 = 2
+        WL_OUTPUT_270 = 3
+        WL_OUTPUT_FLIPPED = 4
+        WL_OUTPUT_FLIPPED_90 = 5
+        WL_OUTPUT_FLIPPED_180 = 6
+        WL_OUTPUT_FLIPPED_270 = 7
+    end
+
+@bitmask WlOutputMode::UInt32 begin
+        WL_OUTPUT_CURRENT = 1
+        WL_OUTPUT_PREFERRED = 2
+    end
+
+@enum WlSubcompositorError::Int32 begin
+        WL_SUBCOMPOSITOR_BAD_SURFACE = 0
+    end
+
+@enum WlSubsurfaceError::Int32 begin
+        WL_SUBSURFACE_BAD_SURFACE = 0
+    end
+

@@ -12,8 +12,10 @@ function __init__()
   xroot[] = xdoc.root
 end
 
+include("util.jl")
 include("types.jl")
 include("interfaces.jl")
+include("functions.jl")
 
 export xroot,
   EnumValue,

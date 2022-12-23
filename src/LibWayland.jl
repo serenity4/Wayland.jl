@@ -2,6 +2,7 @@ module LibWayland
 
 # using Wayland_jll: libwayland_client, libwayland_cursor, libwayland_egl, libwayland_server
 using CEnum
+using BitMasks
 
 const libwayland_client = Symbol("libwayland-client")
 const libwayland_cursor = Symbol("libwayland-cursor")
@@ -70,8 +71,10 @@ else
     error("Unknown platform: $(Base.BUILD_TRIPLET)")
 end
 
+include("../lib/enums.jl")
+
 # exports
-const PREFIXES = ["WL_", "wl"]
+const PREFIXES = ["WL_", "wl", "Wl"]
 for name in names(@__MODULE__; all=true), prefix in PREFIXES
     if startswith(string(name), prefix)
         @eval export $name

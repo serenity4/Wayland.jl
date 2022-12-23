@@ -1,0 +1,8 @@
+name = "Scanner"
+uuid = "bf4486c0-bdb7-4286-85e7-ce7969107320"
+authors = ["serenity4 <cedric.bel@hotmail.fr>"]
+version = "0.1.0"
+
+[deps]
+EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
+Wayland_jll = "a2964d1f-97da-50d4-b82a-358c7fce9d89"

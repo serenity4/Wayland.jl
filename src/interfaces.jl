@@ -30,9 +30,11 @@ function Interface(name::String, version::Int, methods, events)
   Interface(x, deps)
 end
 
-function fill_interface!!(refs, structs, itf::Interface)
+function fill_interface!!(refs, structs, itf::Interface, slots)
   push!(structs, itf)
-  refs[1][] = itf[]
+  for i in slots
+    refs[i][] = itf[]
+  end
 end
 
 include("../lib/interfaces.jl")

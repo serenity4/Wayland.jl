@@ -3,3 +3,5 @@ Manifest.toml
 /experiments
 /JuliaSysimage.so
 /.vscode
+wayland.xml
+wayland.dtd

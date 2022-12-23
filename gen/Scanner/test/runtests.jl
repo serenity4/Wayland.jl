@@ -1,5 +1,5 @@
 using Scanner, Test
-using Scanner: construct, signature
+using Scanner: construct, signature, construct_interfaces
 
 @testset "Scanner.jl" begin
   itf = Interface("wl_display")
@@ -23,4 +23,7 @@ using Scanner: construct, signature
   @test sum(itf -> length(itf.requests), itfs) ≥ 64
   @test sum(itf -> length(itf.events), itfs) ≥ 55
   @test sum(itf -> length(itf.enums), itfs) ≥ 25
+
+  ex = construct_interfaces(itfs)
+  @test Meta.isexpr(ex, :function)
 end;

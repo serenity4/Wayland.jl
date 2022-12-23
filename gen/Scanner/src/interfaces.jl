@@ -31,15 +31,13 @@ function construct(itf::Interface, offsets)
   request_exs = Expr(:ref, :Message)
   event_exs = Expr(:ref, :Message)
   for request in itf.requests
-    push!(request_exs.args, construct(request, offsets[request]))
+    push!(request_exs.args, construct(request, get(offsets, request, 0)))
   end
   for event in itf.events
-    push!(event_exs.args, construct(event, offsets[event]))
+    push!(event_exs.args, construct(event, get(offsets, event, 0)))
   end
   Expr(:call, :Interface, itf.name, itf.version, request_exs, event_exs)
 end
-
-ptr_from_offset(offset) = :(getptr(wayland_interfaces[], $offset))
 
 construct(msg::Message, offset) = Expr(:call, :Message, msg.name, signature(msg), ptr_from_offset(offset))
 
@@ -61,7 +59,47 @@ function signature(t::ArgumentType)
   t === ARGUMENT_TYPE_FIXED && return "f"
   t === ARGUMENT_TYPE_OBJECT && return "o"
   t === ARGUMENT_TYPE_NEW_ID && return "n"
-  t === ARGUMENT_signatureING && return "s"
+  t === ARGUMENT_TYPE_STRING && return "s"
   t === ARGUMENT_TYPE_ARRAY && return "a"
   t === ARGUMENT_TYPE_FD && return "h"
+end
+
+ptr_from_offset(offset) = :(getptr(wayland_interfaces[], $offset))
+
+function null_indices(itfs)
+  indices = Int[]
+  offset = 0
+  for itf in itfs
+    for field in (:requests, :events)
+      for msg in getproperty(itf, field)
+        isempty(msg.args) && continue
+        for arg in msg.args
+          if !contains(signature(arg), r"[on]")
+            push!(indices, offset)
+            offset += 1
+          end
+        end
+      end
+    end
+  end
+  indices
+end
+
+function nullify_interfaces(itfs)
+  indices = null_indices(itfs)
+  :(for i in $indices
+      Base.unsafe_store!(wayland_interfaces[], Ptr{Ptr{wl_interface}}(C_NULL), i)
+  end)
+end
+
+function construct_interfaces(itfs, offsets = compute_offsets(itfs))
+  ex = :(function fill_interfaces!!(refs::Vector{Base.RefValue{wl_interface}}, structs::Vector{Interface})
+    _fill_interface!!(itf) = fill_interface!!(refs, structs, itf)
+  end)
+  body = ex.args[2]
+  push!(body.args, nullify_interfaces(itfs))
+  for itf in itfs
+    push!(body.args, Expr(:call, :_fill_interface!!, construct(itf, offsets)))
+  end
+  ex
 end

@@ -43,7 +43,7 @@ function generate_opcodes(itf::Interface)
   defs
 end
 
-generate_functions(itf::Interface, slot_infos::SlotInfos) = generate_function.(itf.requests, itf, Ref(slot_infos)) #; generate_function.(itf.events)]
+generate_functions(itf::Interface, slot_infos::SlotInfos) = filter!(!isnothing, generate_function.(itf.requests, itf, Ref(slot_infos)))
 
 julia_type(arg::Argument) = julia_type(arg.type)
 function julia_type(t::ArgumentType)
@@ -72,11 +72,13 @@ end
 argument_names(args) = Symbol.(varname.(name.(args)))
 
 function generate_function(request::Request, itf::Interface, slot_infos::SlotInfos)
+  fname = Symbol(join((itf.name, request.name), '_'))
+  # `wl_registry_bind` has a signature that is handled in a special way, so we define it outside the wrapper.
+  fname == :wl_registry_bind && return nothing
   args = extract_arguments(itf, request)
   argnames = argument_names(args)
   argexs = argexpr.(args, argnames)
   argexs_typed = Expr.(:(::), argexs, julia_type.(args))
-  fname = Symbol(join((itf.name, request.name), '_'))
   (; args) = request
   implicit_arg = Argument(itf.name, ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing)
   args = [implicit_arg; args]
@@ -84,14 +86,12 @@ function generate_function(request::Request, itf::Interface, slot_infos::SlotInf
   argexs = argexpr.(args, argnames)
   argexs_typed = Expr.(:(::), argexs, julia_type.(args))
   offset = get(slot_infos.offsets, request, 0)
-  interface = :(Wayland.wayland_interface_ptrs[$(offset + 1)])
-  constructor, extras = (:wl_proxy_marshal_constructor, ())
-  !isnothing(request.since) && ((constructor, extras) = (:wl_proxy_marshal_constructor_versioned, (Expr(:(::), UInt32(request.since), :UInt32),)))
+  interface = :(Wayland.interface_ptrs[$(offset + 1)])
+  constructor = :wl_proxy_marshal_constructor
   constructor_call = :(libwayland_client.$constructor(
     $(argexs_typed[1]),
     $(opcode(itf.name, request))::UInt32,
-    $interface::Ptr{wl_interface},
-    $(extras...);
+    $interface::Ptr{wl_interface};
     $(argexs_typed[2:end]...),
   ))
   parameters = constructor_call.args[2].args

@@ -94,6 +94,13 @@ include("../lib/enums.jl")
 include("../lib/listeners.jl")
 include("../lib/functions.jl")
 
+# This request function is implemented manually, as it uses a non-standard interface with implicit arguments.
+function wl_registry_bind(registry, name, interface::Ptr{wl_interface}, version)
+    @assert interface ≠ C_NULL
+    itf_name = unsafe_load(interface).name
+    @ccall libwayland_client.wl_proxy_marshal_constructor_versioned(registry::Ptr{Cvoid}, WL_REGISTRY_BIND::UInt32, interface::Ptr{wl_interface}, version::UInt32; name::UInt32, itf_name::Ptr{Cchar}, version::UInt32, 0::Int32)::Ptr{Cvoid}
+end
+
 # exports
 const PREFIXES = ["WL_", "wl", "Wl", "@cfunction_wl"]
 for name in names(@__MODULE__; all=true), prefix in PREFIXES

@@ -33,8 +33,15 @@ function SlotInfos(itfs)
       end
     end
   end
+  for itf in itfs
+    if !haskey(slot_infos.slots, itf)
+      slot_infos.slots[itf] = [offset += 1]
+    end
+  end
   slot_infos
 end
+
+max_slotindex(slot_infos::SlotInfos) = maximum(maximum, values(slot_infos.slots))
 
 function construct(itf::Interface, slot_infos::SlotInfos)
   implicit_arg = Symbol(varname(itf.name))
@@ -60,6 +67,9 @@ end
 function signature(t::Argument)
   str = signature(t.type)
   t.isnullable && (str = '?' * str)
+  # There are two implicit arguments for "new id" argument types that don't have an associated interface.
+  # These two arguments are the (string) name of the inteface and the version of the interface.
+  isnothing(t.interface) && t.type == ARGUMENT_TYPE_NEW_ID && (str = "su" * str)
   str
 end
 
@@ -74,11 +84,11 @@ function signature(t::ArgumentType)
   t === ARGUMENT_TYPE_FD && return "h"
 end
 
-ptr_from_offset(offset) = :(getptr(wayland_interfaces[], $offset))
+ptr_from_offset(offset) = :(getptr(interface_slots[], $(offset + 1)))
 
 function nullify_slots(slot_infos::SlotInfos)
   :(for i in $(slot_infos.nulls)
-      Base.unsafe_store!(wayland_interfaces[], Ptr{Ptr{wl_interface}}(C_NULL), i)
+      Base.unsafe_store!(interface_slots[], Ptr{Ptr{wl_interface}}(C_NULL), i)
   end)
 end
 

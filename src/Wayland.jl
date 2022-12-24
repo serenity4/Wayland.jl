@@ -16,16 +16,22 @@ include("requests.jl")
 include("client.jl")
 
 function __init__()
-  for ref in wayland_interface_refs
-    push!(wayland_interface_ptrs, unsafe_convert(Ptr{wl_interface}, ref))
+  for ref in interface_refs
+    push!(interface_ptrs, unsafe_convert(Ptr{wl_interface}, ref))
   end
-  wayland_interfaces[] = unsafe_convert(Ptr{Ptr{wl_interface}}, wayland_interface_ptrs)
+  interface_slots[] = unsafe_convert(Ptr{Ptr{wl_interface}}, interface_ptrs)
 
-  fill_interfaces!!(wayland_interface_refs, wayland_interface_structs)
+  fill_interfaces!!(interface_refs, interface_structs)
+  empty!(interface_ptrs)
+  append!(interface_ptrs, unsafe_wrap(Array, interface_slots[], n))
+  fill_interface_dict!(interface_dict, interface_ptrs)
 end
 
 export LibWayland,
+  Display,
+  synchronize,
   Registry,
-  Display
+  Compositor,
+  SharedMemory
 
 end

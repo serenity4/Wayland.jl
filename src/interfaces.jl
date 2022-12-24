@@ -39,7 +39,8 @@ end
 
 include("../lib/interfaces.jl")
 
-const wayland_interface_refs = [Ref{wl_interface}() for _ in 1:n]
-const wayland_interface_ptrs = Vector{Ptr{wl_interface}}()
-const wayland_interface_structs = Interface[]
-const wayland_interfaces = Ref{Ptr{Ptr{wl_interface}}}()
+const interface_refs = [Ref{wl_interface}() for _ in 1:n]
+const interface_ptrs = Vector{Ptr{wl_interface}}()
+const interface_structs = Interface[]
+const interface_slots = Ref{Ptr{Ptr{wl_interface}}}()
+const interface_dict = Dict{Symbol,Ptr{wl_interface}}()

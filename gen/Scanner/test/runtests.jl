@@ -1,6 +1,6 @@
 using Scanner, Test
 using MacroTools: prettify
-using Scanner: construct, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos, generate_listener, generate_cfunction_wrapper
+using Scanner: construct, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos, generate_listener, generate_cfunction_wrapper, max_slotindex
 
 @testset "Scanner.jl" begin
   itf = Interface("wl_display")
@@ -12,6 +12,7 @@ using Scanner: construct, signature, construct_interfaces, generate_opcodes, gen
 
   @test signature(Interface("wl_surface")["damage_buffer"]) == "4iiii"
   @test signature(Interface("wl_pointer")["set_cursor"]) == "u?oii"
+  @test signature(Interface("wl_registry")["bind"]) == "usun"
 
   itfs = Interface.(findall(".//interface", xroot[]))
   @test length(itfs) ≥ 22
@@ -24,12 +25,13 @@ using Scanner: construct, signature, construct_interfaces, generate_opcodes, gen
   @test !isempty(slot_infos.slots)
   @test !isempty(slot_infos.nulls)
   @test slot_infos.nulls[1:5] == [4, 5, 6, 7, 9]
-  @test maximum(maximum, values(slot_infos.slots)) == maximum(last, slot_infos.offsets) + 1
+  @test haskey(slot_infos.slots, itfs[4]) # "wl_compositor"
+  @test max_slotindex(slot_infos) > maximum(last, slot_infos.offsets) + 1
 
-  @test construct(Interface("wl_display")["sync"], 8) == :(Message("sync", "n", getptr(wayland_interfaces[], 8)))
+  @test construct(Interface("wl_display")["sync"], 8) == :(Message("sync", "n", getptr(interface_slots[], 9)))
   @test construct(itfs[1], slot_infos) == :(Interface("wl_display", 1,
-    Message[Message("sync", "n", getptr(wayland_interfaces[], 0)), Message("get_registry", "n", getptr(wayland_interfaces[], 1))],
-    Message[Message("error", "ous", getptr(wayland_interfaces[], 2)), Message("delete_id", "u", getptr(wayland_interfaces[], 5))],
+    Message[Message("sync", "n", getptr(interface_slots[], 1)), Message("get_registry", "n", getptr(interface_slots[], 2))],
+    Message[Message("error", "ous", getptr(interface_slots[], 3)), Message("delete_id", "u", getptr(interface_slots[], 6))],
   ))
 
   ex = construct_interfaces(itfs)
@@ -51,7 +53,7 @@ using Scanner: construct, signature, construct_interfaces, generate_opcodes, gen
   end))
 
   @test generate_function(Interface("wl_display")["sync"], Interface("wl_display"), slot_infos) == prettify(:(function wl_display_sync(display, callback)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.wayland_interface_ptrs[1]::Ptr{wl_interface}; callback::Ptr{Cvoid})::Ptr{Cvoid}
+    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface}; callback::Ptr{Cvoid})::Ptr{Cvoid}
   end))
 
   @test generate_cfunction_wrapper(Interface("wl_registry"), Interface("wl_registry")["global"]) == prettify(:(

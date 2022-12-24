@@ -90,7 +90,7 @@ include("../lib/listeners.jl")
 include("../lib/functions.jl")
 
 # exports
-const PREFIXES = ["WL_", "wl", "Wl"]
+const PREFIXES = ["WL_", "wl", "Wl", "@cfunction_wl"]
 for name in names(@__MODULE__; all=true), prefix in PREFIXES
     if startswith(string(name), prefix)
         @eval export $name

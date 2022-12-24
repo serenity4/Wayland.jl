@@ -1,6 +1,6 @@
 using Scanner, Test
 using MacroTools: prettify
-using Scanner: construct, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos, generate_listener
+using Scanner: construct, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos, generate_listener, generate_cfunction_wrapper
 
 @testset "Scanner.jl" begin
   itf = Interface("wl_display")
@@ -54,10 +54,14 @@ using Scanner: construct, signature, construct_interfaces, generate_opcodes, gen
     @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.wayland_interface_ptrs[1]::Ptr{wl_interface}; callback::Ptr{Cvoid})::Ptr{Cvoid}
   end))
 
+  @test generate_cfunction_wrapper(Interface("wl_registry"), Interface("wl_registry")["global"]) == prettify(:(
+    macro cfunction_wl_registry_global(f) :(@cfunction($f, Cvoid, (Ptr{Cvoid}, UInt32, Ptr{Cchar}, UInt32))) end
+  ))
+
   @test generate_listener(Interface("wl_registry")) == prettify(:(
     Base.@kwdef struct wl_registry_listener
-      _global::FPtr = @cfunction(((registry, name, interface, version)->nothing), Cvoid, (Ptr{Cvoid}, UInt32, Ptr{Cchar}, UInt32))
-      global_remove::FPtr = @cfunction(((registry, name)->nothing), Cvoid, (Ptr{Cvoid}, UInt32))
+      _global::FPtr = @cfunction_wl_registry_global(((registry, name, interface, version)->nothing))
+      global_remove::FPtr = @cfunction_wl_registry_global_remove(((registry, name)->nothing))
     end
   ))
 end;

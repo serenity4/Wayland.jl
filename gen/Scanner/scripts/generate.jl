@@ -1,6 +1,6 @@
 cd(dirname(@__DIR__))
 using Pkg; Pkg.activate(".")
-using Scanner: Scanner, Interface, xroot, SlotInfos, construct_interfaces, generate_enums, generate_functions, generate_listeners
+using Scanner: Scanner, Interface, xroot, SlotInfos, construct_interfaces, generate_enums, generate_functions, generate_cfunction_wrappers, generate_listeners
 
 itfs = Interface.(findall(".//interface", xroot[]))
 slot_infos = SlotInfos(itfs)
@@ -41,6 +41,10 @@ end
 function construct_listeners(itfs)
   target = joinpath(libdir, "listeners.jl")
   open(target, "w+") do io
+    for ex in generate_cfunction_wrappers(itfs)
+      println(io, ex)
+    end
+    println(io)
     for ex in generate_listeners(itfs)
       println(io, ex)
       println(io)

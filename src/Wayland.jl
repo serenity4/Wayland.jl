@@ -25,10 +25,7 @@ function __init__()
 end
 
 export LibWayland,
-  # Server-side functionality
-  ServerDisplay, add_socket,
-
-  # Client-side functionality
+  Registry,
   Display
 
 end

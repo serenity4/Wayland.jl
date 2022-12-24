@@ -5,14 +5,6 @@ function unalias(name)
   name
 end
 
-function default_listener(itf::Interface, ev::Event)
-  argnames = argument_names(extract_arguments(itf, ev))
-  argdecls = length(argnames) == 1 ? argnames[1] : Expr(:tuple, argnames...)
-  f = :($argdecls -> nothing)
-  ex = Expr(:macrocall, cfunction_macro_name(itf, ev), nothing, f)
-  prettify(ex)
-end
-
 cfunction_macro_name(itf, msg; with_at = true) = Symbol(join(("$(with_at ? '@' : "")cfunction", itf.name, msg.name), '_'))
 
 generate_cfunction_wrappers(itf::Interface) = generate_cfunction_wrapper.(itf, itf.events)
@@ -21,6 +13,8 @@ generate_cfunction_wrappers(itfs) = [generate_cfunction_wrappers.(itfs)...;]
 function generate_cfunction_wrapper(itf::Interface, msg::Message)
   macro_name = cfunction_macro_name(itf, msg; with_at = false)
   args = extract_arguments(itf, msg)
+  # There is an implicit `void *data` argument inserted at the start of the signature.
+  pushfirst!(args, Argument("data", ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing))
   argtypes = map(x -> x === :Fixed ? :wl_fixed_t : x, julia_type.(args))
   ex = :(macro $macro_name(f) $(Expr(:quote, :(@cfunction $(Expr(:$, :f)) Cvoid $(Expr(:tuple, argtypes...))))) end)
   prettify(ex)
@@ -30,10 +24,9 @@ function generate_listener(itf::Interface)
   tname = listener_name(itf)
   fields = map(itf.events) do ev
     evname = unalias(Symbol(ev.name))
-    default = default_listener(itf, ev)
-    :($evname::FPtr = $default)
+    :($evname::FPtr = C_NULL)
   end
-  ex = :(Base.@kwdef struct $tname
+  ex = :(Base.@kwdef struct $tname <: Listener
     $(fields...)
   end)
   prettify(ex)

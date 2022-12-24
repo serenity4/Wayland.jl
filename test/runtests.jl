@@ -1,8 +1,8 @@
 using Wayland, Test
 const WL = Wayland
 
-ENV["JULIA_DEBUG"] = "Wayland"
-ENV["JULIA_DEBUG"] = ""
+ENV["JULIA_DEBUG"] = "Wayland,Main"
+# ENV["JULIA_DEBUG"] = ""
 
 # ENV["WAYLAND_DISPLAY"] = "wayland-1"
 

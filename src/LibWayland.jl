@@ -85,6 +85,11 @@ Base.convert(::Type{Fixed}, t::Fixed) = t
 Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:AbstractFloat}) = wl_fixed_from_double(convert(Cdouble, t.val))
 Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:Integer}) = wl_fixed_from_int(convert(Cint, t.val))
 
+abstract type Listener end
+
+Base.cconvert(::Type{Ptr{Ptr{Cvoid}}}, l::Listener) = Ref(l)
+Base.unsafe_convert(T::Type{Ptr{Ptr{Cvoid}}}, l::Base.RefValue{L}) where {L<:Listener} = T(Base.unsafe_convert(Ptr{L}, l))
+
 include("../lib/enums.jl")
 include("../lib/listeners.jl")
 include("../lib/functions.jl")

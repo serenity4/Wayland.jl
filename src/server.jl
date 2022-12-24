@@ -32,6 +32,6 @@ You should run the event loop *outside the main thread* to avoid blocking the pr
 You can however use the lightweight [ThreadPools.jl](https://github.com/tro3/ThreadPools.jl) package and launch this function in a background thread.
 """
 function Base.run(display::ServerDisplay)
-  @debug "Running Wayland display on socket \"$(socket(display))\" (thread $(Threads.threadid()))"
+  @debug "Running Wayland display $display (thread $(Threads.threadid()))"
   wl_display_run(display)
 end

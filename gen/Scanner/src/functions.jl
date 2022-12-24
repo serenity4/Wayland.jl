@@ -11,34 +11,31 @@ function generate_enum(enum::Enum, basename::String)
   end
   (m, ET) = enum.bitfield ? (Symbol("@bitmask"), :UInt32) : (Symbol("@enum"), :Int32)
   ex = Expr(:macrocall, m, nothing, :($T::$ET), Expr(:block, args...))
-  remove_linenums!(ex)
+  prettify(ex)
 end
 
 generate_enums(itfs) = foldl(vcat, map(generate_enums, itfs); init = Expr[])
 generate_enums(itf::Interface) = map(x -> generate_enum(x, itf.name), itf.enums)
 
-function generate_functions(itfs)
+function generate_functions(itfs, slot_infos = SlotInfos(itfs))
   exs = Expr[]
-  enums = Expr[]
-  funcs = Expr[]
   for itf in itfs
-    push!(exs, generate_opcodes(itf))
-    for enum in itf.enums
-      push!(enums, )
-    end
-    append!(funcs, generate_functions(itf))
+    append!(exs, generate_opcodes(itf))
+    append!(exs, generate_functions(itf, slot_infos))
   end
-  funcs
+  exs
 end
 
 generate_opcodes(itfs) = foldl(vcat, map(generate_opcodes, itfs); init = Expr[])
+
+opcode(basename, msg::Message) = Symbol(uppercase(join((basename, msg.name), '_')))
 
 function generate_opcodes(itf::Interface)
   i = 0
   defs = Expr[]
   for field in (:requests, :events)
     for msg in getproperty(itf, field)
-      name = Symbol(uppercase(join((itf.name, msg.name), '_')))
+      name = opcode(itf.name, msg)
       push!(defs, :(const $name = $i))
       i += 1
     end
@@ -46,14 +43,51 @@ function generate_opcodes(itf::Interface)
   defs
 end
 
-generate_functions(itf::Interface) = [generate_function.(itf.requests); generate_function.(itf.events)]
+generate_functions(itf::Interface, slot_infos::SlotInfos) = generate_function.(itf.requests, itf.name, Ref(slot_infos)) #; generate_function.(itf.events)]
 
-function generate_function(request::Request)
-  ex = Expr(:function)
-  # TODO
+julia_type(arg::Argument) = julia_type(arg.type)
+function julia_type(t::ArgumentType)
+  t === ARGUMENT_TYPE_INT && return :Int32
+  t === ARGUMENT_TYPE_UINT && return :UInt32
+  t === ARGUMENT_TYPE_FIXED && return :Fixed
+  t === ARGUMENT_TYPE_OBJECT && return :(Ptr{Cvoid})
+  t === ARGUMENT_TYPE_NEW_ID && return :(Ptr{Cvoid})
+  t === ARGUMENT_TYPE_STRING && return :(Ptr{Cchar})
+  t === ARGUMENT_TYPE_ARRAY && return :(Ptr{wl_array})
+  t === ARGUMENT_TYPE_FD && return :Int32
+  t === ARGUMENT_TYPE_ENUM && return :Int32
 end
 
-# function wl_display_get_registry(display)
-#   proxy = wl_proxy_marshal_array_constructor(Base.unsafe_convert(Ptr{wl_display}, display), WL_DISPLAY_GET_REGISTRY, getptr(wayland_interface_ptrs, 2), NULL)
-#   Ptr{wl_registry}(proxy)
-# end
+function argexpr(arg::Argument, argname)
+  arg.type == ARGUMENT_TYPE_FIXED && return :(convert(Fixed, $argname))
+  argname
+end
+
+function generate_function(request::Request, basename::String, slot_infos::SlotInfos)
+  fname = Symbol(join((basename, request.name), '_'))
+  (; args) = request
+  implicit_arg = Argument(basename, ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing)
+  args = [implicit_arg; args]
+  argnames = Symbol.(varname.(name.(args)))
+  argexs = argexpr.(args, argnames)
+  argexs_typed = Expr.(:(::), argexs, julia_type.(args))
+  offset = get(slot_infos.offsets, request, 0)
+  interface = :(Wayland.wayland_interface_ptrs[$(offset + 1)])
+  constructor, extras = (:wl_proxy_marshal_constructor, ())
+  !isnothing(request.since) && ((constructor, extras) = (:wl_proxy_marshal_constructor_versioned, (Expr(:(::), UInt32(request.since), :UInt32),)))
+  constructor_call = :(libwayland_client.$constructor(
+    $(argexs_typed[1]),
+    $(opcode(basename, request))::UInt32,
+    $interface::Ptr{wl_interface},
+    $(extras...);
+    $(argexs_typed[2:end]...),
+  ))
+  parameters = constructor_call.args[2].args
+  isempty(parameters) && deleteat!(constructor_call.args, 2)
+  prettify(Expr(:function, Expr(:call, fname, argnames...), :(@ccall $constructor_call::Ptr{Cvoid})))
+end
+
+function varname(name::String)
+  startswith(name, "wl_") && return name[4:end]
+  name
+end

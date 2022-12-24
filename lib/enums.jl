@@ -130,9 +130,7 @@
         WL_DATA_SOURCE_INVALID_SOURCE = 1
     end
 
-@enum WlDataDeviceError::Int32 begin
-        WL_DATA_DEVICE_ROLE = 0
-    end
+@enum WlDataDeviceError::Int32 WL_DATA_DEVICE_ROLE = 0
 
 @bitmask WlDataDeviceManagerDndAction::UInt32 begin
         WL_DATA_DEVICE_MANAGER_NONE = 0
@@ -141,9 +139,7 @@
         WL_DATA_DEVICE_MANAGER_ASK = 4
     end
 
-@enum WlShellError::Int32 begin
-        WL_SHELL_ROLE = 0
-    end
+@enum WlShellError::Int32 WL_SHELL_ROLE = 0
 
 @bitmask WlShellSurfaceResize::UInt32 begin
         WL_SHELL_SURFACE_NONE = 0
@@ -157,9 +153,7 @@
         WL_SHELL_SURFACE_BOTTOM_RIGHT = 10
     end
 
-@bitmask WlShellSurfaceTransient::UInt32 begin
-        WL_SHELL_SURFACE_INACTIVE = 1
-    end
+@bitmask WlShellSurfaceTransient::UInt32 WL_SHELL_SURFACE_INACTIVE = 1
 
 @enum WlShellSurfaceFullscreenMethod::Int32 begin
         WL_SHELL_SURFACE_DEFAULT = 0
@@ -180,13 +174,9 @@
         WL_SEAT_TOUCH = 4
     end
 
-@enum WlSeatError::Int32 begin
-        WL_SEAT_MISSING_CAPABILITY = 0
-    end
+@enum WlSeatError::Int32 WL_SEAT_MISSING_CAPABILITY = 0
 
-@enum WlPointerError::Int32 begin
-        WL_POINTER_ROLE = 0
-    end
+@enum WlPointerError::Int32 WL_POINTER_ROLE = 0
 
 @enum WlPointerButtonState::Int32 begin
         WL_POINTER_RELEASED = 0
@@ -240,11 +230,7 @@
         WL_OUTPUT_PREFERRED = 2
     end
 
-@enum WlSubcompositorError::Int32 begin
-        WL_SUBCOMPOSITOR_BAD_SURFACE = 0
-    end
+@enum WlSubcompositorError::Int32 WL_SUBCOMPOSITOR_BAD_SURFACE = 0
 
-@enum WlSubsurfaceError::Int32 begin
-        WL_SUBSURFACE_BAD_SURFACE = 0
-    end
+@enum WlSubsurfaceError::Int32 WL_SUBSURFACE_BAD_SURFACE = 0
 

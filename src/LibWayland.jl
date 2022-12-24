@@ -1,5 +1,7 @@
 module LibWayland
 
+using ..Wayland: Wayland
+
 # using Wayland_jll: libwayland_client, libwayland_cursor, libwayland_egl, libwayland_server
 using CEnum
 using BitMasks
@@ -72,6 +74,17 @@ else
 end
 
 include("../lib/enums.jl")
+include("../lib/functions.jl")
+
+struct Fixed{T}
+    val::T
+end
+
+Base.convert(::Type{Fixed}, t::Number) = Fixed(t)
+Base.convert(::Type{Fixed}, t::Fixed) = t
+
+Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:AbstractFloat}) = wl_fixed_from_double(convert(Cdouble, t.val))
+Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:Integer}) = wl_fixed_from_int(convert(Cint, t.val))
 
 # exports
 const PREFIXES = ["WL_", "wl", "Wl"]

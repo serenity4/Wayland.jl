@@ -7,4 +7,4 @@
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![repo-status](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
-Wayland backend for [WindowAbstractions.jl](https://github.com/serenity4/WindowAbstractions.jl).
+A high-level Wayland client to interact with Wayland compositors. This library aims at supporting the [WindowAbstractions.jl](https://github.com/serenity4/WindowAbstractions.jl) interface.

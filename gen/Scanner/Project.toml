@@ -5,4 +5,5 @@ version = "0.1.0"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
+MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 Wayland_jll = "a2964d1f-97da-50d4-b82a-358c7fce9d89"

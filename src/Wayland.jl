@@ -1,5 +1,6 @@
 module Wayland
 
+using Base: unsafe_convert
 using Reexport
 
 include("LibWayland.jl")
@@ -16,9 +17,9 @@ include("client.jl")
 
 function __init__()
   for ref in wayland_interface_refs
-    push!(wayland_interface_ptrs, Base.unsafe_convert(Ptr{wl_interface}, ref))
+    push!(wayland_interface_ptrs, unsafe_convert(Ptr{wl_interface}, ref))
   end
-  wayland_interfaces[] = pointer(wayland_interface_ptrs)
+  wayland_interfaces[] = unsafe_convert(Ptr{Ptr{wl_interface}}, wayland_interface_ptrs)
 
   fill_interfaces!!(wayland_interface_refs, wayland_interface_structs)
 end

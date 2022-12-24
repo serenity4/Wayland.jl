@@ -1,16 +1,5 @@
 get_interfaces() = Interface.(findall(".//interface", xroot[]))
 
-function varname(name::String)
-  startswith(name, "wl_") && return name[4:end]
-  name
-end
-
-function generate_function(itf::Interface)
-  fname = Symbol(request.name)
-  args = [varname(arg.name) for arg in request.args]
-  push!(funcs, Expr(:function, Expr(:call, fname, implicit_arg, args...)))
-end
-
 struct SlotInfos
   "0-based offset to apply to the pointer to get the required slot range for a given message."
   offsets::Dict{Message,Int}
@@ -102,5 +91,5 @@ function construct_interfaces(itfs, slot_infos = SlotInfos(itfs))
   for itf in itfs
     push!(body.args, Expr(:call, :_fill_interface!!, construct(itf, slot_infos), Expr(:ref, :Int, get(Vector{Int}, slot_infos.slots, itf)...)))
   end
-  ex
+  prettify(ex)
 end

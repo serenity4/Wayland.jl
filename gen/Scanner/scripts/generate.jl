@@ -1,6 +1,6 @@
 cd(dirname(@__DIR__))
 using Pkg; Pkg.activate(".")
-using Scanner: Scanner, Interface, xroot, SlotInfos, construct_interfaces, generate_enums
+using Scanner: Scanner, Interface, xroot, SlotInfos, construct_interfaces, generate_enums, generate_functions
 
 itfs = Interface.(findall(".//interface", xroot[]))
 slot_infos = SlotInfos(itfs)
@@ -11,7 +11,7 @@ function construct_protocol_interfaces(itfs, slot_infos)
   target = joinpath(libdir, "interfaces.jl")
   open(target, "w+") do io
     println(io, :(const n = $n))
-    println(io, Base.remove_linenums!(construct_interfaces(itfs, slot_infos)))
+    println(io, construct_interfaces(itfs, slot_infos))
   end
   @info "Protocol interfaces successfully written at $target"
 end
@@ -27,5 +27,17 @@ function construct_enums(itfs)
   @info "Enum definitions successfully written at $target"
 end
 
+function construct_functions(itfs, slot_infos)
+  target = joinpath(libdir, "functions.jl")
+  open(target, "w+") do io
+    for ex in generate_functions(itfs)
+      println(io, ex)
+      !Meta.isexpr(ex, :const) && println(io)
+    end
+  end
+  @info "Function definitions successfully written at $target"
+end
+
 construct_protocol_interfaces(itfs, slot_infos)
 construct_enums(itfs)
+construct_functions(itfs, slot_infos)

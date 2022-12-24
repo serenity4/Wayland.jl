@@ -1,6 +1,6 @@
 cd(dirname(@__DIR__))
 using Pkg; Pkg.activate(".")
-using Scanner: Scanner, Interface, xroot, SlotInfos, construct_interfaces, generate_enums, generate_functions
+using Scanner: Scanner, Interface, xroot, SlotInfos, construct_interfaces, generate_enums, generate_functions, generate_listeners
 
 itfs = Interface.(findall(".//interface", xroot[]))
 slot_infos = SlotInfos(itfs)
@@ -38,6 +38,18 @@ function construct_functions(itfs, slot_infos)
   @info "Function definitions successfully written at $target"
 end
 
+function construct_listeners(itfs)
+  target = joinpath(libdir, "listeners.jl")
+  open(target, "w+") do io
+    for ex in generate_listeners(itfs)
+      println(io, ex)
+      println(io)
+    end
+  end
+  @info "Function definitions successfully written at $target"
+end
+
 construct_protocol_interfaces(itfs, slot_infos)
 construct_enums(itfs)
 construct_functions(itfs, slot_infos)
+construct_listeners(itfs)

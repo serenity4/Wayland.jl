@@ -16,6 +16,7 @@ end
 include("types.jl")
 include("interfaces.jl")
 include("functions.jl")
+include("events.jl")
 
 export xroot,
   EnumValue,

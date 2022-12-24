@@ -1,6 +1,6 @@
 using Scanner, Test
 using MacroTools: prettify
-using Scanner: construct, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos
+using Scanner: construct, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos, generate_listener
 
 @testset "Scanner.jl" begin
   itf = Interface("wl_display")
@@ -50,7 +50,14 @@ using Scanner: construct, signature, construct_interfaces, generate_opcodes, gen
       WL_SEAT_TOUCH = 4
   end))
 
-  @test generate_function(Interface("wl_display")["sync"], "wl_display", slot_infos) == prettify(:(function wl_display_sync(display, callback)
+  @test generate_function(Interface("wl_display")["sync"], Interface("wl_display"), slot_infos) == prettify(:(function wl_display_sync(display, callback)
     @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.wayland_interface_ptrs[1]::Ptr{wl_interface}; callback::Ptr{Cvoid})::Ptr{Cvoid}
   end))
+
+  @test generate_listener(Interface("wl_registry")) == prettify(:(
+    Base.@kwdef struct wl_registry_listener
+      _global::FPtr = @cfunction(((registry, name, interface, version)->nothing), Cvoid, (Ptr{Cvoid}, UInt32, Ptr{Cchar}, UInt32))
+      global_remove::FPtr = @cfunction(((registry, name)->nothing), Cvoid, (Ptr{Cvoid}, UInt32))
+    end
+  ))
 end;

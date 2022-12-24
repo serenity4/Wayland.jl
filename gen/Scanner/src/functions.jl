@@ -43,7 +43,7 @@ function generate_opcodes(itf::Interface)
   defs
 end
 
-generate_functions(itf::Interface, slot_infos::SlotInfos) = generate_function.(itf.requests, itf.name, Ref(slot_infos)) #; generate_function.(itf.events)]
+generate_functions(itf::Interface, slot_infos::SlotInfos) = generate_function.(itf.requests, itf, Ref(slot_infos)) #; generate_function.(itf.events)]
 
 julia_type(arg::Argument) = julia_type(arg.type)
 function julia_type(t::ArgumentType)
@@ -63,10 +63,22 @@ function argexpr(arg::Argument, argname)
   argname
 end
 
-function generate_function(request::Request, basename::String, slot_infos::SlotInfos)
-  fname = Symbol(join((basename, request.name), '_'))
+function extract_arguments(itf::Interface, msg::Message)
+  (; args) = msg
+  implicit_arg = Argument(itf.name, ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing)
+  [implicit_arg; args]
+end
+
+argument_names(args) = Symbol.(varname.(name.(args)))
+
+function generate_function(request::Request, itf::Interface, slot_infos::SlotInfos)
+  args = extract_arguments(itf, request)
+  argnames = argument_names(args)
+  argexs = argexpr.(args, argnames)
+  argexs_typed = Expr.(:(::), argexs, julia_type.(args))
+  fname = Symbol(join((itf.name, request.name), '_'))
   (; args) = request
-  implicit_arg = Argument(basename, ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing)
+  implicit_arg = Argument(itf.name, ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing)
   args = [implicit_arg; args]
   argnames = Symbol.(varname.(name.(args)))
   argexs = argexpr.(args, argnames)
@@ -77,7 +89,7 @@ function generate_function(request::Request, basename::String, slot_infos::SlotI
   !isnothing(request.since) && ((constructor, extras) = (:wl_proxy_marshal_constructor_versioned, (Expr(:(::), UInt32(request.since), :UInt32),)))
   constructor_call = :(libwayland_client.$constructor(
     $(argexs_typed[1]),
-    $(opcode(basename, request))::UInt32,
+    $(opcode(itf.name, request))::UInt32,
     $interface::Ptr{wl_interface},
     $(extras...);
     $(argexs_typed[2:end]...),

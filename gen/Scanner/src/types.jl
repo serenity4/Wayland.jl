@@ -131,3 +131,5 @@ function Base.getindex(itf::Interface, str::AbstractString)
   f = ==(str) ∘ name
   @something(find(f, itf.requests), find(f, itf.events), find(f, itf.enums), throw(KeyError(str)))
 end
+
+Base.broadcastable(itf::Interface) = Ref(itf)

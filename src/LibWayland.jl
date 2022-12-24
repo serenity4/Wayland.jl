@@ -73,8 +73,7 @@ else
     error("Unknown platform: $(Base.BUILD_TRIPLET)")
 end
 
-include("../lib/enums.jl")
-include("../lib/functions.jl")
+const FPtr = Ptr{Cvoid}
 
 struct Fixed{T}
     val::T
@@ -85,6 +84,10 @@ Base.convert(::Type{Fixed}, t::Fixed) = t
 
 Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:AbstractFloat}) = wl_fixed_from_double(convert(Cdouble, t.val))
 Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:Integer}) = wl_fixed_from_int(convert(Cint, t.val))
+
+include("../lib/enums.jl")
+include("../lib/listeners.jl")
+include("../lib/functions.jl")
 
 # exports
 const PREFIXES = ["WL_", "wl", "Wl"]

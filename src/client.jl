@@ -19,7 +19,7 @@ function synchronize(dpy::Display)
 end
 
 function barrier(dpy::Display)
-  wl_display_sync(dpy, C_NULL)
+  wl_display_sync(dpy)
   dpy
 end
 
@@ -66,7 +66,7 @@ mutable struct Registry <: Handle
   dpy::Display
   globals::Dict{Symbol, Global}
   function Registry(dpy::Display)
-    handle = wl_display_get_registry(dpy, C_NULL)
+    handle = wl_display_get_registry(dpy)
     handle ≠ C_NULL || error("Failed to obtain the global registry")
     registry = new(handle, dpy, Dict{Symbol, Global}())
     listener = wl_registry_listener(
@@ -100,7 +100,7 @@ mutable struct Surface <: Handle
   handle::Ptr{wl_surface}
   compositor::Compositor
   function Surface(compositor::Compositor)
-    h = wl_compositor_create_surface(compositor, C_NULL)
+    h = wl_compositor_create_surface(compositor)
     new(h, compositor)
   end
 end
@@ -148,7 +148,7 @@ mutable struct SharedMemoryPool <: Handle
   memory::IOStream
   function SharedMemoryPool(shm, size::Integer)
     fd = allocate_shm_fd(size)
-    h = wl_shm_create_pool(shm::SharedMemory, C_NULL, fd, size)
+    h = wl_shm_create_pool(shm::SharedMemory, fd, size)
     io = fdio(Base.cconvert(Cint, fd))
     pool = new(h, shm, io)
     finalizer(wl_shm_pool_destroy, pool)
@@ -188,7 +188,7 @@ mutable struct Buffer{T} <: Handle
   handle::Ptr{wl_buffer}
   memory::T
   function Buffer(shm::SharedMemory, offset, width, height, stride, format::WlShmFormat)
-    h = wl_shm_pool_create_buffer(shm.pool, C_NULL, offset, width, height, stride, format)
+    h = wl_shm_pool_create_buffer(shm.pool, offset, width, height, stride, format)
     buffer = new{SharedMemory}(h, shm)
     finalizer(wl_buffer_destroy, buffer)
   end

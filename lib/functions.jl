@@ -2,12 +2,12 @@ const WL_DISPLAY_SYNC = 0
 const WL_DISPLAY_GET_REGISTRY = 1
 const WL_DISPLAY_ERROR = 2
 const WL_DISPLAY_DELETE_ID = 3
-function wl_display_sync(display, callback)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface}; callback::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_display_sync(display)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
-function wl_display_get_registry(display, registry)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_GET_REGISTRY::UInt32, Wayland.interface_ptrs[2]::Ptr{wl_interface}; registry::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_display_get_registry(display)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_GET_REGISTRY::UInt32, Wayland.interface_ptrs[2]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 const WL_REGISTRY_BIND = 0
@@ -16,19 +16,19 @@ const WL_REGISTRY_GLOBAL_REMOVE = 2
 const WL_CALLBACK_DONE = 0
 const WL_COMPOSITOR_CREATE_SURFACE = 0
 const WL_COMPOSITOR_CREATE_REGION = 1
-function wl_compositor_create_surface(compositor, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(compositor::Ptr{Cvoid}, WL_COMPOSITOR_CREATE_SURFACE::UInt32, Wayland.interface_ptrs[14]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_compositor_create_surface(compositor)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(compositor::Ptr{Cvoid}, WL_COMPOSITOR_CREATE_SURFACE::UInt32, Wayland.interface_ptrs[14]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
-function wl_compositor_create_region(compositor, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(compositor::Ptr{Cvoid}, WL_COMPOSITOR_CREATE_REGION::UInt32, Wayland.interface_ptrs[15]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_compositor_create_region(compositor)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(compositor::Ptr{Cvoid}, WL_COMPOSITOR_CREATE_REGION::UInt32, Wayland.interface_ptrs[15]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 const WL_SHM_POOL_CREATE_BUFFER = 0
 const WL_SHM_POOL_DESTROY = 1
 const WL_SHM_POOL_RESIZE = 2
-function wl_shm_pool_create_buffer(shm_pool, id, offset, width, height, stride, format)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(shm_pool::Ptr{Cvoid}, WL_SHM_POOL_CREATE_BUFFER::UInt32, Wayland.interface_ptrs[16]::Ptr{wl_interface}; id::Ptr{Cvoid}, offset::Int32, width::Int32, height::Int32, stride::Int32, format::UInt32)::Ptr{Cvoid}
+function wl_shm_pool_create_buffer(shm_pool, offset, width, height, stride, format)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(shm_pool::Ptr{Cvoid}, WL_SHM_POOL_CREATE_BUFFER::UInt32, Wayland.interface_ptrs[16]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, offset::Int32, width::Int32, height::Int32, stride::Int32, format::UInt32)::Ptr{Cvoid}
 end
 
 function wl_shm_pool_destroy(shm_pool)
@@ -41,8 +41,8 @@ end
 
 const WL_SHM_CREATE_POOL = 0
 const WL_SHM_FORMAT = 1
-function wl_shm_create_pool(shm, id, fd, size)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(shm::Ptr{Cvoid}, WL_SHM_CREATE_POOL::UInt32, Wayland.interface_ptrs[23]::Ptr{wl_interface}; id::Ptr{Cvoid}, fd::Int32, size::Int32)::Ptr{Cvoid}
+function wl_shm_create_pool(shm, fd, size)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(shm::Ptr{Cvoid}, WL_SHM_CREATE_POOL::UInt32, Wayland.interface_ptrs[23]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, fd::Int32, size::Int32)::Ptr{Cvoid}
 end
 
 const WL_BUFFER_DESTROY = 0
@@ -123,17 +123,17 @@ end
 
 const WL_DATA_DEVICE_MANAGER_CREATE_DATA_SOURCE = 0
 const WL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE = 1
-function wl_data_device_manager_create_data_source(data_device_manager, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(data_device_manager::Ptr{Cvoid}, WL_DATA_DEVICE_MANAGER_CREATE_DATA_SOURCE::UInt32, Wayland.interface_ptrs[58]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_data_device_manager_create_data_source(data_device_manager)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(data_device_manager::Ptr{Cvoid}, WL_DATA_DEVICE_MANAGER_CREATE_DATA_SOURCE::UInt32, Wayland.interface_ptrs[58]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
-function wl_data_device_manager_get_data_device(data_device_manager, id, seat)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(data_device_manager::Ptr{Cvoid}, WL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE::UInt32, Wayland.interface_ptrs[59]::Ptr{wl_interface}; id::Ptr{Cvoid}, seat::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_data_device_manager_get_data_device(data_device_manager, seat)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(data_device_manager::Ptr{Cvoid}, WL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE::UInt32, Wayland.interface_ptrs[59]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, seat::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 const WL_SHELL_GET_SHELL_SURFACE = 0
-function wl_shell_get_shell_surface(shell, id, surface)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(shell::Ptr{Cvoid}, WL_SHELL_GET_SHELL_SURFACE::UInt32, Wayland.interface_ptrs[61]::Ptr{wl_interface}; id::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_shell_get_shell_surface(shell, surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(shell::Ptr{Cvoid}, WL_SHELL_GET_SHELL_SURFACE::UInt32, Wayland.interface_ptrs[61]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 const WL_SHELL_SURFACE_PONG = 0
@@ -213,8 +213,8 @@ function wl_surface_damage(surface, x, y, width, height)
     @ccall libwayland_client.wl_proxy_marshal_constructor(surface::Ptr{Cvoid}, WL_SURFACE_DAMAGE::UInt32, Wayland.interface_ptrs[92]::Ptr{wl_interface}; x::Int32, y::Int32, width::Int32, height::Int32)::Ptr{Cvoid}
 end
 
-function wl_surface_frame(surface, callback)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(surface::Ptr{Cvoid}, WL_SURFACE_FRAME::UInt32, Wayland.interface_ptrs[96]::Ptr{wl_interface}; callback::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_surface_frame(surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(surface::Ptr{Cvoid}, WL_SURFACE_FRAME::UInt32, Wayland.interface_ptrs[96]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 function wl_surface_set_opaque_region(surface, region)
@@ -247,16 +247,16 @@ const WL_SEAT_GET_TOUCH = 2
 const WL_SEAT_RELEASE = 3
 const WL_SEAT_CAPABILITIES = 4
 const WL_SEAT_NAME = 5
-function wl_seat_get_pointer(seat, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(seat::Ptr{Cvoid}, WL_SEAT_GET_POINTER::UInt32, Wayland.interface_ptrs[107]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_seat_get_pointer(seat)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(seat::Ptr{Cvoid}, WL_SEAT_GET_POINTER::UInt32, Wayland.interface_ptrs[107]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
-function wl_seat_get_keyboard(seat, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(seat::Ptr{Cvoid}, WL_SEAT_GET_KEYBOARD::UInt32, Wayland.interface_ptrs[108]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_seat_get_keyboard(seat)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(seat::Ptr{Cvoid}, WL_SEAT_GET_KEYBOARD::UInt32, Wayland.interface_ptrs[108]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
-function wl_seat_get_touch(seat, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(seat::Ptr{Cvoid}, WL_SEAT_GET_TOUCH::UInt32, Wayland.interface_ptrs[109]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_seat_get_touch(seat)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(seat::Ptr{Cvoid}, WL_SEAT_GET_TOUCH::UInt32, Wayland.interface_ptrs[109]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 function wl_seat_release(seat)
@@ -335,8 +335,8 @@ function wl_subcompositor_destroy(subcompositor)
     @ccall libwayland_client.wl_proxy_marshal_constructor(subcompositor::Ptr{Cvoid}, WL_SUBCOMPOSITOR_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
 end
 
-function wl_subcompositor_get_subsurface(subcompositor, id, surface, parent)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(subcompositor::Ptr{Cvoid}, WL_SUBCOMPOSITOR_GET_SUBSURFACE::UInt32, Wayland.interface_ptrs[195]::Ptr{wl_interface}; id::Ptr{Cvoid}, surface::Ptr{Cvoid}, parent::Ptr{Cvoid})::Ptr{Cvoid}
+function wl_subcompositor_get_subsurface(subcompositor, surface, parent)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(subcompositor::Ptr{Cvoid}, WL_SUBCOMPOSITOR_GET_SUBSURFACE::UInt32, Wayland.interface_ptrs[195]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, surface::Ptr{Cvoid}, parent::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 const WL_SUBSURFACE_DESTROY = 0
@@ -376,8 +376,8 @@ function wp_presentation_destroy(wp_presentation)
     @ccall libwayland_client.wl_proxy_marshal_constructor(wp_presentation::Ptr{Cvoid}, WP_PRESENTATION_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
 end
 
-function wp_presentation_feedback(wp_presentation, surface, callback)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_presentation::Ptr{Cvoid}, WP_PRESENTATION_FEEDBACK::UInt32, Wayland.interface_ptrs[202]::Ptr{wl_interface}; surface::Ptr{Cvoid}, callback::Ptr{Cvoid})::Ptr{Cvoid}
+function wp_presentation_feedback(wp_presentation, surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_presentation::Ptr{Cvoid}, WP_PRESENTATION_FEEDBACK::UInt32, Wayland.interface_ptrs[202]::Ptr{wl_interface}; surface::Ptr{Cvoid}, C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 const WP_PRESENTATION_FEEDBACK_SYNC_OUTPUT = 0
@@ -389,8 +389,8 @@ function wp_viewporter_destroy(wp_viewporter)
     @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewporter::Ptr{Cvoid}, WP_VIEWPORTER_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
 end
 
-function wp_viewporter_get_viewport(wp_viewporter, id, surface)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewporter::Ptr{Cvoid}, WP_VIEWPORTER_GET_VIEWPORT::UInt32, Wayland.interface_ptrs[213]::Ptr{wl_interface}; id::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
+function wp_viewporter_get_viewport(wp_viewporter, surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewporter::Ptr{Cvoid}, WP_VIEWPORTER_GET_VIEWPORT::UInt32, Wayland.interface_ptrs[213]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 const WP_VIEWPORT_DESTROY = 0
@@ -417,12 +417,12 @@ function xdg_wm_base_destroy(xdg_wm_base)
     @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
 end
 
-function xdg_wm_base_create_positioner(xdg_wm_base, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_CREATE_POSITIONER::UInt32, Wayland.interface_ptrs[221]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function xdg_wm_base_create_positioner(xdg_wm_base)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_CREATE_POSITIONER::UInt32, Wayland.interface_ptrs[221]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
-function xdg_wm_base_get_xdg_surface(xdg_wm_base, id, surface)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_GET_XDG_SURFACE::UInt32, Wayland.interface_ptrs[222]::Ptr{wl_interface}; id::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
+function xdg_wm_base_get_xdg_surface(xdg_wm_base, surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_GET_XDG_SURFACE::UInt32, Wayland.interface_ptrs[222]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 function xdg_wm_base_pong(xdg_wm_base, serial)
@@ -489,12 +489,12 @@ function xdg_surface_destroy(xdg_surface)
     @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
 end
 
-function xdg_surface_get_toplevel(xdg_surface, id)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_GET_TOPLEVEL::UInt32, Wayland.interface_ptrs[240]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+function xdg_surface_get_toplevel(xdg_surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_GET_TOPLEVEL::UInt32, Wayland.interface_ptrs[240]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
-function xdg_surface_get_popup(xdg_surface, id, parent, positioner)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_GET_POPUP::UInt32, Wayland.interface_ptrs[241]::Ptr{wl_interface}; id::Ptr{Cvoid}, parent::Ptr{Cvoid}, positioner::Ptr{Cvoid})::Ptr{Cvoid}
+function xdg_surface_get_popup(xdg_surface, parent, positioner)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_GET_POPUP::UInt32, Wayland.interface_ptrs[241]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid}, parent::Ptr{Cvoid}, positioner::Ptr{Cvoid})::Ptr{Cvoid}
 end
 
 function xdg_surface_set_window_geometry(xdg_surface, x, y, width, height)

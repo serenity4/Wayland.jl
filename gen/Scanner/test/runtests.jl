@@ -52,8 +52,8 @@ using Scanner: construct, interfaces, signature, construct_interfaces, generate_
       WL_SEAT_TOUCH = 4
   end))
 
-  @test generate_function(Interface("wl_display")["sync"], Interface("wl_display"), slot_infos) == prettify(:(function wl_display_sync(display, callback)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface}; callback::Ptr{Cvoid})::Ptr{Cvoid}
+  @test generate_function(Interface("wl_display")["sync"], Interface("wl_display"), slot_infos) == prettify(:(function wl_display_sync(display)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
   end))
 
   @test generate_cfunction_wrapper(Interface("wl_registry"), Interface("wl_registry")["global"]) == prettify(:(

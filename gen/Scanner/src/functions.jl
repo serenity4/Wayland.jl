@@ -63,6 +63,7 @@ end
 
 function argexpr(arg::Argument, argname)
   arg.type == ARGUMENT_TYPE_FIXED && return :(convert(Fixed, $argname))
+  arg.type == ARGUMENT_TYPE_NEW_ID && return :C_NULL
   argname
 end
 
@@ -98,6 +99,11 @@ function generate_function(request::Request, itf::Interface, slot_infos::SlotInf
     $(argexs_typed[2:end]...),
   ))
   parameters = constructor_call.args[2].args
+  new_id_args = findall(arg -> arg.type == ARGUMENT_TYPE_NEW_ID, args)
+  if !isempty(new_id_args)
+    @assert length(new_id_args) == 1
+    deleteat!(argnames, new_id_args[1])
+  end
   isempty(parameters) && deleteat!(constructor_call.args, 2)
   prettify(Expr(:function, Expr(:call, fname, argnames...), :(@ccall $constructor_call::Ptr{Cvoid})))
 end

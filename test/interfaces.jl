@@ -9,7 +9,7 @@
   end
 
   @testset "Listeners" begin
-    l = wl_registry_listener()
+    l = wl_registry_listener(C_NULL, C_NULL)
     @test isa(l, wl_registry_listener)
   end
 

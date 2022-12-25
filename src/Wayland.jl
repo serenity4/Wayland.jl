@@ -39,6 +39,10 @@ export LibWayland,
   Surface,
   attach,
   damage,
-  commit
+  commit,
+
+  # Cross-desktop group integration
+  XdgSurface, XdgRole, XDG_ROLE_TOPLEVEL, XDG_ROLE_POPUP, XdgIntegration,
+  create_surface!
 
 end

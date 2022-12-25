@@ -70,8 +70,8 @@ mutable struct Registry <: Handle
     handle ≠ C_NULL || error("Failed to obtain the global registry")
     registry = new(handle, dpy, Dict{Symbol, Global}())
     listener = wl_registry_listener(
-      _global = @cfunction_wl_registry_global(on_global),
-      global_remove = @cfunction_wl_registry_global_remove(on_global_remove),
+      @cfunction_wl_registry_global(on_global),
+      @cfunction_wl_registry_global_remove(on_global_remove),
     )
     wl_proxy_add_listener(registry, listener, pointer_from_objref(registry))
     # Wait for globals to be filled in.
@@ -173,7 +173,7 @@ mutable struct SharedMemory <: Handle
     shm.registry = registry
     shm.supported_formats = WlShmFormat[]
     shm.pool = SharedMemoryPool(shm, size)
-    wl_proxy_add_listener(shm, wl_shm_listener(format = @cfunction_wl_shm_format(on_format)), pointer_from_objref(shm))
+    wl_proxy_add_listener(shm, wl_shm_listener(@cfunction_wl_shm_format(on_format)), pointer_from_objref(shm))
     # Wait for formats to be filled in.
     synchronize(shm)
   end
@@ -184,13 +184,19 @@ Base.parent(x::SharedMemory) = x.registry
 Base.write(shm::SharedMemory, args...) = write(shm.pool.memory, args...)
 Base.read(shm::SharedMemory, args...) = read(shm.pool.memory, args...)
 
+function finalize_buffer(data, buffer)
+  wl_buffer_destroy(x)
+  nothing
+end
+
 mutable struct Buffer{T} <: Handle
   handle::Ptr{wl_buffer}
   memory::T
   function Buffer(shm::SharedMemory, offset, width, height, stride, format::WlShmFormat)
     h = wl_shm_pool_create_buffer(shm.pool, offset, width, height, stride, format)
     buffer = new{SharedMemory}(h, shm)
-    finalizer(wl_buffer_destroy, buffer)
+    wl_proxy_add_listener(buffer, wl_buffer_listener(@cfunction_wl_buffer_release(finalize_buffer)), C_NULL)
+    buffer
   end
 end
 
@@ -209,5 +215,50 @@ function damage(surface::Surface, offset = (0, 0), extent = (nothing, nothing))
 end
 function commit(surface::Surface)
   wl_surface_commit(surface)
+  surface
+end
+
+@enum XdgRole begin
+  XDG_ROLE_TOPLEVEL = 1
+  XDG_ROLE_POPUP = 2
+end
+
+mutable struct XdgSurface <: Handle
+  handle::Ptr{Cvoid}
+  surface::Surface
+  xdg_base::Ptr{Cvoid}
+  role::XdgRole
+  role_handle::Ptr{Cvoid}
+  children::Vector{XdgSurface}
+  cfunc::Base.CFunction
+  function XdgSurface(configure, xdg_base, surface::Surface, role::XdgRole, parent = nothing; positioner = nothing)
+    h = xdg_wm_base_get_xdg_surface(xdg_base, surface)
+    cfunc = @cfunction_xdg_surface_configure($configure)
+    fptr = unsafe_convert(Ptr{Cvoid}, cfunc)
+    role_handle = C_NULL
+    role == XDG_ROLE_TOPLEVEL && (role_handle = xdg_surface_get_toplevel(h))
+    role == XDG_ROLE_POPUP && (role_handle = xdg_surface_get_popup(h, something(parent::Optional{XdgSurface}, C_NULL), positioner::Ptr{Cvoid}))
+    xdg_surface = new(h, surface, xdg_base, role, role_handle, XdgSurface[], cfunc)
+    wl_proxy_add_listener(xdg_surface, xdg_surface_listener(fptr), pointer_from_objref(xdg_surface))
+    synchronize(surface)
+    xdg_surface
+  end
+end
+
+mutable struct XdgIntegration <: Handle
+  handle::Ptr{Cvoid}
+  registry::Registry
+  toplevel_surfaces::Vector{XdgSurface}
+  function XdgIntegration(registry::Registry, version = nothing)
+    h = bind(registry, :xdg_wm_base, version)
+    wl_proxy_add_listener(h, xdg_wm_base_listener(@cfunction_xdg_wm_base_ping((_, h, serial) -> (xdg_wm_base_pong(h, serial); nothing))), C_NULL)
+    new(h, registry, XdgSurface[])
+  end
+end
+
+function create_surface!(xdg::XdgIntegration, surface::Surface, role::XdgRole, configure)
+  role == XDG_ROLE_TOPLEVEL || error("Only top-level surfaces (i.e. with a role fo `XDG_ROLE_TOPLEVEL`) can be created without parent.")
+  surface = XdgSurface(configure, xdg[], surface, role)
+  push!(xdg.toplevel_surfaces, surface)
   surface
 end

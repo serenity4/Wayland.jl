@@ -57,13 +57,13 @@ using Scanner: construct, interfaces, signature, construct_interfaces, generate_
   end))
 
   @test generate_cfunction_wrapper(Interface("wl_registry"), Interface("wl_registry")["global"]) == prettify(:(
-    macro cfunction_wl_registry_global(f) :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32, Ptr{Cchar}, UInt32))) end
+    macro cfunction_wl_registry_global(f) esc(:(Base.@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32, Ptr{Cchar}, UInt32)))) end
   ))
 
   @test generate_listener(Interface("wl_registry")) == prettify(:(
-    Base.@kwdef struct wl_registry_listener <: Listener
-      _global::FPtr = C_NULL
-      global_remove::FPtr = C_NULL
+    struct wl_registry_listener <: Listener
+      _global::FPtr
+      global_remove::FPtr
     end
   ))
 

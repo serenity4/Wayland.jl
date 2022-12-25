@@ -16,7 +16,7 @@ function generate_cfunction_wrapper(itf::Interface, msg::Message)
   # There is an implicit `void *data` argument inserted at the start of the signature.
   pushfirst!(args, Argument("data", ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing))
   argtypes = map(x -> x === :Fixed ? :wl_fixed_t : x, julia_type.(args))
-  ex = :(macro $macro_name(f) $(Expr(:quote, :(@cfunction $(Expr(:$, :f)) Cvoid $(Expr(:tuple, argtypes...))))) end)
+  ex = :(macro $macro_name(f) esc($(Expr(:quote, :(Base.@cfunction $(Expr(:$, :f)) Cvoid $(Expr(:tuple, argtypes...)))))) end)
   prettify(ex)
 end
 
@@ -24,9 +24,9 @@ function generate_listener(itf::Interface)
   tname = listener_name(itf)
   fields = map(itf.events) do ev
     evname = unalias(Symbol(ev.name))
-    :($evname::FPtr = C_NULL)
+    :($evname::FPtr)
   end
-  ex = :(Base.@kwdef struct $tname <: Listener
+  ex = :(struct $tname <: Listener
     $(fields...)
   end)
   prettify(ex)

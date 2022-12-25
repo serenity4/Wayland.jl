@@ -33,7 +33,7 @@ export core_protocol,
   Request,
   Event,
   Interface,
-  get_interfaces,
+  interfaces,
   generate
 
 end # module Scanner

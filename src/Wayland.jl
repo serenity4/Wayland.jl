@@ -1,7 +1,10 @@
 module Wayland
 
 using Base: unsafe_convert
+using .Libc: RawFD, errno, EEXIST
+using Base.Filesystem: File, Filesystem, JL_O_RDWR, JL_O_CREAT, JL_O_EXCL, S_IRUSR, S_IWUSR
 using Reexport
+const Optional{T} = Union{T,Nothing}
 
 include("LibWayland.jl")
 @reexport using .LibWayland
@@ -32,6 +35,10 @@ export LibWayland,
   synchronize,
   Registry,
   Compositor,
-  SharedMemory
+  SharedMemory,
+  Surface,
+  attach,
+  damage,
+  commit
 
 end

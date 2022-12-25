@@ -1,4 +1,5 @@
 using Wayland, Test
+using Wayland: Buffer
 const WL = Wayland
 
 ENV["JULIA_DEBUG"] = "Wayland,Main"

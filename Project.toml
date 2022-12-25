@@ -11,6 +11,7 @@ Wayland_jll = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
 WindowAbstractions = "e18202ca-4a7d-4de8-b056-fa6bbd7de157"
 
 [compat]
+BitMasks = "0.1"
 CEnum = "0.4"
 Reexport = "1"
 WindowAbstractions = "0.5"

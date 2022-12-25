@@ -1,6 +1,6 @@
 using Scanner, Test
 using MacroTools: prettify
-using Scanner: construct, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos, generate_listener, generate_cfunction_wrapper, max_slotindex
+using Scanner: construct, interfaces, signature, construct_interfaces, generate_opcodes, generate_enum, generate_function, SlotInfos, generate_listener, generate_cfunction_wrapper, max_slotindex
 
 @testset "Scanner.jl" begin
   itf = Interface("wl_display")
@@ -14,7 +14,7 @@ using Scanner: construct, signature, construct_interfaces, generate_opcodes, gen
   @test signature(Interface("wl_pointer")["set_cursor"]) == "u?oii"
   @test signature(Interface("wl_registry")["bind"]) == "usun"
 
-  itfs = Interface.(findall(".//interface", xroot[]))
+  itfs = interfaces(core_protocol())
   @test length(itfs) ≥ 22
   @test sum(itf -> length(itf.requests), itfs) ≥ 64
   @test sum(itf -> length(itf.events), itfs) ≥ 55
@@ -66,4 +66,7 @@ using Scanner: construct, signature, construct_interfaces, generate_opcodes, gen
       global_remove::FPtr = C_NULL
     end
   ))
+
+  @test length(interfaces(extension_protocol("stable/presentation-time/presentation-time.xml"))) ≥ 2
+  @test length(interfaces(extension_protocol("stable/xdg-shell/xdg-shell.xml"))) ≥ 5
 end;

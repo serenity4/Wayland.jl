@@ -1,5 +1,3 @@
-get_interfaces() = Interface.(findall(".//interface", xroot[]))
-
 struct SlotInfos
   "0-based offset to apply to the pointer to get the required slot range for a given message."
   offsets::Dict{Message,Int}

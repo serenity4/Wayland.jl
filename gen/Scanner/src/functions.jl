@@ -3,10 +3,13 @@ function snake_case_to_pascal_case(x)
   join(uppercasefirst.(groups))
 end
 
+enum_value_name(basename, val::EnumValue) = Symbol(uppercase(join((basename, val.name), '_')))
+
 function generate_enum(enum::Enum, basename::String)
+  basename == "xdg_positioner" && (basename *= enum.name)
   T = Symbol(join(snake_case_to_pascal_case.((basename, enum.name))))
   args = map(enum.values) do val
-    lhs = Symbol(uppercase(join((basename, val.name), '_')))
+    lhs = enum_value_name(basename, val)
     :($lhs = $(Int32(val.value)))
   end
   (m, ET) = enum.bitfield ? (Symbol("@bitmask"), :UInt32) : (Symbol("@enum"), :Int32)
@@ -69,6 +72,12 @@ function extract_arguments(itf::Interface, msg::Message)
   [implicit_arg; args]
 end
 
+function julia_type_c(t::Argument)
+  jtype = julia_type(t)
+  jtype == :Fixed && return :wl_fixed_t
+  jtype
+end
+
 argument_names(args) = Symbol.(varname.(name.(args)))
 
 function generate_function(request::Request, itf::Interface, slot_infos::SlotInfos)
@@ -78,13 +87,7 @@ function generate_function(request::Request, itf::Interface, slot_infos::SlotInf
   args = extract_arguments(itf, request)
   argnames = argument_names(args)
   argexs = argexpr.(args, argnames)
-  argexs_typed = Expr.(:(::), argexs, julia_type.(args))
-  (; args) = request
-  implicit_arg = Argument(itf.name, ARGUMENT_TYPE_OBJECT, nothing, nothing, false, nothing)
-  args = [implicit_arg; args]
-  argnames = Symbol.(varname.(name.(args)))
-  argexs = argexpr.(args, argnames)
-  argexs_typed = Expr.(:(::), argexs, julia_type.(args))
+  argexs_typed = Expr.(:(::), argexs, julia_type_c.(args))
   offset = get(slot_infos.offsets, request, 0)
   interface = :(Wayland.interface_ptrs[$(offset + 1)])
   constructor = :wl_proxy_marshal_constructor

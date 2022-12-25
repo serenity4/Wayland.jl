@@ -117,7 +117,8 @@ function Interface(node::Node)
   Interface(node["name"], parse(Int, node["version"]), requests, events, enums, get_description(node))
 end
 
-Interface(name::AbstractString) = Interface(findfirst(".//interface[@name = \"$name\"]", xroot[]))
+Interface(name::AbstractString, protocol = core_protocol()) = Interface(findfirst(".//interface[@name = \"$name\"]", protocol))
+interfaces(protocol::Node) = map(Interface, findall(".//interface", protocol))
 
 function find(f, vec)
   i = findfirst(f, vec)

@@ -102,7 +102,10 @@ function wl_registry_bind(registry, name, interface::Ptr{wl_interface}, version)
 end
 
 # exports
-const PREFIXES = ["WL_", "wl", "Wl", "@cfunction_wl"]
+
+all_prefixes(x) = [uppercase(x) * '_', x, uppercasefirst(x), "@cfunction_" * x]
+
+const PREFIXES = foldl(vcat, all_prefixes.(["wl", "xdg", "wp"]))
 for name in names(@__MODULE__; all=true), prefix in PREFIXES
     if startswith(string(name), prefix)
         @eval export $name

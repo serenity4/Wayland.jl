@@ -163,6 +163,42 @@ end
 macro cfunction_wl_output_scale(f)
     :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, Int32)))
 end
+macro cfunction_wp_presentation_clock_id(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32)))
+end
+macro cfunction_wp_presentation_feedback_sync_output(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid})))
+end
+macro cfunction_wp_presentation_feedback_presented(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32)))
+end
+macro cfunction_wp_presentation_feedback_discarded(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})))
+end
+macro cfunction_xdg_wm_base_ping(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32)))
+end
+macro cfunction_xdg_surface_configure(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32)))
+end
+macro cfunction_xdg_toplevel_configure(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, Int32, Int32, Ptr{wl_array})))
+end
+macro cfunction_xdg_toplevel_close(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})))
+end
+macro cfunction_xdg_toplevel_configure_bounds(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, Int32, Int32)))
+end
+macro cfunction_xdg_popup_configure(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, Int32, Int32, Int32, Int32)))
+end
+macro cfunction_xdg_popup_popup_done(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})))
+end
+macro cfunction_xdg_popup_repositioned(f)
+    :(@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32)))
+end
 
 Base.@kwdef struct wl_display_listener <: Listener
         error::FPtr = C_NULL
@@ -262,5 +298,35 @@ Base.@kwdef struct wl_output_listener <: Listener
         mode::FPtr = C_NULL
         done::FPtr = C_NULL
         scale::FPtr = C_NULL
+    end
+
+Base.@kwdef struct wp_presentation_listener <: Listener
+        clock_id::FPtr = C_NULL
+    end
+
+Base.@kwdef struct wp_presentation_feedback_listener <: Listener
+        sync_output::FPtr = C_NULL
+        presented::FPtr = C_NULL
+        discarded::FPtr = C_NULL
+    end
+
+Base.@kwdef struct xdg_wm_base_listener <: Listener
+        ping::FPtr = C_NULL
+    end
+
+Base.@kwdef struct xdg_surface_listener <: Listener
+        configure::FPtr = C_NULL
+    end
+
+Base.@kwdef struct xdg_toplevel_listener <: Listener
+        configure::FPtr = C_NULL
+        close::FPtr = C_NULL
+        configure_bounds::FPtr = C_NULL
+    end
+
+Base.@kwdef struct xdg_popup_listener <: Listener
+        configure::FPtr = C_NULL
+        popup_done::FPtr = C_NULL
+        repositioned::FPtr = C_NULL
     end
 

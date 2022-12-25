@@ -369,3 +369,230 @@ function wl_subsurface_set_desync(subsurface)
     @ccall libwayland_client.wl_proxy_marshal_constructor(subsurface::Ptr{Cvoid}, WL_SUBSURFACE_SET_DESYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
 end
 
+const WP_PRESENTATION_DESTROY = 0
+const WP_PRESENTATION_FEEDBACK = 1
+const WP_PRESENTATION_CLOCK_ID = 2
+function wp_presentation_destroy(wp_presentation)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_presentation::Ptr{Cvoid}, WP_PRESENTATION_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function wp_presentation_feedback(wp_presentation, surface, callback)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_presentation::Ptr{Cvoid}, WP_PRESENTATION_FEEDBACK::UInt32, Wayland.interface_ptrs[202]::Ptr{wl_interface}; surface::Ptr{Cvoid}, callback::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+const WP_PRESENTATION_FEEDBACK_SYNC_OUTPUT = 0
+const WP_PRESENTATION_FEEDBACK_PRESENTED = 1
+const WP_PRESENTATION_FEEDBACK_DISCARDED = 2
+const WP_VIEWPORTER_DESTROY = 0
+const WP_VIEWPORTER_GET_VIEWPORT = 1
+function wp_viewporter_destroy(wp_viewporter)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewporter::Ptr{Cvoid}, WP_VIEWPORTER_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function wp_viewporter_get_viewport(wp_viewporter, id, surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewporter::Ptr{Cvoid}, WP_VIEWPORTER_GET_VIEWPORT::UInt32, Wayland.interface_ptrs[213]::Ptr{wl_interface}; id::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+const WP_VIEWPORT_DESTROY = 0
+const WP_VIEWPORT_SET_SOURCE = 1
+const WP_VIEWPORT_SET_DESTINATION = 2
+function wp_viewport_destroy(wp_viewport)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewport::Ptr{Cvoid}, WP_VIEWPORT_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function wp_viewport_set_source(wp_viewport, x, y, width, height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewport::Ptr{Cvoid}, WP_VIEWPORT_SET_SOURCE::UInt32, Wayland.interface_ptrs[215]::Ptr{wl_interface}; convert(Fixed, x)::wl_fixed_t, convert(Fixed, y)::wl_fixed_t, convert(Fixed, width)::wl_fixed_t, convert(Fixed, height)::wl_fixed_t)::Ptr{Cvoid}
+end
+
+function wp_viewport_set_destination(wp_viewport, width, height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(wp_viewport::Ptr{Cvoid}, WP_VIEWPORT_SET_DESTINATION::UInt32, Wayland.interface_ptrs[219]::Ptr{wl_interface}; width::Int32, height::Int32)::Ptr{Cvoid}
+end
+
+const XDG_WM_BASE_DESTROY = 0
+const XDG_WM_BASE_CREATE_POSITIONER = 1
+const XDG_WM_BASE_GET_XDG_SURFACE = 2
+const XDG_WM_BASE_PONG = 3
+const XDG_WM_BASE_PING = 4
+function xdg_wm_base_destroy(xdg_wm_base)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_wm_base_create_positioner(xdg_wm_base, id)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_CREATE_POSITIONER::UInt32, Wayland.interface_ptrs[221]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+function xdg_wm_base_get_xdg_surface(xdg_wm_base, id, surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_GET_XDG_SURFACE::UInt32, Wayland.interface_ptrs[222]::Ptr{wl_interface}; id::Ptr{Cvoid}, surface::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+function xdg_wm_base_pong(xdg_wm_base, serial)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_wm_base::Ptr{Cvoid}, XDG_WM_BASE_PONG::UInt32, Wayland.interface_ptrs[224]::Ptr{wl_interface}; serial::UInt32)::Ptr{Cvoid}
+end
+
+const XDG_POSITIONER_DESTROY = 0
+const XDG_POSITIONER_SET_SIZE = 1
+const XDG_POSITIONER_SET_ANCHOR_RECT = 2
+const XDG_POSITIONER_SET_ANCHOR = 3
+const XDG_POSITIONER_SET_GRAVITY = 4
+const XDG_POSITIONER_SET_CONSTRAINT_ADJUSTMENT = 5
+const XDG_POSITIONER_SET_OFFSET = 6
+const XDG_POSITIONER_SET_REACTIVE = 7
+const XDG_POSITIONER_SET_PARENT_SIZE = 8
+const XDG_POSITIONER_SET_PARENT_CONFIGURE = 9
+function xdg_positioner_destroy(xdg_positioner)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_size(xdg_positioner, width, height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_SIZE::UInt32, Wayland.interface_ptrs[226]::Ptr{wl_interface}; width::Int32, height::Int32)::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_anchor_rect(xdg_positioner, x, y, width, height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_ANCHOR_RECT::UInt32, Wayland.interface_ptrs[228]::Ptr{wl_interface}; x::Int32, y::Int32, width::Int32, height::Int32)::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_anchor(xdg_positioner, anchor)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_ANCHOR::UInt32, Wayland.interface_ptrs[232]::Ptr{wl_interface}; anchor::UInt32)::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_gravity(xdg_positioner, gravity)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_GRAVITY::UInt32, Wayland.interface_ptrs[233]::Ptr{wl_interface}; gravity::UInt32)::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_constraint_adjustment(xdg_positioner, constraint_adjustment)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_CONSTRAINT_ADJUSTMENT::UInt32, Wayland.interface_ptrs[234]::Ptr{wl_interface}; constraint_adjustment::UInt32)::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_offset(xdg_positioner, x, y)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_OFFSET::UInt32, Wayland.interface_ptrs[235]::Ptr{wl_interface}; x::Int32, y::Int32)::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_reactive(xdg_positioner)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_REACTIVE::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_parent_size(xdg_positioner, parent_width, parent_height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_PARENT_SIZE::UInt32, Wayland.interface_ptrs[237]::Ptr{wl_interface}; parent_width::Int32, parent_height::Int32)::Ptr{Cvoid}
+end
+
+function xdg_positioner_set_parent_configure(xdg_positioner, serial)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_positioner::Ptr{Cvoid}, XDG_POSITIONER_SET_PARENT_CONFIGURE::UInt32, Wayland.interface_ptrs[239]::Ptr{wl_interface}; serial::UInt32)::Ptr{Cvoid}
+end
+
+const XDG_SURFACE_DESTROY = 0
+const XDG_SURFACE_GET_TOPLEVEL = 1
+const XDG_SURFACE_GET_POPUP = 2
+const XDG_SURFACE_SET_WINDOW_GEOMETRY = 3
+const XDG_SURFACE_ACK_CONFIGURE = 4
+const XDG_SURFACE_CONFIGURE = 5
+function xdg_surface_destroy(xdg_surface)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_surface_get_toplevel(xdg_surface, id)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_GET_TOPLEVEL::UInt32, Wayland.interface_ptrs[240]::Ptr{wl_interface}; id::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+function xdg_surface_get_popup(xdg_surface, id, parent, positioner)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_GET_POPUP::UInt32, Wayland.interface_ptrs[241]::Ptr{wl_interface}; id::Ptr{Cvoid}, parent::Ptr{Cvoid}, positioner::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+function xdg_surface_set_window_geometry(xdg_surface, x, y, width, height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_SET_WINDOW_GEOMETRY::UInt32, Wayland.interface_ptrs[244]::Ptr{wl_interface}; x::Int32, y::Int32, width::Int32, height::Int32)::Ptr{Cvoid}
+end
+
+function xdg_surface_ack_configure(xdg_surface, serial)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_surface::Ptr{Cvoid}, XDG_SURFACE_ACK_CONFIGURE::UInt32, Wayland.interface_ptrs[248]::Ptr{wl_interface}; serial::UInt32)::Ptr{Cvoid}
+end
+
+const XDG_TOPLEVEL_DESTROY = 0
+const XDG_TOPLEVEL_SET_PARENT = 1
+const XDG_TOPLEVEL_SET_TITLE = 2
+const XDG_TOPLEVEL_SET_APP_ID = 3
+const XDG_TOPLEVEL_SHOW_WINDOW_MENU = 4
+const XDG_TOPLEVEL_MOVE = 5
+const XDG_TOPLEVEL_RESIZE = 6
+const XDG_TOPLEVEL_SET_MAX_SIZE = 7
+const XDG_TOPLEVEL_SET_MIN_SIZE = 8
+const XDG_TOPLEVEL_SET_MAXIMIZED = 9
+const XDG_TOPLEVEL_UNSET_MAXIMIZED = 10
+const XDG_TOPLEVEL_SET_FULLSCREEN = 11
+const XDG_TOPLEVEL_UNSET_FULLSCREEN = 12
+const XDG_TOPLEVEL_SET_MINIMIZED = 13
+const XDG_TOPLEVEL_CONFIGURE = 14
+const XDG_TOPLEVEL_CLOSE = 15
+const XDG_TOPLEVEL_CONFIGURE_BOUNDS = 16
+function xdg_toplevel_destroy(xdg_toplevel)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_parent(xdg_toplevel, parent)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_PARENT::UInt32, Wayland.interface_ptrs[250]::Ptr{wl_interface}; parent::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_title(xdg_toplevel, title)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_TITLE::UInt32, Wayland.interface_ptrs[251]::Ptr{wl_interface}; title::Ptr{Cchar})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_app_id(xdg_toplevel, app_id)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_APP_ID::UInt32, Wayland.interface_ptrs[252]::Ptr{wl_interface}; app_id::Ptr{Cchar})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_show_window_menu(xdg_toplevel, seat, serial, x, y)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SHOW_WINDOW_MENU::UInt32, Wayland.interface_ptrs[253]::Ptr{wl_interface}; seat::Ptr{Cvoid}, serial::UInt32, x::Int32, y::Int32)::Ptr{Cvoid}
+end
+
+function xdg_toplevel_move(xdg_toplevel, seat, serial)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_MOVE::UInt32, Wayland.interface_ptrs[257]::Ptr{wl_interface}; seat::Ptr{Cvoid}, serial::UInt32)::Ptr{Cvoid}
+end
+
+function xdg_toplevel_resize(xdg_toplevel, seat, serial, edges)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_RESIZE::UInt32, Wayland.interface_ptrs[259]::Ptr{wl_interface}; seat::Ptr{Cvoid}, serial::UInt32, edges::UInt32)::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_max_size(xdg_toplevel, width, height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_MAX_SIZE::UInt32, Wayland.interface_ptrs[262]::Ptr{wl_interface}; width::Int32, height::Int32)::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_min_size(xdg_toplevel, width, height)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_MIN_SIZE::UInt32, Wayland.interface_ptrs[264]::Ptr{wl_interface}; width::Int32, height::Int32)::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_maximized(xdg_toplevel)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_MAXIMIZED::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_unset_maximized(xdg_toplevel)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_UNSET_MAXIMIZED::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_fullscreen(xdg_toplevel, output)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_FULLSCREEN::UInt32, Wayland.interface_ptrs[266]::Ptr{wl_interface}; output::Ptr{Cvoid})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_unset_fullscreen(xdg_toplevel)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_UNSET_FULLSCREEN::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_toplevel_set_minimized(xdg_toplevel)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_toplevel::Ptr{Cvoid}, XDG_TOPLEVEL_SET_MINIMIZED::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+const XDG_POPUP_DESTROY = 0
+const XDG_POPUP_GRAB = 1
+const XDG_POPUP_REPOSITION = 2
+const XDG_POPUP_CONFIGURE = 3
+const XDG_POPUP_POPUP_DONE = 4
+const XDG_POPUP_REPOSITIONED = 5
+function xdg_popup_destroy(xdg_popup)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_popup::Ptr{Cvoid}, XDG_POPUP_DESTROY::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface})::Ptr{Cvoid}
+end
+
+function xdg_popup_grab(xdg_popup, seat, serial)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_popup::Ptr{Cvoid}, XDG_POPUP_GRAB::UInt32, Wayland.interface_ptrs[272]::Ptr{wl_interface}; seat::Ptr{Cvoid}, serial::UInt32)::Ptr{Cvoid}
+end
+
+function xdg_popup_reposition(xdg_popup, positioner, token)
+    @ccall libwayland_client.wl_proxy_marshal_constructor(xdg_popup::Ptr{Cvoid}, XDG_POPUP_REPOSITION::UInt32, Wayland.interface_ptrs[274]::Ptr{wl_interface}; positioner::Ptr{Cvoid}, token::UInt32)::Ptr{Cvoid}
+end
+

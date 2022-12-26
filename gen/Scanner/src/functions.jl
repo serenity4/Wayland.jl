@@ -46,7 +46,7 @@ function generate_opcodes(itf::Interface)
   defs
 end
 
-generate_functions(itf::Interface, slot_infos::SlotInfos) = filter!(!isnothing, generate_function.(itf.requests, itf, Ref(slot_infos)))
+generate_functions(itf::Interface, slot_infos::SlotInfos) = generate_function.(itf.requests, itf, Ref(slot_infos))
 
 julia_type(arg::Argument) = julia_type(arg.type)
 function julia_type(t::ArgumentType)
@@ -79,33 +79,54 @@ function julia_type_c(t::Argument)
   jtype
 end
 
-argument_names(args) = Symbol.(varname.(name.(args)))
+argument_name(arg) = Symbol(varname(name(arg)))
 
 function generate_function(request::Request, itf::Interface, slot_infos::SlotInfos)
   fname = Symbol(join((itf.name, request.name), '_'))
-  # `wl_registry_bind` has a signature that is handled in a special way, so we define it outside the wrapper.
-  fname == :wl_registry_bind && return nothing
   args = extract_arguments(itf, request)
-  argnames = argument_names(args)
-  argexs = argexpr.(args, argnames)
-  argexs_typed = Expr.(:(::), argexs, julia_type_c.(args))
-  offset = get(slot_infos.offsets, request, 0)
-  interface = :(Wayland.interface_ptrs[$(offset + 1)])
-  constructor = :wl_proxy_marshal_constructor
-  constructor_call = :(libwayland_client.$constructor(
-    $(argexs_typed[1]),
-    $(opcode(itf.name, request))::UInt32,
-    $interface::Ptr{wl_interface};
-    $(argexs_typed[2:end]...),
-  ))
-  parameters = constructor_call.args[2].args
-  new_id_args = findall(arg -> arg.type == ARGUMENT_TYPE_NEW_ID, args)
-  if !isempty(new_id_args)
-    @assert length(new_id_args) == 1
-    deleteat!(argnames, new_id_args[1])
+  fargsdecl = Symbol[]
+  libfname = :wl_proxy_marshal
+  libfargs = []
+  libfargs_variadic = []
+  ret = nothing
+  for (i, arg) in enumerate(args)
+    argname = argument_name(arg)
+    if arg.type == ARGUMENT_TYPE_NEW_ID
+      @assert isnothing(ret)
+      ret = arg
+    else
+      push!(fargsdecl, argname)
+    end
+    argex = argexpr(arg, argname)
+    argex_typed = Expr(:(::), argex, julia_type_c(arg))
+    if i == 1
+      push!(libfargs, argex_typed)
+      push!(libfargs, Expr(:(::), opcode(itf.name, request), :UInt32))
+    else
+      if arg === ret
+        if isnothing(ret.interface)
+          push!(fargsdecl, :interface, :version)
+          push!(libfargs, :(interface::Ptr{wl_interface}), :(version::UInt32))
+          push!(libfargs_variadic, :(unsafe_load(Ptr{wl_interface}(interface)).name::Ptr{Cchar}), :(version::UInt32))
+        else
+          offset = get(slot_infos.offsets, request, 0)
+          interface = :(Wayland.interface_ptrs[$(offset + 1)])
+          push!(libfargs, :($interface::Ptr{wl_interface}))
+        end
+      end
+      push!(libfargs_variadic, argex_typed)
+    end
   end
-  isempty(parameters) && deleteat!(constructor_call.args, 2)
-  prettify(Expr(:function, Expr(:call, fname, argnames...), :(@ccall $constructor_call::Ptr{Cvoid})))
+  isnothing(ret) && push!(libfargs, :(C_NULL::Ptr{wl_interface}))
+  (isnothing(ret) || !isnothing(ret.interface)) && push!(libfargs, :(wl_proxy_get_version($(argument_name(args[1])))::UInt32))
+  push!(libfargs, :(0::UInt32))
+
+  libfcall = :(libwayland_client.wl_proxy_marshal_flags(
+    $(libfargs...);
+    $(libfargs_variadic...),
+  ))
+  isempty(libfargs_variadic) && deleteat!(libfcall.args, 2)
+  prettify(Expr(:function, Expr(:call, fname, fargsdecl...), :(@ccall $libfcall::Ptr{Cvoid})))
 end
 
 function varname(name::String)

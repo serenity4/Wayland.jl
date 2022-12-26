@@ -6,9 +6,9 @@
   @test haskey(registry.globals, :wl_compositor)
   compositor = Compositor(registry)
   surface = Surface(compositor)
-  width = 1920
-  height = 1080
-  pixel_size = 32 # 4 8-bit RGBA values
+  width = 512
+  height = 512
+  pixel_size = 4 # 4 8-bit RGBA values
   buffering = 2 # double buffering
   size = width * height * pixel_size * buffering
   @test haskey(registry.globals, :wl_shm)
@@ -18,7 +18,6 @@
   stride = width * pixel_size * buffering
   format = WL_SHM_XRGB8888
   buffer = Buffer(shm, 0, width, height, stride, format)
-  attach(buffer, surface)
   function configure(data, _, serial)
     xdg_surface = unsafe_pointer_to_objref(data)::XdgSurface
     @show "hello"
@@ -33,10 +32,15 @@
   xdg_surface = create_surface!(xdg, surface, XDG_ROLE_TOPLEVEL, configure)
   xdg_toplevel_set_title(xdg_surface.role_handle, "Example client")
   commit(surface)
+  synchronize(surface)
+  attach(buffer, surface)
+  commit(surface)
   t0 = time()
+  wl_display_dispatch(dpy)
   while time() < t0 + 2 yield() end
-  synchronize(dpy)
   finalize(shm.pool)
   finalize(buffer)
+  finalize(xdg_surface)
+  finalize(xdg)
   finalize(dpy)
 end;

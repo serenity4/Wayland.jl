@@ -53,7 +53,15 @@ using Scanner: construct, interfaces, signature, construct_interfaces, generate_
   end))
 
   @test generate_function(Interface("wl_display")["sync"], Interface("wl_display"), slot_infos) == prettify(:(function wl_display_sync(display)
-    @ccall libwayland_client.wl_proxy_marshal_constructor(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface}; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
+    @ccall libwayland_client.wl_proxy_marshal_flags(display::Ptr{Cvoid}, WL_DISPLAY_SYNC::UInt32, Wayland.interface_ptrs[1]::Ptr{wl_interface}, wl_proxy_get_version(display)::UInt32, 0::UInt32; C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
+  end))
+
+  @test generate_function(Interface("wl_surface")["commit"], Interface("wl_surface"), slot_infos) == prettify(:(function wl_surface_commit(surface)
+    @ccall libwayland_client.wl_proxy_marshal_flags(surface::Ptr{Cvoid}, WL_SURFACE_COMMIT::UInt32, C_NULL::Ptr{wl_interface}, wl_proxy_get_version(surface)::UInt32, 0::UInt32)::Ptr{Cvoid}
+  end))
+
+  @test generate_function(Interface("wl_registry")["bind"], Interface("wl_registry"), slot_infos) == prettify(:(function wl_registry_bind(registry, name, interface, version)
+    @ccall libwayland_client.wl_proxy_marshal_flags(registry::Ptr{Cvoid}, WL_REGISTRY_BIND::UInt32, interface::Ptr{wl_interface}, version::UInt32, 0::UInt32; name::UInt32, unsafe_load(Ptr{wl_interface}(interface)).name::Ptr{Cchar}, version::UInt32, C_NULL::Ptr{Cvoid})::Ptr{Cvoid}
   end))
 
   @test generate_cfunction_wrapper(Interface("wl_registry"), Interface("wl_registry")["global"]) == prettify(:(

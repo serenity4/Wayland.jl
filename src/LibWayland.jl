@@ -6,6 +6,7 @@ using ..Wayland: Wayland
 using CEnum
 using BitMasks
 
+# Use system libs for now.
 const libwayland_client = Symbol("libwayland-client")
 const libwayland_cursor = Symbol("libwayland-cursor")
 const libwayland_egl = Symbol("libwayland-egl")
@@ -94,14 +95,7 @@ include("../lib/enums.jl")
 include("../lib/listeners.jl")
 include("../lib/functions.jl")
 
-# This request function is implemented manually, as it uses a non-standard interface with implicit arguments.
-function wl_registry_bind(registry, name, interface::Ptr{wl_interface}, version)
-    @assert interface ≠ C_NULL
-    itf_name = unsafe_load(interface).name
-    @ccall libwayland_client.wl_proxy_marshal_constructor_versioned(registry::Ptr{Cvoid}, WL_REGISTRY_BIND::UInt32, interface::Ptr{wl_interface}, version::UInt32; name::UInt32, itf_name::Ptr{Cchar}, version::UInt32, 0::Int32)::Ptr{Cvoid}
-end
-
-# exports
+# Exports.
 
 all_prefixes(x) = [uppercase(x) * '_', x, uppercasefirst(x), "@cfunction_" * x]
 

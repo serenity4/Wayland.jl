@@ -101,7 +101,7 @@ mutable struct Surface <: Handle
   compositor::Compositor
   function Surface(compositor::Compositor)
     h = wl_compositor_create_surface(compositor)
-    new(h, compositor)
+    finalizer(wl_surface_destroy, new(h, compositor))
   end
 end
 
@@ -210,7 +210,7 @@ function attach(buffer::Buffer, surface::Surface, offset = (0, 0))
   surface
 end
 function damage(surface::Surface, offset = (0, 0), extent = (nothing, nothing))
-  wl_surface_damage(surface, offset..., something.(extent, typemax(Int32))...)
+  wl_surface_damage(surface, offset..., something.(extent, typemax(UInt16))...)
   surface
 end
 function commit(surface::Surface)
@@ -240,8 +240,17 @@ mutable struct XdgSurface <: Handle
     role == XDG_ROLE_POPUP && (role_handle = xdg_surface_get_popup(h, something(parent::Optional{XdgSurface}, C_NULL), positioner::Ptr{Cvoid}))
     xdg_surface = new(h, surface, xdg_base, role, role_handle, XdgSurface[], cfunc)
     wl_proxy_add_listener(xdg_surface, xdg_surface_listener(fptr), pointer_from_objref(xdg_surface))
-    synchronize(surface)
-    xdg_surface
+    wl_proxy_add_listener(role_handle, xdg_toplevel_listener(
+        @cfunction_xdg_toplevel_configure((data, h, width, height, states) -> nothing),
+        @cfunction_xdg_toplevel_close((data, h) -> nothing),
+        @cfunction_xdg_toplevel_configure_bounds((data, h, width, height) -> nothing),
+      ), C_NULL)
+    finalizer(xdg_surface) do x
+      x.role == XDG_ROLE_TOPLEVEL && (xdg_toplevel_destroy(x.role_handle))
+      x.role == XDG_ROLE_POPUP && (xdg_popup_destroy(x.role_handle))
+      xdg_surface_destroy(x)
+      finalize(x.surface)
+    end
   end
 end
 

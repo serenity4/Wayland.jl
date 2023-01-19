@@ -49,11 +49,6 @@
     wl_display_roundtrip(dpy)
     sleep(0.01)
   end
-  finalize(shm.pool)
-  finalize(buffer)
-  finalize(xdg_surface)
-  finalize(xdg)
-  finalize(dpy)
 end;
 
 GC.gc()

@@ -4,6 +4,7 @@ const WL = Wayland
 
 ENV["JULIA_DEBUG"] = "Wayland,Main"
 ENV["JULIA_DEBUG"] = ""
+# ENV["WAYLAND_DEBUG"] = "1"
 
 @testset "Wayland.jl" begin
   include("interfaces.jl");

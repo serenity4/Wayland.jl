@@ -20,12 +20,11 @@
   buffer = Buffer(shm, 0, width, height, stride, format)
   function configure(data, _, serial)
     xdg_surface = unsafe_pointer_to_objref(data)::XdgSurface
-    @show "hello"
-    sleep(0.1)
     xdg_surface_ack_configure(xdg_surface, serial)
     seekstart(buffer.memory.pool.memory)
-    write(buffer, rand((0xffbb00ff, 0x00000011), size))
+    write(buffer, rand((0xff0000ff, 0x00ff00ff, 0x0000ffff), size))
     commit(damage(xdg_surface.surface))
+    nothing
   end
   @test haskey(registry.globals, :xdg_wm_base)
   xdg = XdgIntegration(registry, 4)
@@ -37,7 +36,7 @@
   commit(surface)
   t0 = time()
   wl_display_dispatch(dpy)
-  while time() < t0 + 2 yield() end
+  while time() < t0 + 1 yield() end
   finalize(shm.pool)
   finalize(buffer)
   finalize(xdg_surface)

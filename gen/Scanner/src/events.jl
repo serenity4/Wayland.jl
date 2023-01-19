@@ -26,7 +26,7 @@ function generate_listener(itf::Interface)
     evname = unalias(Symbol(ev.name))
     :($evname::FPtr)
   end
-  ex = :(struct $tname <: Listener
+  ex = :(struct $tname <: ListenerCallbacks
     $(fields...)
   end)
   prettify(ex)

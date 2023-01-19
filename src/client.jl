@@ -69,14 +69,16 @@ mutable struct Registry <: Handle
     handle = wl_display_get_registry(dpy)
     handle ≠ C_NULL || error("Failed to obtain the global registry")
     registry = new(handle, dpy, Dict{Symbol, Global}())
-    listener = wl_registry_listener(
+    listener = Listener(registry, wl_registry_listener(
       @cfunction_wl_registry_global(on_global),
       @cfunction_wl_registry_global_remove(on_global_remove),
-    )
-    wl_proxy_add_listener(registry, listener, pointer_from_objref(registry))
+    ))
+    register(listener, pointer_from_objref(registry); keep_alive = false)
     # Wait for globals to be filled in.
     # Make sure to keep it alive as long as the listener is active.
     synchronize(registry)
+    finalize(listener)
+    registry
   end
 end
 
@@ -173,9 +175,12 @@ mutable struct SharedMemory <: Handle
     shm.registry = registry
     shm.supported_formats = WlShmFormat[]
     shm.pool = SharedMemoryPool(shm, size)
-    wl_proxy_add_listener(shm, wl_shm_listener(@cfunction_wl_shm_format(on_format)), pointer_from_objref(shm))
+    listener = Listener(shm, wl_shm_listener(@cfunction_wl_shm_format(on_format)))
+    register(listener, pointer_from_objref(shm); keep_alive = false)
     # Wait for formats to be filled in.
     synchronize(shm)
+    finalize(listener)
+    shm
   end
 end
 
@@ -185,17 +190,19 @@ Base.write(shm::SharedMemory, args...) = write(shm.pool.memory, args...)
 Base.read(shm::SharedMemory, args...) = read(shm.pool.memory, args...)
 
 function finalize_buffer(data, buffer)
-  wl_buffer_destroy(x)
+  wl_buffer_destroy(buffer)
   nothing
 end
 
 mutable struct Buffer{T} <: Handle
   handle::Ptr{wl_buffer}
   memory::T
+  listener::Listener
   function Buffer(shm::SharedMemory, offset, width, height, stride, format::WlShmFormat)
     h = wl_shm_pool_create_buffer(shm.pool, offset, width, height, stride, format)
-    buffer = new{SharedMemory}(h, shm)
-    wl_proxy_add_listener(buffer, wl_buffer_listener(@cfunction_wl_buffer_release(finalize_buffer)), C_NULL)
+    listener = Listener(h, wl_buffer_listener(@cfunction_wl_buffer_release(finalize_buffer)))
+    buffer = new{SharedMemory}(h, shm, listener)
+    register(listener; keep_alive = false)
     buffer
   end
 end
@@ -226,25 +233,36 @@ end
 mutable struct XdgSurface <: Handle
   handle::Ptr{Cvoid}
   surface::Surface
+  surface_listener::Listener
   xdg_base::Ptr{Cvoid}
   role::XdgRole
   role_handle::Ptr{Cvoid}
+  role_listener::Listener
   children::Vector{XdgSurface}
   cfunc::Base.CFunction
   function XdgSurface(configure, xdg_base, surface::Surface, role::XdgRole, parent = nothing; positioner = nothing)
     h = xdg_wm_base_get_xdg_surface(xdg_base, surface)
     cfunc = @cfunction_xdg_surface_configure($configure)
     fptr = unsafe_convert(Ptr{Cvoid}, cfunc)
-    role_handle = C_NULL
-    role == XDG_ROLE_TOPLEVEL && (role_handle = xdg_surface_get_toplevel(h))
-    role == XDG_ROLE_POPUP && (role_handle = xdg_surface_get_popup(h, something(parent::Optional{XdgSurface}, C_NULL), positioner::Ptr{Cvoid}))
-    xdg_surface = new(h, surface, xdg_base, role, role_handle, XdgSurface[], cfunc)
-    wl_proxy_add_listener(xdg_surface, xdg_surface_listener(fptr), pointer_from_objref(xdg_surface))
-    wl_proxy_add_listener(role_handle, xdg_toplevel_listener(
+    surface_listener = Listener(h, xdg_surface_listener(fptr))
+    if role == XDG_ROLE_TOPLEVEL
+      role_handle = xdg_surface_get_toplevel(h)
+      role_listener = Listener(role_handle, xdg_toplevel_listener(
         @cfunction_xdg_toplevel_configure((data, h, width, height, states) -> nothing),
         @cfunction_xdg_toplevel_close((data, h) -> nothing),
         @cfunction_xdg_toplevel_configure_bounds((data, h, width, height) -> nothing),
-      ), C_NULL)
+      ))
+    elseif role == XDG_ROLE_POPUP
+      role_handle = xdg_surface_get_popup(h, something(parent::Optional{XdgSurface}, C_NULL), positioner::Ptr{Cvoid})
+      role_listener = Listener(role_handle, xdg_popup_listener(
+        @cfunction_xdg_popup_configure((data, h, x, y, width, height) -> nothing),
+        @cfunction_xdg_popup_popup_done((data, h) -> nothing),
+        @cfunction_xdg_popup_repositioned((data, h, token) -> nothing),
+      ))
+    end
+    xdg_surface = new(h, surface, surface_listener, xdg_base, role, role_handle, role_listener, XdgSurface[], cfunc)
+    register(surface_listener, pointer_from_objref(xdg_surface); keep_alive = false)
+    register(role_listener; keep_alive = false)
     finalizer(xdg_surface) do x
       x.role == XDG_ROLE_TOPLEVEL && (xdg_toplevel_destroy(x.role_handle))
       x.role == XDG_ROLE_POPUP && (xdg_popup_destroy(x.role_handle))
@@ -260,7 +278,7 @@ mutable struct XdgIntegration <: Handle
   toplevel_surfaces::Vector{XdgSurface}
   function XdgIntegration(registry::Registry, version = nothing)
     h = bind(registry, :xdg_wm_base, version)
-    wl_proxy_add_listener(h, xdg_wm_base_listener(@cfunction_xdg_wm_base_ping((_, h, serial) -> (xdg_wm_base_pong(h, serial); nothing))), C_NULL)
+    listen(h, xdg_wm_base_listener(@cfunction_xdg_wm_base_ping((_, h, serial) -> (xdg_wm_base_pong(h, serial); nothing))))
     new(h, registry, XdgSurface[])
   end
 end

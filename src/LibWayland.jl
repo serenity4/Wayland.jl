@@ -86,16 +86,81 @@ Base.convert(::Type{Fixed}, t::Fixed) = t
 Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:AbstractFloat}) = wl_fixed_from_double(convert(Cdouble, t.val))
 Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:Integer}) = wl_fixed_from_int(convert(Cint, t.val))
 
-abstract type Listener end
+abstract type ListenerCallbacks end
 
-Base.cconvert(::Type{Ptr{Ptr{Cvoid}}}, l::Listener) = Ref(l)
-Base.unsafe_convert(T::Type{Ptr{Ptr{Cvoid}}}, l::Base.RefValue{L}) where {L<:Listener} = T(Base.unsafe_convert(Ptr{L}, l))
+mutable struct Listener
+    proxy::Ptr{wl_proxy}
+    callbacks::Base.RefValue{ListenerCallbacks}
+    function Listener(proxy, callbacks::ListenerCallbacks)
+        l = new(proxy, Ref{ListenerCallbacks}(callbacks))
+        finalizer(l) do x
+            # Unset it from the set of active listeners so that the object can be garbage-collected.
+            @lock active_listeners.lock haskey(active_listeners.dict, x) && deleteat!(active_listeners.dict, x)
+        end
+    end
+end
+
+Base.cconvert(::Type{Ptr{Ptr{Cvoid}}}, l::Listener) = l.callbacks
+Base.unsafe_convert(T::Type{Ptr{Ptr{Cvoid}}}, ref::Base.RefValue{ListenerCallbacks}) = T(Base.unsafe_convert(Ptr{ListenerCallbacks}, ref))
+
+mutable struct ActiveListeners
+    lock::Threads.SpinLock
+    dict::IdDict{Listener,Nothing}
+    has_warned::Bool
+end
+
+function Base.empty!(listeners::ActiveListeners)
+    empty!(listeners.dict)
+    listeners.has_warned = false
+end
+
+# Prevent these listeners from being garbage-collected.
+const active_listeners = ActiveListeners(Threads.SpinLock(), IdDict{Listener,Nothing}(), false)
+
+
+function keep_alive(listener::Listener)
+    @lock active_listeners.lock begin
+        (; dict) = active_listeners
+        if !active_listeners.has_warned && length(dict) > 1000
+            @warn "More than 1000 listeners are being kept alive - this may be a sign of an unhandled memory leak. Listeners allocated on a frequent basis should be manually kept alive or killed after use by explicitly calling `finalize(listener)`."
+            active_listeners.has_warned = true
+        end
+        dict[listener] = nothing
+    end
+end
+
+"""
+Register a listener with optional user-data `data`.
+
+If `keep_alive` is set to true (default), then the listener will be kept on a global concurrent data structure
+to prevent it from being garbage-collected. You can manually remove the listener from this state by calling
+`finalize(listener)` (which will be a no-op if the listener was never preserved via a call to `register(..., `keep_alive = true`)`.
+
+!!! danger
+    `keep_alive = false` should be used with care; the listener must be kept alive as long as the callback may be fired
+    by the Wayland server. The most robust way to accomplish this is by storing the callback in a parent data structure or by using `GC.@preserve` if
+    the listener is known to be called during a set of statements.
+
+!!! danger
+    `keep_alive = true` will keep the listener alive indefinitely, effectively resulting in a memory leak. For one-time listeners, that is generally fine - but if
+    you create lots of such listeners (e.g. one per frame), it may end up eating up a lot of memory. In this case, you should manually keep it alive or killed
+    after use by explicitly calling `finalize(listener)` when you know its callback will never be invoked again.
+"""
+function register(listener::Listener, data = C_NULL; keep_alive = true)
+    wl_proxy_add_listener(listener.proxy, listener.callbacks, data)
+    keep_alive && @__MODULE__().keep_alive(listener)
+    listener
+end
+
+listen(proxy, callbacks::ListenerCallbacks, data = C_NULL; keep_listener_alive = true) = register(Listener(proxy, callbacks), data; keep_alive = keep_listener_alive)
 
 include("../lib/enums.jl")
 include("../lib/listeners.jl")
 include("../lib/functions.jl")
 
 # Exports.
+
+export Listener, ListenerCallbacks
 
 all_prefixes(x) = [uppercase(x) * '_', x, uppercasefirst(x), "@cfunction_" * x]
 

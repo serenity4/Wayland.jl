@@ -8,6 +8,7 @@ const Optional{T} = Union{T,Nothing}
 
 include("LibWayland.jl")
 @reexport using .LibWayland
+using .LibWayland: register, listen
 
 using WindowAbstractions
 

@@ -69,7 +69,7 @@ using Scanner: construct, interfaces, signature, construct_interfaces, generate_
   ))
 
   @test generate_listener(Interface("wl_registry")) == prettify(:(
-    struct wl_registry_listener <: Listener
+    struct wl_registry_listener <: ListenerCallbacks
       _global::FPtr
       global_remove::FPtr
     end

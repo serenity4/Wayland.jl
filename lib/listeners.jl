@@ -200,35 +200,35 @@ macro cfunction_xdg_popup_repositioned(f)
     esc(:(Base.@cfunction($f, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}, UInt32))))
 end
 
-struct wl_display_listener <: Listener
+struct wl_display_listener <: ListenerCallbacks
     error::FPtr
     delete_id::FPtr
 end
 
-struct wl_registry_listener <: Listener
+struct wl_registry_listener <: ListenerCallbacks
     _global::FPtr
     global_remove::FPtr
 end
 
-struct wl_callback_listener <: Listener
+struct wl_callback_listener <: ListenerCallbacks
     done::FPtr
 end
 
-struct wl_shm_listener <: Listener
+struct wl_shm_listener <: ListenerCallbacks
     format::FPtr
 end
 
-struct wl_buffer_listener <: Listener
+struct wl_buffer_listener <: ListenerCallbacks
     release::FPtr
 end
 
-struct wl_data_offer_listener <: Listener
+struct wl_data_offer_listener <: ListenerCallbacks
     offer::FPtr
     source_actions::FPtr
     action::FPtr
 end
 
-struct wl_data_source_listener <: Listener
+struct wl_data_source_listener <: ListenerCallbacks
     target::FPtr
     send::FPtr
     cancelled::FPtr
@@ -237,7 +237,7 @@ struct wl_data_source_listener <: Listener
     action::FPtr
 end
 
-struct wl_data_device_listener <: Listener
+struct wl_data_device_listener <: ListenerCallbacks
     data_offer::FPtr
     enter::FPtr
     leave::FPtr
@@ -246,23 +246,23 @@ struct wl_data_device_listener <: Listener
     selection::FPtr
 end
 
-struct wl_shell_surface_listener <: Listener
+struct wl_shell_surface_listener <: ListenerCallbacks
     ping::FPtr
     configure::FPtr
     popup_done::FPtr
 end
 
-struct wl_surface_listener <: Listener
+struct wl_surface_listener <: ListenerCallbacks
     enter::FPtr
     leave::FPtr
 end
 
-struct wl_seat_listener <: Listener
+struct wl_seat_listener <: ListenerCallbacks
     capabilities::FPtr
     name::FPtr
 end
 
-struct wl_pointer_listener <: Listener
+struct wl_pointer_listener <: ListenerCallbacks
     enter::FPtr
     leave::FPtr
     motion::FPtr
@@ -274,7 +274,7 @@ struct wl_pointer_listener <: Listener
     axis_discrete::FPtr
 end
 
-struct wl_keyboard_listener <: Listener
+struct wl_keyboard_listener <: ListenerCallbacks
     keymap::FPtr
     enter::FPtr
     leave::FPtr
@@ -283,7 +283,7 @@ struct wl_keyboard_listener <: Listener
     repeat_info::FPtr
 end
 
-struct wl_touch_listener <: Listener
+struct wl_touch_listener <: ListenerCallbacks
     down::FPtr
     up::FPtr
     motion::FPtr
@@ -293,38 +293,38 @@ struct wl_touch_listener <: Listener
     orientation::FPtr
 end
 
-struct wl_output_listener <: Listener
+struct wl_output_listener <: ListenerCallbacks
     geometry::FPtr
     mode::FPtr
     done::FPtr
     scale::FPtr
 end
 
-struct wp_presentation_listener <: Listener
+struct wp_presentation_listener <: ListenerCallbacks
     clock_id::FPtr
 end
 
-struct wp_presentation_feedback_listener <: Listener
+struct wp_presentation_feedback_listener <: ListenerCallbacks
     sync_output::FPtr
     presented::FPtr
     discarded::FPtr
 end
 
-struct xdg_wm_base_listener <: Listener
+struct xdg_wm_base_listener <: ListenerCallbacks
     ping::FPtr
 end
 
-struct xdg_surface_listener <: Listener
+struct xdg_surface_listener <: ListenerCallbacks
     configure::FPtr
 end
 
-struct xdg_toplevel_listener <: Listener
+struct xdg_toplevel_listener <: ListenerCallbacks
     configure::FPtr
     close::FPtr
     configure_bounds::FPtr
 end
 
-struct xdg_popup_listener <: Listener
+struct xdg_popup_listener <: ListenerCallbacks
     configure::FPtr
     popup_done::FPtr
     repositioned::FPtr

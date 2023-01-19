@@ -18,12 +18,17 @@
   stride = width * pixel_size * buffering
   format = WL_SHM_XRGB8888
   buffer = Buffer(shm, 0, width, height, stride, format)
-  function configure(data, _, serial)
-    xdg_surface = unsafe_pointer_to_objref(data)::XdgSurface
-    xdg_surface_ack_configure(xdg_surface, serial)
+  function write_random_data(buffer, size)
     seekstart(buffer.memory.pool.memory)
     write(buffer, rand((0xff0000ff, 0x00ff00ff, 0x0000ffff), size))
-    commit(damage(xdg_surface.surface))
+  end
+  function configure(data, _, serial)
+    xdg_surface = retrieve_data(data, XdgSurface)
+    (; surface) = xdg_surface
+    xdg_surface_ack_configure(xdg_surface, serial)
+    write_random_data(buffer, size)
+    attach(buffer, surface)
+    commit(damage(surface))
     nothing
   end
   @test haskey(registry.globals, :xdg_wm_base)
@@ -32,14 +37,23 @@
   xdg_toplevel_set_title(xdg_surface.role_handle, "Example client")
   commit(surface)
   synchronize(surface)
-  attach(buffer, surface)
   commit(surface)
   t0 = time()
   wl_display_dispatch(dpy)
-  while time() < t0 + 1 yield() end
+  while time() < t0 + 1
+    new_shm = SharedMemory(registry, size)
+    new_buffer = Buffer(new_shm, 0, width, height, stride, format)
+    attach(new_buffer, surface)
+    write_random_data(new_buffer, size)
+    commit(damage(surface))
+    wl_display_roundtrip(dpy)
+    sleep(0.01)
+  end
   finalize(shm.pool)
   finalize(buffer)
   finalize(xdg_surface)
   finalize(xdg)
   finalize(dpy)
 end;
+
+GC.gc()

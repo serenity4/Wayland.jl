@@ -1,10 +1,9 @@
-mutable struct Display <: Handle
-  handle::Ptr{wl_display}
+struct Display <: Handle
+  handle::RefcountHandle # Ptr{wl_display}
   function Display(socket = nothing)
     handle = wl_display_connect(something(socket, C_NULL))
     handle ≠ C_NULL || error("No connection could be established to a wayland display on", isnothing(socket) ? " the default socket" : " socket $socket")
-    display = new(handle)
-    finalizer(wl_display_disconnect, display)
+    new(RefcountHandle(handle, wl_display_disconnect))
   end
 end
 
@@ -42,7 +41,7 @@ struct Global
 end
 
 function on_global(data, registry, name, interface, version)
-  registry = unsafe_pointer_to_objref(data)
+  registry = retrieve_data(data, Registry)
   interface == C_NULL && return
   id = name
   name = Symbol(unsafe_string(interface))
@@ -52,7 +51,7 @@ function on_global(data, registry, name, interface, version)
 end
 
 function on_global_remove(data, registry, id)
-  registry = unsafe_pointer_to_objref(data)::Registry
+  registry = retrieve_data(data, Registry)
   for (k, v) in registry.globals
     if v.id == id
       delete!(registry.globals, k)
@@ -62,18 +61,18 @@ function on_global_remove(data, registry, id)
 end
 
 mutable struct Registry <: Handle
-  handle::Ptr{wl_registry}
+  handle::RefcountHandle # Ptr{wl_registry}
   dpy::Display
   globals::Dict{Symbol, Global}
   function Registry(dpy::Display)
     handle = wl_display_get_registry(dpy)
     handle ≠ C_NULL || error("Failed to obtain the global registry")
-    registry = new(handle, dpy, Dict{Symbol, Global}())
+    registry = new(RefcountHandle(handle, nothing, dpy), dpy, Dict{Symbol, Global}())
     listener = Listener(registry, wl_registry_listener(
       @cfunction_wl_registry_global(on_global),
       @cfunction_wl_registry_global_remove(on_global_remove),
-    ))
-    register(listener, pointer_from_objref(registry); keep_alive = false)
+    ), registry)
+    register(listener; keep_alive = false)
     # Wait for globals to be filled in.
     # Make sure to keep it alive as long as the listener is active.
     synchronize(registry)
@@ -91,26 +90,26 @@ function Base.bind(registry::Registry, gname::Symbol, version = nothing)
 end
 
 mutable struct Compositor <: Handle
-  handle::Ptr{wl_compositor}
+  handle::RefcountHandle # Ptr{wl_compositor}
   registry::Registry
-  Compositor(registry::Registry, version = nothing) = new(bind(registry, :wl_compositor, version), registry)
+  Compositor(registry::Registry, version = nothing) = new(RefcountHandle(bind(registry, :wl_compositor, version), nothing, registry), registry)
 end
 
 Base.parent(x::Compositor) = x.registry
 
 mutable struct Surface <: Handle
-  handle::Ptr{wl_surface}
+  handle::RefcountHandle # Ptr{wl_surface}
   compositor::Compositor
   function Surface(compositor::Compositor)
     h = wl_compositor_create_surface(compositor)
-    finalizer(wl_surface_destroy, new(h, compositor))
+    new(RefcountHandle(h, wl_surface_destroy, compositor), compositor)
   end
 end
 
 Base.parent(x::Surface) = x.compositor
 
 function on_format(data, shm, format)
-  shm = unsafe_pointer_to_objref(data)::SharedMemory
+  shm = retrieve_data(data, SharedMemory)
   try
     # Guard against future additions of enumerated values.
     # The µs-scale slowness of `try/catch` on failure should be alright for this case.
@@ -145,15 +144,14 @@ function allocate_shm_fd(size)
 end
 
 mutable struct SharedMemoryPool <: Handle
-  handle::Ptr{wl_shm_pool}
+  handle::RefcountHandle # Ptr{wl_shm_pool}
   shm
   memory::IOStream
   function SharedMemoryPool(shm, size::Integer)
     fd = allocate_shm_fd(size)
     h = wl_shm_create_pool(shm::SharedMemory, fd, size)
     io = fdio(Base.cconvert(Cint, fd))
-    pool = new(h, shm, io)
-    finalizer(wl_shm_pool_destroy, pool)
+    new(RefcountHandle(h, wl_shm_pool_destroy, shm), shm, io)
   end
 end
 
@@ -165,18 +163,18 @@ end
 Base.parent(x::SharedMemoryPool) = x.shm
 
 mutable struct SharedMemory <: Handle
-  handle::Ptr{wl_shm}
+  handle::RefcountHandle # Ptr{wl_shm}
   registry::Registry
   supported_formats::Vector{WlShmFormat}
   pool::SharedMemoryPool
   function SharedMemory(registry::Registry, size::Integer, version = nothing)
     shm = new()
-    shm.handle = bind(registry, :wl_shm, version)
+    shm.handle = RefcountHandle(bind(registry, :wl_shm, version), nothing, registry)
     shm.registry = registry
     shm.supported_formats = WlShmFormat[]
     shm.pool = SharedMemoryPool(shm, size)
-    listener = Listener(shm, wl_shm_listener(@cfunction_wl_shm_format(on_format)))
-    register(listener, pointer_from_objref(shm); keep_alive = false)
+    listener = Listener(shm, wl_shm_listener(@cfunction_wl_shm_format(on_format)), shm)
+    register(listener; keep_alive = false)
     # Wait for formats to be filled in.
     synchronize(shm)
     finalize(listener)
@@ -189,20 +187,22 @@ Base.parent(x::SharedMemory) = x.registry
 Base.write(shm::SharedMemory, args...) = write(shm.pool.memory, args...)
 Base.read(shm::SharedMemory, args...) = read(shm.pool.memory, args...)
 
-function finalize_buffer(data, buffer)
-  wl_buffer_destroy(buffer)
+function finalize_buffer(data, _)
+  buffer = retrieve_data(data, Buffer)
+  finalize(buffer.listener)
   nothing
 end
 
 mutable struct Buffer{T} <: Handle
-  handle::Ptr{wl_buffer}
+  handle::RefcountHandle # Ptr{wl_buffer}
   memory::T
   listener::Listener
   function Buffer(shm::SharedMemory, offset, width, height, stride, format::WlShmFormat)
     h = wl_shm_pool_create_buffer(shm.pool, offset, width, height, stride, format)
-    listener = Listener(h, wl_buffer_listener(@cfunction_wl_buffer_release(finalize_buffer)))
-    buffer = new{SharedMemory}(h, shm, listener)
+    buffer = new{SharedMemory}(RefcountHandle(h, wl_buffer_destroy, shm), shm)
+    listener = Listener(h, wl_buffer_listener(@cfunction_wl_buffer_release(finalize_buffer)), buffer)
     register(listener; keep_alive = false)
+    buffer.listener = listener
     buffer
   end
 end
@@ -231,20 +231,18 @@ end
 end
 
 mutable struct XdgSurface <: Handle
-  handle::Ptr{Cvoid}
+  handle::RefcountHandle # Ptr{xdg_surface}
   surface::Surface
   surface_listener::Listener
-  xdg_base::Ptr{Cvoid}
   role::XdgRole
-  role_handle::Ptr{Cvoid}
+  role_handle::RefcountHandle # Ptr{xdg_popup} / Ptr{xdg_toplevel}
   role_listener::Listener
   children::Vector{XdgSurface}
   cfunc::Base.CFunction
-  function XdgSurface(configure, xdg_base, surface::Surface, role::XdgRole, parent = nothing; positioner = nothing)
+  function XdgSurface(configure, xdg_base #= ::XdgIntegration =#, surface::Surface, role::XdgRole, parent = nothing; positioner = nothing)
     h = xdg_wm_base_get_xdg_surface(xdg_base, surface)
     cfunc = @cfunction_xdg_surface_configure($configure)
     fptr = unsafe_convert(Ptr{Cvoid}, cfunc)
-    surface_listener = Listener(h, xdg_surface_listener(fptr))
     if role == XDG_ROLE_TOPLEVEL
       role_handle = xdg_surface_get_toplevel(h)
       role_listener = Listener(role_handle, xdg_toplevel_listener(
@@ -260,32 +258,34 @@ mutable struct XdgSurface <: Handle
         @cfunction_xdg_popup_repositioned((data, h, token) -> nothing),
       ))
     end
-    xdg_surface = new(h, surface, surface_listener, xdg_base, role, role_handle, role_listener, XdgSurface[], cfunc)
-    register(surface_listener, pointer_from_objref(xdg_surface); keep_alive = false)
+    xdg_surface = new(RefcountHandle(h, xdg_surface_destroy, xdg_base), surface)
+    surface_listener = Listener(h, xdg_surface_listener(fptr), xdg_surface)
+    xdg_surface.surface_listener = surface_listener
+    xdg_surface.role = role
+    xdg_surface.role_handle = RefcountHandle(role_handle, role == XDG_ROLE_TOPLEVEL ? xdg_toplevel_destroy : xdg_popup_destroy, xdg_surface)
+    xdg_surface.role_listener = role_listener
+    xdg_surface.children = XdgSurface[]
+    xdg_surface.cfunc = cfunc
+    register(surface_listener; keep_alive = false)
     register(role_listener; keep_alive = false)
-    finalizer(xdg_surface) do x
-      x.role == XDG_ROLE_TOPLEVEL && (xdg_toplevel_destroy(x.role_handle))
-      x.role == XDG_ROLE_POPUP && (xdg_popup_destroy(x.role_handle))
-      xdg_surface_destroy(x)
-      finalize(x.surface)
-    end
+    xdg_surface
   end
 end
 
 mutable struct XdgIntegration <: Handle
-  handle::Ptr{Cvoid}
+  handle::RefcountHandle # Ptr{xdg_wm_base}
   registry::Registry
   toplevel_surfaces::Vector{XdgSurface}
   function XdgIntegration(registry::Registry, version = nothing)
     h = bind(registry, :xdg_wm_base, version)
     listen(h, xdg_wm_base_listener(@cfunction_xdg_wm_base_ping((_, h, serial) -> (xdg_wm_base_pong(h, serial); nothing))))
-    new(h, registry, XdgSurface[])
+    new(RefcountHandle(h, nothing, registry), registry, XdgSurface[])
   end
 end
 
 function create_surface!(xdg::XdgIntegration, surface::Surface, role::XdgRole, configure)
   role == XDG_ROLE_TOPLEVEL || error("Only top-level surfaces (i.e. with a role fo `XDG_ROLE_TOPLEVEL`) can be created without parent.")
-  surface = XdgSurface(configure, xdg[], surface, role)
+  surface = XdgSurface(configure, xdg, surface, role)
   push!(xdg.toplevel_surfaces, surface)
   surface
 end

@@ -5,3 +5,4 @@ Manifest.toml
 /.vscode
 wayland.xml
 wayland.dtd
+/LocalPreferences.toml

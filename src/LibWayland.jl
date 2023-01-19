@@ -88,16 +88,60 @@ Base.cconvert(::Type{wl_fixed_t}, t::Fixed{<:Integer}) = wl_fixed_from_int(conve
 
 abstract type ListenerCallbacks end
 
+"""
+    Listener(proxy, callbacks::ListenerCallbacks, data = nothing)
+
+Create a listener object which ensures that all the memory used by a set of callbacks will remain valid
+as long as the listener is valid.
+
+User-provided data may be:
+- `nothing` (default), in which case the user data provided to Wayland will be `C_NULL`.
+- `Ptr`, in which case it will be assumed that the pointer will remain valid. Loads to this data should be done manually by the user
+  in the callback code, as [`retrieve_data`](@ref) makes a few assumptions as to how the pointer was obtained.
+- Mutable data, in which case its pointer will obtained via `pointer_from_objref` and [`retrieve_data`](@ref) will use `unsafe_pointer_to_objref`.
+- Immutable data, in which case a `Ref` will wrap the data and a pointer to this reference will be passed in as user data. Loads with `retrieve_data` will
+  use `Base.unsafe_load`.
+
+For the callbacks to be active, you must [`register`](@ref) the listener. Read the documentation of [`register`](@ref) carefully for more information about
+managing the listener's lifetime, which is vital in order for the callbacks not to cause undefined behavior.
+"""
 mutable struct Listener
     proxy::Ptr{wl_proxy}
     callbacks::Base.RefValue{ListenerCallbacks}
-    function Listener(proxy, callbacks::ListenerCallbacks)
-        l = new(proxy, Ref{ListenerCallbacks}(callbacks))
+    dataref::Any
+    dataptr::Ptr{Cvoid}
+    function Listener(proxy, callbacks::ListenerCallbacks, data = nothing)
+        dataref = data_reference(data)
+        dataptr = get_dataptr(data)
+        l = new(proxy, Ref{ListenerCallbacks}(callbacks), dataref, dataptr)
         finalizer(l) do x
             # Unset it from the set of active listeners so that the object can be garbage-collected.
-            @lock active_listeners.lock haskey(active_listeners.dict, x) && deleteat!(active_listeners.dict, x)
+            @lock active_listeners.lock haskey(active_listeners.dict, x) && delete!(active_listeners.dict, x)
         end
     end
+end
+
+data_reference(data::Nothing) = data
+data_reference(data::Ptr) = data
+data_reference(data::T) where {T} = ismutabletype(T) ? data : Ref(data)
+
+get_dataptr(data::Nothing) = C_NULL
+get_dataptr(data::Ptr) = data
+get_dataptr(data::Base.RefValue{T}) where {T} = Ptr{Cvoid}(Base.unsafe_convert(Ptr{T}, data))
+function get_dataptr(data::T) where {T}
+    @assert ismutabletype(T)
+    pointer_from_objref(data)
+end
+
+"""
+Retrieve data from a pointer, assuming that it is derived from the provided type.
+
+`data` must not be null, will be assumed to point to valid memory and will be assumed to have been handled by `data_reference` and `get_dataptr`.
+If `data` was provided as a pointer to a [`Listener`](@ref), 
+"""
+function retrieve_data(data, ::Type{T}) where {T}
+    data == C_NULL && return error("Attempt to retrieve data from a null pointer.")
+    ismutabletype(T) ? unsafe_pointer_to_objref(data)::T : Base.unsafe_load(Ptr{T}(data))
 end
 
 Base.cconvert(::Type{Ptr{Ptr{Cvoid}}}, l::Listener) = l.callbacks
@@ -146,13 +190,13 @@ to prevent it from being garbage-collected. You can manually remove the listener
     you create lots of such listeners (e.g. one per frame), it may end up eating up a lot of memory. In this case, you should manually keep it alive or killed
     after use by explicitly calling `finalize(listener)` when you know its callback will never be invoked again.
 """
-function register(listener::Listener, data = C_NULL; keep_alive = true)
-    wl_proxy_add_listener(listener.proxy, listener.callbacks, data)
+function register(listener::Listener; keep_alive = true)
+    wl_proxy_add_listener(listener.proxy, listener.callbacks, listener.dataptr)
     keep_alive && @__MODULE__().keep_alive(listener)
     listener
 end
 
-listen(proxy, callbacks::ListenerCallbacks, data = C_NULL; keep_listener_alive = true) = register(Listener(proxy, callbacks), data; keep_alive = keep_listener_alive)
+listen(proxy, callbacks::ListenerCallbacks, data = nothing; keep_listener_alive = true) = register(Listener(proxy, callbacks, data); keep_alive = keep_listener_alive)
 
 include("../lib/enums.jl")
 include("../lib/listeners.jl")
@@ -160,7 +204,7 @@ include("../lib/functions.jl")
 
 # Exports.
 
-export Listener, ListenerCallbacks
+export Listener, ListenerCallbacks, retrieve_data
 
 all_prefixes(x) = [uppercase(x) * '_', x, uppercasefirst(x), "@cfunction_" * x]
 

@@ -12,6 +12,7 @@ using .LibWayland: register, listen
 
 using WindowAbstractions
 
+include("preferences.jl")
 include("handles.jl")
 include("wrappers.jl")
 include("interfaces.jl")

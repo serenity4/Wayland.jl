@@ -38,12 +38,10 @@ export LibWayland,
   Registry,
   Compositor,
   SharedMemory,
-  Surface,
-  attach,
-  damage,
-  commit,
+  Surface, attach, damage, commit,
+  Seat, Keyboard, Pointer, Touch,
 
-  # Cross-desktop group integration
+  # Cross-desktop group integration (XDG)
   XdgSurface, XdgRole, XDG_ROLE_TOPLEVEL, XDG_ROLE_POPUP, XdgIntegration,
   create_surface!
 

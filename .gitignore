@@ -6,3 +6,4 @@ Manifest.toml
 wayland.xml
 wayland.dtd
 /LocalPreferences.toml
+*.code-workspace

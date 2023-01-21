@@ -38,8 +38,14 @@
   commit(surface)
   synchronize(surface)
   commit(surface)
-  t0 = time()
   wl_display_dispatch(dpy)
+
+  seat = Seat(registry)
+  @test in(WL_SEAT_POINTER | WL_SEAT_KEYBOARD, seat.capabilities)
+  @test isdefined(seat, :pointer)
+  @test isdefined(seat, :keyboard)
+
+  t0 = time()
   while time() < t0 + 1
     new_shm = SharedMemory(registry, size)
     new_buffer = Buffer(new_shm, 0, width, height, stride, format)

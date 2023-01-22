@@ -8,8 +8,8 @@ cd(@__DIR__)
 WL_INCLUDE = joinpath(Wayland_jll.artifact_dir, "include")
 WL_HEADERS = [joinpath(WL_INCLUDE, "wayland-client.h"), joinpath(WL_INCLUDE, "wayland-server.h")]
 
-# for target in JLLEnvs.JLL_ENV_TRIPLES
-for target in ["x86_64-linux-gnu"]
+for target in JLLEnvs.JLL_ENV_TRIPLES
+# for target in ["x86_64-linux-gnu"]
     @info "processing $target"
 
     # programmatically add options
@@ -29,10 +29,6 @@ for target in ["x86_64-linux-gnu"]
     general["output_file_path"] = joinpath(dirname(@__DIR__), "lib", "$target.jl")
     general["use_deterministic_symbol"] = true
     general["print_using_CEnum"] = false
-    general["printer_blacklist"] = [
-        # "WLAPI_PTR",
-        # "WLAPI_CALL",
-        ]
     general["extract_c_comment_style"] = "doxygen"
     general["struct_field_comment_style"] = "outofline"
     general["enumerator_comment_style"] = "outofline"

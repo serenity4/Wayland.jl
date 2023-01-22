@@ -1,14 +1,14 @@
-const __uid_t = Cuint
+const __gid_t = UInt32
 
-const __gid_t = Cuint
+const __pid_t = Int32
 
-const __pid_t = Cint
+const __uid_t = UInt32
 
 const gid_t = __gid_t
 
-const uid_t = __uid_t
-
 const pid_t = __pid_t
+
+const uid_t = __uid_t
 
 """
     wl_message
@@ -770,7 +770,7 @@ function wl_resource_get_link(resource)
     ccall((:wl_resource_get_link, libwayland_server), Ptr{wl_list}, (Ptr{wl_resource},), resource)
 end
 
-@cenum __JL_Ctag_21::UInt32 begin
+@cenum __JL_Ctag_9::UInt32 begin
     WL_EVENT_READABLE = 1
     WL_EVENT_WRITABLE = 2
     WL_EVENT_HANGUP = 4

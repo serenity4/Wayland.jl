@@ -440,7 +440,7 @@ This union represents all of the argument types in the Wayland protocol wire for
 [`wl_message`](@ref), [`wl_interface`](@ref), <a href="https://wayland.freedesktop.org/docs/html/ch04.html#sect-Protocol-wire-Format">Wire Format</a>
 """
 struct wl_argument
-    data::NTuple{8, UInt8}
+    data::NTuple{4, UInt8}
 end
 
 function Base.getproperty(x::Ptr{wl_argument}, f::Symbol)
@@ -770,7 +770,7 @@ function wl_resource_get_link(resource)
     ccall((:wl_resource_get_link, libwayland_server), Ptr{wl_list}, (Ptr{wl_resource},), resource)
 end
 
-@cenum __JL_Ctag_21::UInt32 begin
+@cenum __JL_Ctag_20::UInt32 begin
     WL_EVENT_READABLE = 1
     WL_EVENT_WRITABLE = 2
     WL_EVENT_HANGUP = 4

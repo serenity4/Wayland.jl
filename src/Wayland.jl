@@ -17,6 +17,9 @@ include("handles.jl")
 include("wrappers.jl")
 include("interfaces.jl")
 include("client.jl")
+include("buffers.jl")
+include("surfaces.jl")
+include("input.jl")
 
 function __init__()
   for ref in interface_refs

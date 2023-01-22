@@ -16,8 +16,6 @@ include("preferences.jl")
 include("handles.jl")
 include("wrappers.jl")
 include("interfaces.jl")
-include("proxy.jl")
-include("requests.jl")
 include("client.jl")
 
 function __init__()

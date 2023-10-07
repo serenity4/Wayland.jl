@@ -13,7 +13,7 @@ WindowAbstractions = "e18202ca-4a7d-4de8-b056-fa6bbd7de157"
 
 [compat]
 BitMasks = "0.1"
-CEnum = "0.4"
+CEnum = "0.4, 0.5"
 Preferences = "1"
 Reexport = "1"
 WindowAbstractions = "0.5, 0.7"
